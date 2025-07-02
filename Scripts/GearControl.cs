@@ -50,6 +50,14 @@ public class GearControl : MonoBehaviour {
         }
     }
 
+    public void hideGear() {
+        GetComponent<SpriteRenderer>().enabled = false;
+    }
+
+    public void unhideGear() {
+        GetComponent<SpriteRenderer>().enabled = true;
+    }
+
     void Update() {
         unbrakeIfNoBrake();
     }

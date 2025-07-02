@@ -30,9 +30,20 @@ public class PlaneController : MonoBehaviour {
     [Header("Atmosphere")]
     [SerializeField] private float airDensity;
 
+    private Sprite origSprite;
+
+    void Start() {
+        origSprite = GetComponent<SpriteRenderer>().sprite;
+    }
+
     void Update() {
         handleControls();
-        if (AoA() < -rollOverThresh / GetComponent<Rigidbody2D>().velocity.magnitude) transform.RotateAround(transform.position, transform.right, 180f);
+        if (AoA() < -rollOverThresh / GetComponent<Rigidbody2D>().velocity.magnitude) {
+            rollover();
+        }
+        if (GetComponent<SpriteRenderer>().sprite == origSprite) {
+            transform.Find("Gear").GetComponent<GearControl>().unhideGear();
+        }
         GetComponent<Rigidbody2D>().centerOfMass = transform.Find("CoM").localPosition;
     }
 
@@ -41,6 +52,12 @@ public class PlaneController : MonoBehaviour {
         handleDrag();
         handleLift();
         handleTorque();
+    }
+
+    private void rollover() {
+        transform.RotateAround(transform.position, transform.right, 180f);
+        GetComponent<Animator>().SetTrigger("Rollover");
+        transform.Find("Gear").GetComponent<GearControl>().hideGear();
     }
 
     private float AoA() {
