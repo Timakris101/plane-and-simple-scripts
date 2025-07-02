@@ -7,20 +7,26 @@ public class GearControl : MonoBehaviour {
     [SerializeField] private bool gearDownAtStart = true;
     [SerializeField] private PhysicsMaterial2D brakeMat;
     [SerializeField] private PhysicsMaterial2D rollMat;
+    [SerializeField] private Sprite gearDeployedSprite;
+    [SerializeField] private Sprite gearUpSprite;
     private float timeBraking;
     private float time;
 
     void Start() {
-        if (gearDownAtStart) gearDown();
+        GetComponent<Animator>().SetBool("gearDownAtStart", gearDownAtStart);
+        GetComponent<Animator>().SetBool("gearDeployed", gearDownAtStart);
+        if (gearDownAtStart) {
+            GetComponent<SpriteRenderer>().sprite = gearDeployedSprite;
+        } else {
+            GetComponent<SpriteRenderer>().sprite = gearUpSprite;
+        }
     }
 
     public void gearDown() {
-        GetComponent<BoxCollider2D>().enabled = true;
         GetComponent<Animator>().SetBool("gearDeployed", true);
     }
 
     public void gearUp() {
-        GetComponent<BoxCollider2D>().enabled = false;
         GetComponent<Animator>().SetBool("gearDeployed", false);
     }
 
@@ -60,5 +66,6 @@ public class GearControl : MonoBehaviour {
 
     void Update() {
         unbrakeIfNoBrake();
+        GetComponent<BoxCollider2D>().enabled = GetComponent<SpriteRenderer>().sprite == gearDeployedSprite;
     }
 }
