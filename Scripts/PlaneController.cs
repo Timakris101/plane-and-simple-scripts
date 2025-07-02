@@ -34,6 +34,13 @@ public class PlaneController : MonoBehaviour {
     [Header("Atmosphere")]
     [SerializeField] private float airDensity;
 
+    [Header("Flaps")]
+    [SerializeField] private float maxDeflection;
+    [SerializeField] private float flapSpeed;
+    [SerializeField] private bool flapsDown;
+    [SerializeField] private float flapEffectiveness;
+    [SerializeField] private float flapDrag;
+
     private Sprite origSprite;
 
     void Start() {
@@ -49,7 +56,10 @@ public class PlaneController : MonoBehaviour {
         if (GetComponent<SpriteRenderer>().sprite == origSprite) {
             transform.Find("Gear").GetComponent<GearControl>().unhideGear();
         }
+
         GetComponent<Rigidbody2D>().centerOfMass = transform.Find("CoM").localPosition;
+
+        handleFlaps();
     }
 
     void FixedUpdate() {
@@ -57,6 +67,18 @@ public class PlaneController : MonoBehaviour {
         handleDrag();
         handleLift();
         handleTorque();
+    }
+
+    private void handleFlaps() {
+        if (flapsDown) {
+            if (transform.Find("Flaps").localEulerAngles.z - 90f < maxDeflection) {
+                transform.Find("Flaps").RotateAround(transform.Find("Flaps").Find("Rp").position, transform.forward, flapSpeed * Time.deltaTime);
+            }
+        } else {
+            if (transform.Find("Flaps").localEulerAngles.z - 90f > 0f) {
+                transform.Find("Flaps").RotateAround(transform.Find("Flaps").Find("Rp").position, transform.forward, -flapSpeed * Time.deltaTime);
+            }
+        }
     }
 
     private void rollover() {
@@ -80,14 +102,14 @@ public class PlaneController : MonoBehaviour {
     }
 
     private void handleLift() {
-        float liftForce = cL.Evaluate(AoA()) * airDensity * Mathf.Pow(GetComponent<Rigidbody2D>().velocity.magnitude, 2) * wingArea / 2f;
+        float liftForce = (cL.Evaluate(AoA()) + (flapEffectiveness * (transform.Find("Flaps").localEulerAngles.z - 90f) / maxDeflection)) * airDensity * Mathf.Pow(GetComponent<Rigidbody2D>().velocity.magnitude, 2) * wingArea / 2f;
         Vector2 liftDir = Vector3.Cross(GetComponent<Rigidbody2D>().velocity, -transform.forward).normalized;
         GetComponent<Rigidbody2D>().AddForceAtPosition(liftDir * liftForce, transform.Find("CoL").position);
     }
 
     private void handleDrag() {
         float inducedDragCoef = Mathf.Pow(cL.Evaluate(AoA()), 2) / (Mathf.PI * wingAspectRatio() * wingEfficiency);
-        float totalDragCoef = inducedDragCoef + baseDragCoef;
+        float totalDragCoef = inducedDragCoef + baseDragCoef + (flapDrag * (transform.Find("Flaps").localEulerAngles.z - 90f) / maxDeflection);
 
         float dragForce = totalDragCoef * airDensity * Mathf.Pow(GetComponent<Rigidbody2D>().velocity.magnitude, 2) * frontArea;
 
@@ -131,12 +153,18 @@ public class PlaneController : MonoBehaviour {
 
         if (Input.GetKeyDown("i")) toggleEngines();
 
+        if (Input.GetKeyDown("f")) toggleFlaps();
+
         if (Input.GetKeyDown("g")) transform.Find("Gear").GetComponent<GearControl>().toggleGear();
         if (Input.GetKey("s") && throttle <= 0) transform.Find("Gear").GetComponent<GearControl>().brake();
     }
 
     public void toggleEngines() {
         enginesOn = !enginesOn;
+    }
+
+    public void toggleFlaps() {
+        flapsDown = !flapsDown;
     }
 
     public float getThrottle() {
