@@ -4,20 +4,27 @@ using UnityEngine;
 
 public class PlaneController : MonoBehaviour {
 
-    private float throttle;
+    [Header("Thrust")]
+    [SerializeField] private float throttle;
     [SerializeField] private float maxThrust;
 
+    [Header("Lift / Induced Drag")]
     [SerializeField] private AnimationCurve cL;
     [SerializeField] private float wingArea;
     [SerializeField] private float wingSpan;
     [SerializeField] private float wingEfficiency = .8f;
 
+    [Header("Drag")]
     [SerializeField] private float baseDragCoef = 0.02f;
     [SerializeField] private float frontArea;
 
+    [Header("Torque")]
     [SerializeField] private AnimationCurve torqueStrength;
     [SerializeField] private float baseTorque;
+    [SerializeField] private float alignmentStrength;
+    [SerializeField] private float alignmentThresh = 45f;
 
+    [Header("Atmosphere")]
     [SerializeField] private float airDensity;
 
     void Update() {
@@ -76,7 +83,8 @@ public class PlaneController : MonoBehaviour {
 
     private void handleTorque() {
         int dirToTurn = getWantedDir();
-        GetComponent<Rigidbody2D>().angularVelocity = dirToTurn * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude) * baseTorque;
+        GetComponent<Rigidbody2D>().angularVelocity += dirToTurn * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude) * baseTorque * Time.fixedDeltaTime;
+        if (GetComponent<Rigidbody2D>().velocity.magnitude > 1f && (AoA() > alignmentThresh || AoA() < -alignmentThresh)) GetComponent<Rigidbody2D>().angularVelocity += (AoA() > 0 ? -alignmentStrength : alignmentStrength) * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude) * Time.fixedDeltaTime;
     }
 
     private void handleControls() {
