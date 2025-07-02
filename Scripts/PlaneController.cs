@@ -7,6 +7,9 @@ public class PlaneController : MonoBehaviour {
     [Header("Thrust")]
     [SerializeField] private float throttle;
     [SerializeField] private float maxThrust;
+    [SerializeField] private float idleCoef = 0.05f;
+    [SerializeField] private bool enginesOn;
+    [SerializeField] private bool enginesStartOn;
 
     [Header("Lift / Induced Drag")]
     [SerializeField] private AnimationCurve cL;
@@ -35,6 +38,7 @@ public class PlaneController : MonoBehaviour {
 
     void Start() {
         origSprite = GetComponent<SpriteRenderer>().sprite;
+        enginesOn = enginesStartOn;
     }
 
     void Update() {
@@ -68,7 +72,7 @@ public class PlaneController : MonoBehaviour {
     }
 
     private void handleThrust() {
-        GetComponent<Rigidbody2D>().AddForce(transform.right * throttle * maxThrust);
+        GetComponent<Rigidbody2D>().AddForce(transform.right * Mathf.Min(idleCoef + throttle, 1) * maxThrust);
     }
 
     private float wingAspectRatio() {
@@ -125,11 +129,29 @@ public class PlaneController : MonoBehaviour {
         if (Input.GetKey("w") && throttle < 1) throttle += 0.5f * Time.deltaTime;
         if (Input.GetKey("s") && throttle > 0) throttle -= 0.5f * Time.deltaTime;
 
+        if (Input.GetKeyDown("i")) toggleEngines();
+
         if (Input.GetKeyDown("g")) transform.Find("Gear").GetComponent<GearControl>().toggleGear();
         if (Input.GetKey("s") && throttle <= 0) transform.Find("Gear").GetComponent<GearControl>().brake();
     }
 
+    public void toggleEngines() {
+        enginesOn = !enginesOn;
+    }
+
     public float getThrottle() {
         return throttle;
+    }
+
+    public float getIdle() {
+        return idleCoef;
+    }
+
+    public bool getEnginesOn() {
+        return enginesOn;
+    }
+
+    public bool getEnginesStartOn() {
+        return enginesStartOn;
     }
 }
