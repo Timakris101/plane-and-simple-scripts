@@ -39,7 +39,7 @@ public class PlaneController : MonoBehaviour {
 
     void Update() {
         handleControls();
-        if (AoA() < -rollOverThresh / GetComponent<Rigidbody2D>().velocity.magnitude && !realignNeeded) {
+        if (AoA() < -rollOverThresh / Mathf.Sqrt(GetComponent<Rigidbody2D>().velocity.magnitude) && !realignNeeded) {
             rollover();
         }
         if (GetComponent<SpriteRenderer>().sprite == origSprite) {
