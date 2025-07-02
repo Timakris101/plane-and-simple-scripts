@@ -90,5 +90,12 @@ public class PlaneController : MonoBehaviour {
     private void handleControls() {
         if (Input.GetKey("w") && throttle < 1) throttle += 0.5f * Time.deltaTime;
         if (Input.GetKey("s") && throttle > 0) throttle -= 0.5f * Time.deltaTime;
+
+        if (Input.GetKeyDown("g")) transform.Find("Gear").GetComponent<GearControl>().toggleGear();
+        if (Input.GetKey("s") && throttle <= 0) transform.Find("Gear").GetComponent<GearControl>().brake();
+    }
+
+    public float getThrottle() {
+        return throttle;
     }
 }
