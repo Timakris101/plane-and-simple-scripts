@@ -23,6 +23,7 @@ public class PlaneController : MonoBehaviour {
     [SerializeField] private float baseTorque;
     [SerializeField] private float alignmentStrength;
     [SerializeField] private float alignmentThresh;
+    private bool realignNeeded;
 
     [Header("Roll")]
     [SerializeField] private float rollOverThresh;
@@ -38,7 +39,7 @@ public class PlaneController : MonoBehaviour {
 
     void Update() {
         handleControls();
-        if (AoA() < -rollOverThresh / GetComponent<Rigidbody2D>().velocity.magnitude) {
+        if (AoA() < -rollOverThresh / GetComponent<Rigidbody2D>().velocity.magnitude && !realignNeeded) {
             rollover();
         }
         if (GetComponent<SpriteRenderer>().sprite == origSprite) {
@@ -104,12 +105,12 @@ public class PlaneController : MonoBehaviour {
     }
 
     private void handleTorque() {
-        int dirToTurn = getWantedDir();
+        realignNeeded = GetComponent<Rigidbody2D>().velocity.magnitude > 1f && (AoA() > alignmentThresh || AoA() < -alignmentThresh);
+        int dirToTurn = realignNeeded ? 0 : getWantedDir();
         if (dirToTurn == 0 && torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude) > .1f) {
             GetComponent<Rigidbody2D>().angularVelocity /= 1 + torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude);
             return;
         }
-        bool realignNeeded = GetComponent<Rigidbody2D>().velocity.magnitude > 1f && (AoA() > alignmentThresh || AoA() < -alignmentThresh);
         if (dirToTurn == 0 && !realignNeeded) {
             return;
         }
