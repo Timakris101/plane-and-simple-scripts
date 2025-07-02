@@ -84,7 +84,7 @@ public class PlaneController : MonoBehaviour {
     private void handleTorque() {
         int dirToTurn = getWantedDir();
         GetComponent<Rigidbody2D>().angularVelocity += dirToTurn * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude) * baseTorque * Time.fixedDeltaTime;
-        if (GetComponent<Rigidbody2D>().velocity.magnitude > 1f && (AoA() > alignmentThresh || AoA() < -alignmentThresh)) GetComponent<Rigidbody2D>().angularVelocity += (AoA() > 0 ? -alignmentStrength : alignmentStrength) * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude) * Time.fixedDeltaTime;
+        if (GetComponent<Rigidbody2D>().velocity.magnitude > 1f && (AoA() > alignmentThresh || AoA() < -alignmentThresh)) GetComponent<Rigidbody2D>().angularVelocity += -AoA() * alignmentStrength * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude) * Time.fixedDeltaTime;
     }
 
     private void handleControls() {
