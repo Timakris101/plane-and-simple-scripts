@@ -140,7 +140,7 @@ public class PlaneController : MonoBehaviour {
         if (Input.GetKeyDown("f")) transform.Find("Flaps").GetComponent<FlapScript>().toggleFlaps();
 
         if (Input.GetKeyDown("g")) transform.Find("Gear").GetComponent<GearScript>().toggleGear();
-        if (Input.GetKey("s") && throttle <= 0) transform.Find("Gear").GetComponent<GearScript>().brake();
+        if (Input.GetKey("s") && throttle - throttleChangeSpeed * Time.deltaTime < 0) transform.Find("Gear").GetComponent<GearScript>().brake();
     }
 
     public void toggleEngines() {
