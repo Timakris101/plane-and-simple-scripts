@@ -26,7 +26,7 @@ public class PlaneController : MonoBehaviour {
     [SerializeField] private float baseTorque;
     [SerializeField] private float alignmentStrength;
     [SerializeField] private float alignmentThresh;
-    private bool realignNeeded;
+    [SerializeField] private float speedOfControlEffectiveness;
 
     [Header("Roll")]
     [SerializeField] private float rollOverThresh;
@@ -43,7 +43,7 @@ public class PlaneController : MonoBehaviour {
 
     void Update() {
         handleControls();
-        if (AoA() < -rollOverThresh / Mathf.Sqrt(GetComponent<Rigidbody2D>().velocity.magnitude) && !realignNeeded) {
+        if (AoA() < -rollOverThresh / GetComponent<Rigidbody2D>().velocity.magnitude) {
             rollover();
         }
         if (GetComponent<SpriteRenderer>().sprite == origSprite) {
@@ -114,20 +114,15 @@ public class PlaneController : MonoBehaviour {
     }
 
     private void handleTorque() {
-        realignNeeded = GetComponent<Rigidbody2D>().velocity.magnitude > 1f && (AoA() > alignmentThresh || AoA() < -alignmentThresh);
-        int dirToTurn = realignNeeded ? 0 : getWantedDir();
-        if (dirToTurn == 0 && torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude) > .1f) {
-            GetComponent<Rigidbody2D>().angularVelocity /= 1 + torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude);
-            return;
-        }
-        if (dirToTurn == 0 && !realignNeeded) {
-            return;
-        }
-        if (torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude) < .1f && !realignNeeded) {
+        int dirToTurn = getWantedDir();
+        if (GetComponent<Rigidbody2D>().velocity.magnitude < speedOfControlEffectiveness) {
             return;
         }
         GetComponent<Rigidbody2D>().angularVelocity = dirToTurn * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude) * baseTorque;
-        if (realignNeeded) GetComponent<Rigidbody2D>().angularVelocity = -AoA() * alignmentStrength * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude);
+        bool fwdAxisAlignedWithWorld = Mathf.Abs(transform.eulerAngles.y) <= 1f && Mathf.Abs(transform.eulerAngles.y) <= 1f;
+        bool positiveAoA = AoA() >= 0;
+        int correctionDir = fwdAxisAlignedWithWorld ^ positiveAoA ? 1 : -1;
+        if (AoA() > alignmentThresh || AoA() < -alignmentThresh) GetComponent<Rigidbody2D>().angularVelocity += correctionDir * Mathf.Abs(AoA()) * alignmentStrength * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude);
     }
 
     private void handleControls() {
