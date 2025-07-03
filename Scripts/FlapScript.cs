@@ -8,9 +8,13 @@ public class FlapScript : MonoBehaviour {
     [SerializeField] private bool flapsDown;
     [SerializeField] private float flapEffectiveness;
     [SerializeField] private float flapDrag;
+    [SerializeField] private float breakSpeed;
 
     void Update() {
         handleFlaps();
+        if (transform.parent != null) {
+            if (transform.localEulerAngles.z - 90f >= maxDeflection && transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude > breakSpeed) breakFlaps();
+        }
     }
 
     private void handleFlaps() {
@@ -31,6 +35,15 @@ public class FlapScript : MonoBehaviour {
 
     public void unhideFlaps() {
         GetComponent<SpriteRenderer>().enabled = true;
+    }
+
+    public void breakFlaps() {
+        Vector3 vel = transform.parent.GetComponent<Rigidbody2D>().velocity;
+        transform.SetParent(null, true);
+        gameObject.AddComponent<Rigidbody2D>();
+        GetComponent<Rigidbody2D>().drag = 1;
+        GetComponent<Rigidbody2D>().velocity = vel;
+        GetComponent<Rigidbody2D>().angularVelocity = Random.Range(-GetComponent<Rigidbody2D>().velocity.magnitude, GetComponent<Rigidbody2D>().velocity.magnitude);
     }
 
     public void toggleFlaps() {

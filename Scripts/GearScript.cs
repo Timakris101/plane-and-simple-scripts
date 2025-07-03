@@ -6,6 +6,13 @@ public class GearScript : MonoBehaviour {
 
     [SerializeField] private bool gearDownAtStart = true;
     [SerializeField] private float gearDrag;
+
+    [Header("Breaking")]
+    [SerializeField] private float breakSpeed;
+    [SerializeField] private float crushSpeed;
+    [SerializeField] private float gearlessArea;
+
+    [Header("Mats")]
     [SerializeField] private PhysicsMaterial2D brakeMat;
     [SerializeField] private PhysicsMaterial2D rollMat;
     [SerializeField] private Sprite gearDeployedSprite;
@@ -13,6 +20,12 @@ public class GearScript : MonoBehaviour {
 
     private float timeBraking;
     private float time;
+
+    void OnCollisionEnter2D(Collision2D col) {
+        if (transform.parent != null) {
+            if (Vector3.Project(col.contacts[0].relativeVelocity, -col.contacts[0].normal).magnitude > crushSpeed) breakGear();
+        }
+    }
 
     void Start() {
         GetComponent<Animator>().SetBool("gearDownAtStart", gearDownAtStart);
@@ -38,6 +51,16 @@ public class GearScript : MonoBehaviour {
 
     public bool isGearDown() {
         return GetComponent<Animator>().GetBool("gearDeployed");
+    }
+
+    public void breakGear() {
+        Vector3 vel = transform.parent.GetComponent<Rigidbody2D>().velocity;
+        transform.parent.GetComponent<Aerodynamics>().setFrontArea(transform.parent.GetComponent<Aerodynamics>().getFrontArea() + gearlessArea);
+        transform.SetParent(null, true);
+        gameObject.AddComponent<Rigidbody2D>();
+        GetComponent<Rigidbody2D>().drag = 1;
+        GetComponent<Rigidbody2D>().velocity = vel;
+        GetComponent<Rigidbody2D>().angularVelocity = Random.Range(-GetComponent<Rigidbody2D>().velocity.magnitude, GetComponent<Rigidbody2D>().velocity.magnitude);
     }
 
     public void toggleGear() {
@@ -73,5 +96,8 @@ public class GearScript : MonoBehaviour {
     void Update() {
         unbrakeIfNoBrake();
         GetComponent<BoxCollider2D>().enabled = GetComponent<SpriteRenderer>().sprite == gearDeployedSprite;
+        if (transform.parent != null) {
+            if (isGearDown() && transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude > breakSpeed) breakGear();
+        }
     }
 }

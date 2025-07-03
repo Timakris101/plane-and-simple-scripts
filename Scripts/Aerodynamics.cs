@@ -43,16 +43,18 @@ public class Aerodynamics : MonoBehaviour {
     }
 
     private void handleLift() {
-        FlapScript fs = transform.Find("Flaps").GetComponent<FlapScript>();
-        float liftForce = (cL.Evaluate(AoA()) + (fs.getFlapEffectiveness() * (transform.Find("Flaps").localEulerAngles.z - 90f) / fs.getMaxDeflection())) * airDensity * Mathf.Pow(GetComponent<Rigidbody2D>().velocity.magnitude, 2) * wingArea / 2f;
+        FlapScript fs = null;
+        if (transform.Find("Flaps") != null) fs = transform.Find("Flaps").GetComponent<FlapScript>();
+        float liftForce = (cL.Evaluate(AoA()) + (fs == null ? 0 : (fs.getFlapEffectiveness() * (transform.Find("Flaps").localEulerAngles.z - 90f) / fs.getMaxDeflection()))) * airDensity * Mathf.Pow(GetComponent<Rigidbody2D>().velocity.magnitude, 2) * wingArea / 2f;
         Vector2 liftDir = Vector3.Cross(GetComponent<Rigidbody2D>().velocity, -transform.forward).normalized;
         GetComponent<Rigidbody2D>().AddForceAtPosition(liftDir * liftForce, transform.Find("CoL").position);
     }
 
     private void handleDrag() {
-        FlapScript fs = transform.Find("Flaps").GetComponent<FlapScript>();
+        FlapScript fs = null;
+        if (transform.Find("Flaps") != null) fs = transform.Find("Flaps").GetComponent<FlapScript>();
         float inducedDragCoef = Mathf.Pow(cL.Evaluate(AoA()), 2) / (Mathf.PI * wingAspectRatio() * wingEfficiency);
-        float totalDragCoef = inducedDragCoef + cD.Evaluate(AoA()) + (fs.getFlapDrag() * (transform.Find("Flaps").localEulerAngles.z - 90f) / fs.getMaxDeflection()) + transform.Find("Gear").GetComponent<GearScript>().getGearDrag();
+        float totalDragCoef = inducedDragCoef + cD.Evaluate(AoA()) + (transform.Find("Flaps") == null ? 0 : (fs.getFlapDrag() * (transform.Find("Flaps").localEulerAngles.z - 90f) / fs.getMaxDeflection())) + (transform.Find("Gear") == null ? 0 : transform.Find("Gear").GetComponent<GearScript>().getGearDrag());
 
         float dragForce = totalDragCoef * airDensity * Mathf.Pow(GetComponent<Rigidbody2D>().velocity.magnitude, 2) * frontArea;
 
@@ -72,7 +74,7 @@ public class Aerodynamics : MonoBehaviour {
     }
 
     private void handleThrust() {
-        if (pc.getEnginesOn()) GetComponent<Rigidbody2D>().AddForce(transform.right * (pc.getInWEP() ? WEP : Mathf.Min(idle + pc.getThrottle(), 1)) * maxThrust);
+        if (transform.Find("Propeller") != null) if (pc.getEnginesOn()) GetComponent<Rigidbody2D>().AddForce(transform.right * (pc.getInWEP() ? WEP : Mathf.Min(idle + pc.getThrottle(), 1)) * maxThrust);
     }
 
     private float AoA() {
@@ -87,5 +89,53 @@ public class Aerodynamics : MonoBehaviour {
 
     public float getIdle() {
         return idle;
+    }
+
+    public void setBaseTorque(float val) {
+        baseTorque = val;
+    }
+
+    public float getBaseTorque() {
+        return baseTorque;
+    }
+
+    public void setAlignmentThresh(float val) {
+        alignmentThresh = val;
+    }
+
+    public float getAlignmentThresh() {
+        return alignmentThresh;
+    }
+
+    public void setWingArea(float val) {
+        wingArea = val;
+    }
+
+    public float getWingArea() {
+        return wingArea;
+    }
+
+    public void setWingEfficiency(float val) {
+        wingEfficiency = val;
+    }
+
+    public float getWingEfficiency() {
+        return wingEfficiency;
+    }
+
+    public void setMaxThrust(float val) {
+        maxThrust = val;
+    }
+
+    public float getMaxThrust() {
+        return maxThrust;
+    }
+
+    public float getFrontArea() {
+        return frontArea;
+    }
+
+    public void setFrontArea(float val) {
+        frontArea = val;
     }
 }

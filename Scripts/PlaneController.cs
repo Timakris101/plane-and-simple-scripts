@@ -28,8 +28,8 @@ public class PlaneController : MonoBehaviour {
             rollover();
         }
         if (GetComponent<SpriteRenderer>().sprite == origSprite) {
-            transform.Find("Gear").GetComponent<GearScript>().unhideGear();
-            transform.Find("Flaps").GetComponent<FlapScript>().unhideFlaps();
+            if (transform.Find("Gear") != null) transform.Find("Gear").GetComponent<GearScript>().unhideGear();
+            if (transform.Find("Flaps") != null) transform.Find("Flaps").GetComponent<FlapScript>().unhideFlaps();
         }
 
         GetComponent<Rigidbody2D>().centerOfMass = transform.Find("CoM").localPosition;
@@ -40,8 +40,8 @@ public class PlaneController : MonoBehaviour {
     private void rollover() {
         transform.RotateAround(transform.position, transform.right, 180f);
         GetComponent<Animator>().SetTrigger("Rollover");
-        transform.Find("Gear").GetComponent<GearScript>().hideGear();
-        transform.Find("Flaps").GetComponent<FlapScript>().hideFlaps();
+        if (transform.Find("Gear") != null) transform.Find("Gear").GetComponent<GearScript>().hideGear();
+        if (transform.Find("Flaps") != null) transform.Find("Flaps").GetComponent<FlapScript>().hideFlaps();
     }
 
     public int getWantedDir() {
@@ -78,10 +78,10 @@ public class PlaneController : MonoBehaviour {
 
         if (Input.GetKeyDown("i")) toggleEngines();
 
-        if (Input.GetKeyDown("f")) transform.Find("Flaps").GetComponent<FlapScript>().toggleFlaps();
+        if (Input.GetKeyDown("f") && transform.Find("Flaps") != null) transform.Find("Flaps").GetComponent<FlapScript>().toggleFlaps();
 
-        if (Input.GetKeyDown("g")) transform.Find("Gear").GetComponent<GearScript>().toggleGear();
-        if (Input.GetKey("s") && throttle - throttleChangeSpeed * Time.deltaTime < 0) transform.Find("Gear").GetComponent<GearScript>().brake();
+        if (Input.GetKeyDown("g") && transform.Find("Gear")) transform.Find("Gear").GetComponent<GearScript>().toggleGear();
+        if (Input.GetKey("s") && throttle - throttleChangeSpeed * Time.deltaTime < 0 && transform.Find("Gear")) transform.Find("Gear").GetComponent<GearScript>().brake();
     }
 
     public void toggleEngines() {

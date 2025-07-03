@@ -8,6 +8,10 @@ public class PropellerScript : MonoBehaviour {
     [SerializeField] private float engineAccelRate;
     private bool engineOn;
 
+    void OnCollisionEnter2D(Collision2D col) {
+        if (col.transform != transform.parent) Destroy(gameObject);
+    }
+
     void Start() {
         idleCoef = transform.parent.GetComponent<Aerodynamics>().getIdle();
         GetComponent<Animator>().speed = transform.parent.GetComponent<PlaneController>().getEnginesStartOn() ? 0 : 1;
