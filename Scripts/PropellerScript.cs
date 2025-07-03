@@ -9,7 +9,7 @@ public class PropellerScript : MonoBehaviour {
     private bool engineOn;
 
     void Start() {
-        idleCoef = transform.parent.GetComponent<PlaneController>().getIdle();
+        idleCoef = transform.parent.GetComponent<Aerodynamics>().getIdle();
         GetComponent<Animator>().speed = transform.parent.GetComponent<PlaneController>().getEnginesStartOn() ? 0 : 1;
     }
 
