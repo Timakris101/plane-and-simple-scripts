@@ -5,7 +5,6 @@ using UnityEngine;
 public class CamScript : MonoBehaviour {
 
     private Vector3 offset;
-    [SerializeField] private GameObject objToFollow;
 
     [SerializeField] private int minO = 1; //min for ortho
     [SerializeField] private int maxO = 100; //max for ortho
@@ -13,14 +12,15 @@ public class CamScript : MonoBehaviour {
     [SerializeField] private int maxP = 90; //max for perspective
 
     void Start() {
-        offset = transform.position - objToFollow.transform.position;
+        offset = transform.position - transform.parent.position;
         offset = new Vector3(0, 0, offset.z);
 
         Camera camera = gameObject.GetComponent<Camera>();
     }
 
     void Update() {
-        transform.position = objToFollow.transform.position + offset;
+        transform.position = transform.parent.position + offset;
+        transform.eulerAngles = new Vector3(0, 0, 0);
 
         Camera camera = gameObject.GetComponent<Camera>();
         if (camera.orthographic) {
