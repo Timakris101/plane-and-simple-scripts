@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PropellerControl : MonoBehaviour {
+public class PropellerScript : MonoBehaviour {
 
     private float idleCoef;
     [SerializeField] private float engineAccelRate;

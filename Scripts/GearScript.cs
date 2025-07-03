@@ -2,13 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GearControl : MonoBehaviour {
+public class GearScript : MonoBehaviour {
 
     [SerializeField] private bool gearDownAtStart = true;
+    [SerializeField] private float gearDrag;
     [SerializeField] private PhysicsMaterial2D brakeMat;
     [SerializeField] private PhysicsMaterial2D rollMat;
     [SerializeField] private Sprite gearDeployedSprite;
     [SerializeField] private Sprite gearUpSprite;
+
     private float timeBraking;
     private float time;
 
@@ -20,6 +22,10 @@ public class GearControl : MonoBehaviour {
         } else {
             GetComponent<SpriteRenderer>().sprite = gearUpSprite;
         }
+    }
+
+    public float getGearDrag() {
+        return gearDrag;
     }
 
     public void gearDown() {

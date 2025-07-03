@@ -34,13 +34,6 @@ public class PlaneController : MonoBehaviour {
     [Header("Atmosphere")]
     [SerializeField] private float airDensity;
 
-    [Header("Flaps")]
-    [SerializeField] private float maxDeflection;
-    [SerializeField] private float flapSpeed;
-    [SerializeField] private bool flapsDown;
-    [SerializeField] private float flapEffectiveness;
-    [SerializeField] private float flapDrag;
-
     private Sprite origSprite;
 
     void Start() {
@@ -54,12 +47,11 @@ public class PlaneController : MonoBehaviour {
             rollover();
         }
         if (GetComponent<SpriteRenderer>().sprite == origSprite) {
-            transform.Find("Gear").GetComponent<GearControl>().unhideGear();
+            transform.Find("Gear").GetComponent<GearScript>().unhideGear();
+            transform.Find("Flaps").GetComponent<FlapScript>().unhideFlaps();
         }
 
         GetComponent<Rigidbody2D>().centerOfMass = transform.Find("CoM").localPosition;
-
-        handleFlaps();
     }
 
     void FixedUpdate() {
@@ -69,22 +61,11 @@ public class PlaneController : MonoBehaviour {
         handleTorque();
     }
 
-    private void handleFlaps() {
-        if (flapsDown) {
-            if (transform.Find("Flaps").localEulerAngles.z - 90f < maxDeflection) {
-                transform.Find("Flaps").RotateAround(transform.Find("Flaps").Find("Rp").position, transform.forward, flapSpeed * Time.deltaTime);
-            }
-        } else {
-            if (transform.Find("Flaps").localEulerAngles.z - 90f > 0f) {
-                transform.Find("Flaps").RotateAround(transform.Find("Flaps").Find("Rp").position, transform.forward, -flapSpeed * Time.deltaTime);
-            }
-        }
-    }
-
     private void rollover() {
         transform.RotateAround(transform.position, transform.right, 180f);
         GetComponent<Animator>().SetTrigger("Rollover");
-        transform.Find("Gear").GetComponent<GearControl>().hideGear();
+        transform.Find("Gear").GetComponent<GearScript>().hideGear();
+        transform.Find("Flaps").GetComponent<FlapScript>().hideFlaps();
     }
 
     private float AoA() {
@@ -102,14 +83,16 @@ public class PlaneController : MonoBehaviour {
     }
 
     private void handleLift() {
-        float liftForce = (cL.Evaluate(AoA()) + (flapEffectiveness * (transform.Find("Flaps").localEulerAngles.z - 90f) / maxDeflection)) * airDensity * Mathf.Pow(GetComponent<Rigidbody2D>().velocity.magnitude, 2) * wingArea / 2f;
+        FlapScript fs = transform.Find("Flaps").GetComponent<FlapScript>();
+        float liftForce = (cL.Evaluate(AoA()) + (fs.getFlapEffectiveness() * (transform.Find("Flaps").localEulerAngles.z - 90f) / fs.getMaxDeflection())) * airDensity * Mathf.Pow(GetComponent<Rigidbody2D>().velocity.magnitude, 2) * wingArea / 2f;
         Vector2 liftDir = Vector3.Cross(GetComponent<Rigidbody2D>().velocity, -transform.forward).normalized;
         GetComponent<Rigidbody2D>().AddForceAtPosition(liftDir * liftForce, transform.Find("CoL").position);
     }
 
     private void handleDrag() {
+        FlapScript fs = transform.Find("Flaps").GetComponent<FlapScript>();
         float inducedDragCoef = Mathf.Pow(cL.Evaluate(AoA()), 2) / (Mathf.PI * wingAspectRatio() * wingEfficiency);
-        float totalDragCoef = inducedDragCoef + baseDragCoef + (flapDrag * (transform.Find("Flaps").localEulerAngles.z - 90f) / maxDeflection);
+        float totalDragCoef = inducedDragCoef + baseDragCoef + (fs.getFlapDrag() * (transform.Find("Flaps").localEulerAngles.z - 90f) / fs.getMaxDeflection()) + transform.Find("Gear").GetComponent<GearScript>().getGearDrag();
 
         float dragForce = totalDragCoef * airDensity * Mathf.Pow(GetComponent<Rigidbody2D>().velocity.magnitude, 2) * frontArea;
 
@@ -153,18 +136,14 @@ public class PlaneController : MonoBehaviour {
 
         if (Input.GetKeyDown("i")) toggleEngines();
 
-        if (Input.GetKeyDown("f")) toggleFlaps();
+        if (Input.GetKeyDown("f")) transform.Find("Flaps").GetComponent<FlapScript>().toggleFlaps();
 
-        if (Input.GetKeyDown("g")) transform.Find("Gear").GetComponent<GearControl>().toggleGear();
-        if (Input.GetKey("s") && throttle <= 0) transform.Find("Gear").GetComponent<GearControl>().brake();
+        if (Input.GetKeyDown("g")) transform.Find("Gear").GetComponent<GearScript>().toggleGear();
+        if (Input.GetKey("s") && throttle <= 0) transform.Find("Gear").GetComponent<GearScript>().brake();
     }
 
     public void toggleEngines() {
         enginesOn = !enginesOn;
-    }
-
-    public void toggleFlaps() {
-        flapsDown = !flapsDown;
     }
 
     public float getThrottle() {
