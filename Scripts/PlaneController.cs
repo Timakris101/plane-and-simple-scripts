@@ -7,18 +7,21 @@ public class PlaneController : MonoBehaviour {
     [Header("Thrust")]
     [SerializeField] private float throttle;
     [SerializeField] private float maxThrust;
-    [SerializeField] private float idleCoef = 0.05f;
-    [SerializeField] private bool enginesOn;
+    [SerializeField] private float idle;
+    [SerializeField] private float WEP;
+    private bool inWEP;
+    [SerializeField] private float throttleChangeSpeed;
+    private bool enginesOn;
     [SerializeField] private bool enginesStartOn;
 
     [Header("Lift / Induced Drag")]
     [SerializeField] private AnimationCurve cL;
     [SerializeField] private float wingArea;
     [SerializeField] private float wingSpan;
-    [SerializeField] private float wingEfficiency = .8f;
+    [SerializeField] private float wingEfficiency;
 
     [Header("Drag")]
-    [SerializeField] private float baseDragCoef = 0.02f;
+    [SerializeField] private float baseDragCoef;
     [SerializeField] private float frontArea;
 
     [Header("Torque")]
@@ -43,7 +46,7 @@ public class PlaneController : MonoBehaviour {
 
     void Update() {
         handleControls();
-        if (AoA() < -rollOverThresh / GetComponent<Rigidbody2D>().velocity.magnitude) {
+        if (AoA() < -rollOverThresh / Mathf.Sqrt(GetComponent<Rigidbody2D>().velocity.magnitude)) {
             rollover();
         }
         if (GetComponent<SpriteRenderer>().sprite == origSprite) {
@@ -75,7 +78,7 @@ public class PlaneController : MonoBehaviour {
     }
 
     private void handleThrust() {
-        GetComponent<Rigidbody2D>().AddForce(transform.right * Mathf.Min(idleCoef + throttle, 1) * maxThrust);
+        GetComponent<Rigidbody2D>().AddForce(transform.right * (inWEP ? WEP : Mathf.Min(idle + throttle, 1)) * maxThrust);
     }
 
     private float wingAspectRatio() {
@@ -126,8 +129,11 @@ public class PlaneController : MonoBehaviour {
     }
 
     private void handleControls() {
-        if (Input.GetKey("w") && throttle < 1) throttle += 0.5f * Time.deltaTime;
-        if (Input.GetKey("s") && throttle > 0) throttle -= 0.5f * Time.deltaTime;
+        if (Input.GetKey("w") && throttle < 1) throttle += throttleChangeSpeed * Time.deltaTime;
+        if (Input.GetKey("s") && throttle > 0) throttle -= throttleChangeSpeed * Time.deltaTime;
+
+        inWEP = false;
+        if (Input.GetKey("w") && throttle + throttleChangeSpeed * Time.deltaTime > 1) inWEP = true;
 
         if (Input.GetKeyDown("i")) toggleEngines();
 
@@ -146,7 +152,7 @@ public class PlaneController : MonoBehaviour {
     }
 
     public float getIdle() {
-        return idleCoef;
+        return idle;
     }
 
     public bool getEnginesOn() {
