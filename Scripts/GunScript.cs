@@ -9,6 +9,7 @@ public class GunScript : MonoBehaviour {
     private float timer;
     [SerializeField] private float maxAmmunition;
     [SerializeField] private float ammunition;
+    private bool shooting;
 
     void Start() {
         ammunition = maxAmmunition;
@@ -22,9 +23,13 @@ public class GunScript : MonoBehaviour {
 
     void Update() {
         timer += Time.deltaTime;
-        if (timer > fireRate && Input.GetMouseButton(0)) {
+        if (timer > fireRate && shooting) {
             timer = 0;
             shoot();
         }
+    }
+
+    public void setShooting(bool b) {
+        shooting = b;
     }
 }

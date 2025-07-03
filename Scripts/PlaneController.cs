@@ -15,9 +15,21 @@ public class PlaneController : MonoBehaviour {
     [SerializeField] private float currentGs;
     private Vector3 prevVel;
 
-    [SerializeField] private bool onGround;
+    [Header("Death")]
+    [SerializeField] private float crushSpeed;
+    [SerializeField] private float pilotCrushSpeed;
+
+    private bool onGround;
 
     private Sprite origSprite;
+
+    void OnCollisionEnter2D(Collision2D col) {
+        if (col.transform.tag == "Ground") {
+            float rs = Vector3.Project(col.contacts[0].relativeVelocity, -col.contacts[0].normal).magnitude; //relative speed
+            if (rs > crushSpeed) Destroy(gameObject);
+            if (rs > pilotCrushSpeed) transform.Find("CockpitHitbox").GetComponent<DamageModel>().damage(rs);
+        }
+    }
 
     void OnCollisionStay2D() {
         onGround = true;
@@ -33,9 +45,11 @@ public class PlaneController : MonoBehaviour {
     }
 
     void Update() {
-        handleControls();
-        if (currentGs < rollOverThresh) {
-            rollover();
+        if (transform.Find("CockpitHitbox").GetComponent<DamageModel>().isAlive()) {
+            handleControls();
+            if (currentGs < rollOverThresh) {
+                rollover();
+            }
         }
         if (GetComponent<SpriteRenderer>().sprite == origSprite) {
             if (transform.Find("Gear") != null) transform.Find("Gear").GetComponent<GearScript>().unhideGear();
@@ -92,6 +106,10 @@ public class PlaneController : MonoBehaviour {
 
         if (Input.GetKeyDown("g") && transform.Find("Gear") && !onGround) transform.Find("Gear").GetComponent<GearScript>().toggleGear();
         if (Input.GetKey("s") && throttle - throttleChangeSpeed * Time.deltaTime < 0 && transform.Find("Gear")) transform.Find("Gear").GetComponent<GearScript>().brake();
+
+        for (int i = 0; i < transform.childCount; i++) {
+            if (transform.GetChild(i).GetComponent<GunScript>() != null) transform.GetChild(i).GetComponent<GunScript>().setShooting(Input.GetMouseButton(0));
+        }
     }
 
     public void toggleEngines() {

@@ -20,20 +20,20 @@ public class DamageModel : MonoBehaviour {
         
     }
 
-    public void hit(float damage) {
+    public void hit(float amt) {
         if (Random.Range(0f, 1f) < hitChance) {
-            applyEffects(damage);
+            damage(amt);
         }
     }
 
-    private void applyEffects(float damage) {
-        health -= damage;
+    public void damage(float amt) {
+        health -= amt;
         foreach (string effect in hitEffects) {
             if (effect == "tail") {
-                aero.setBaseTorque(health <= 0 ? 0 : aero.getBaseTorque() * (1 - damage / maxHealth));
+                aero.setBaseTorque(health <= 0 ? 0 : aero.getBaseTorque() * (1 - amt / maxHealth));
             }
             if (effect == "wings") {
-                aero.setWingArea(health <= 0 ? 0 : aero.getWingArea() * (1 - damage / maxHealth));
+                aero.setWingArea(health <= 0 ? 0 : aero.getWingArea() * (1 - amt / maxHealth));
                 if (health / maxHealth < Random.Range(0f, .5f)) {
                     if (transform.parent.Find("Gear") != null) transform.parent.Find("Gear").GetComponent<GearScript>().breakGear();
                 }
@@ -42,7 +42,7 @@ public class DamageModel : MonoBehaviour {
                 }
             }
             if (effect == "engine") {
-                aero.setMaxThrust(health <= 0 ? 0 : aero.getMaxThrust() - damage / maxHealth);
+                aero.setMaxThrust(health <= 0 ? 0 : aero.getMaxThrust() - amt / maxHealth);
             }
             if (effect == "pilot") {
                 if (health == 0) {
@@ -51,5 +51,9 @@ public class DamageModel : MonoBehaviour {
                 }
             }
         }
+    }
+
+    public bool isAlive() {
+        return health > 0;
     }
 }
