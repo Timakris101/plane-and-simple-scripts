@@ -15,7 +15,17 @@ public class PlaneController : MonoBehaviour {
     [SerializeField] private float currentGs;
     private Vector3 prevVel;
 
+    [SerializeField] private bool onGround;
+
     private Sprite origSprite;
+
+    void OnCollisionStay2D() {
+        onGround = true;
+    }
+
+    void OnCollisionExit2D() {
+        onGround = false;
+    }
 
     void Start() {
         origSprite = GetComponent<SpriteRenderer>().sprite;
@@ -80,7 +90,7 @@ public class PlaneController : MonoBehaviour {
 
         if (Input.GetKeyDown("f") && transform.Find("Flaps") != null) transform.Find("Flaps").GetComponent<FlapScript>().toggleFlaps();
 
-        if (Input.GetKeyDown("g") && transform.Find("Gear")) transform.Find("Gear").GetComponent<GearScript>().toggleGear();
+        if (Input.GetKeyDown("g") && transform.Find("Gear") && !onGround) transform.Find("Gear").GetComponent<GearScript>().toggleGear();
         if (Input.GetKey("s") && throttle - throttleChangeSpeed * Time.deltaTime < 0 && transform.Find("Gear")) transform.Find("Gear").GetComponent<GearScript>().brake();
     }
 
