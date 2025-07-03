@@ -34,10 +34,10 @@ public class DamageModel : MonoBehaviour {
             }
             if (effect == "wings") {
                 aero.setWingArea(health <= 0 ? 0 : aero.getWingArea() * (1 - damage / maxHealth));
-                if (health / maxHealth > Random.Range(0f, .5f)) {
+                if (health / maxHealth < Random.Range(0f, .5f)) {
                     if (transform.parent.Find("Gear") != null) transform.parent.Find("Gear").GetComponent<GearScript>().breakGear();
                 }
-                if (health / maxHealth > Random.Range(.5f, .75f)) {
+                if (health / maxHealth < Random.Range(0f, .75f)) {
                     if (transform.parent.Find("Flaps") != null) transform.parent.Find("Flaps").GetComponent<FlapScript>().breakFlaps();
                 }
             }
