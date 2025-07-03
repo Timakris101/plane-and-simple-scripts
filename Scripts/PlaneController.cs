@@ -21,7 +21,7 @@ public class PlaneController : MonoBehaviour {
     [SerializeField] private float wingEfficiency;
 
     [Header("Drag")]
-    [SerializeField] private float baseDragCoef;
+    [SerializeField] private AnimationCurve cD;
     [SerializeField] private float frontArea;
 
     [Header("Torque")]
@@ -31,11 +31,13 @@ public class PlaneController : MonoBehaviour {
     [SerializeField] private float alignmentThresh;
     [SerializeField] private float speedOfControlEffectiveness;
 
-    [Header("Roll")]
-    [SerializeField] private float rollOverThresh;
-
     [Header("Atmosphere")]
     [SerializeField] private float airDensity;
+
+    [Header("GForces")]
+    [SerializeField] private float rollOverThresh;
+    [SerializeField] private float currentGs;
+    private Vector3 prevVel;
 
     private Sprite origSprite;
 
@@ -46,7 +48,7 @@ public class PlaneController : MonoBehaviour {
 
     void Update() {
         handleControls();
-        if (AoA() < -rollOverThresh / Mathf.Sqrt(GetComponent<Rigidbody2D>().velocity.magnitude)) {
+        if (currentGs < rollOverThresh) {
             rollover();
         }
         if (GetComponent<SpriteRenderer>().sprite == origSprite) {
@@ -55,6 +57,8 @@ public class PlaneController : MonoBehaviour {
         }
 
         GetComponent<Rigidbody2D>().centerOfMass = transform.Find("CoM").localPosition;
+
+        calculateGs();
     }
 
     void FixedUpdate() {
@@ -78,7 +82,7 @@ public class PlaneController : MonoBehaviour {
     }
 
     private void handleThrust() {
-        GetComponent<Rigidbody2D>().AddForce(transform.right * (inWEP ? WEP : Mathf.Min(idle + throttle, 1)) * maxThrust);
+        if (enginesOn) GetComponent<Rigidbody2D>().AddForce(transform.right * (inWEP ? WEP : Mathf.Min(idle + throttle, 1)) * maxThrust);
     }
 
     private float wingAspectRatio() {
@@ -95,7 +99,7 @@ public class PlaneController : MonoBehaviour {
     private void handleDrag() {
         FlapScript fs = transform.Find("Flaps").GetComponent<FlapScript>();
         float inducedDragCoef = Mathf.Pow(cL.Evaluate(AoA()), 2) / (Mathf.PI * wingAspectRatio() * wingEfficiency);
-        float totalDragCoef = inducedDragCoef + baseDragCoef + (fs.getFlapDrag() * (transform.Find("Flaps").localEulerAngles.z - 90f) / fs.getMaxDeflection()) + transform.Find("Gear").GetComponent<GearScript>().getGearDrag();
+        float totalDragCoef = inducedDragCoef + cD.Evaluate(AoA()) + (fs.getFlapDrag() * (transform.Find("Flaps").localEulerAngles.z - 90f) / fs.getMaxDeflection()) + transform.Find("Gear").GetComponent<GearScript>().getGearDrag();
 
         float dragForce = totalDragCoef * airDensity * Mathf.Pow(GetComponent<Rigidbody2D>().velocity.magnitude, 2) * frontArea;
 
@@ -114,6 +118,17 @@ public class PlaneController : MonoBehaviour {
             val = 0;
         }
         return val;
+    }
+
+    private void calculateGs() {
+        Vector3 curVel = GetComponent<Rigidbody2D>().velocity;
+        Vector3 currentForces = curVel - prevVel;
+        
+        currentForces = Vector3.Project(currentForces, transform.up);
+
+        if (currentForces.magnitude != 0) currentGs = (currentForces.y / transform.up.y) + Mathf.Cos(Vector3.SignedAngle(transform.right, Vector3.right, transform.forward) / 180f * 3.14f);
+
+        prevVel = GetComponent<Rigidbody2D>().velocity;
     }
 
     private void handleTorque() {
