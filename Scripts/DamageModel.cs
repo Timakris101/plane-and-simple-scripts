@@ -53,6 +53,10 @@ public class DamageModel : MonoBehaviour {
         }
     }
 
+    public void kill() {
+        damage(health);
+    }
+
     public bool isAlive() {
         return health > 0;
     }

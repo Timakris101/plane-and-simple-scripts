@@ -32,4 +32,8 @@ public class GunScript : MonoBehaviour {
     public void setShooting(bool b) {
         shooting = b;
     }
+
+    public GameObject getBullet() {
+        return bullet;
+    }
 }

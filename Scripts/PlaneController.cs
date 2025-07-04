@@ -3,33 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlaneController : MonoBehaviour {
-    [Header("Thrust")]
+    [Header("Controls")]
     [SerializeField] protected float throttle;
     protected bool inWEP;
     [SerializeField] protected float throttleChangeSpeed;
     protected bool enginesOn;
     [SerializeField] protected bool enginesStartOn;
 
-    [Header("GForces")]
-    [SerializeField] private float rollOverThresh;
-    [SerializeField] private float currentGs;
-    private Vector3 prevVel;
-
-    [Header("Death")]
-    [SerializeField] private float crushSpeed;
-    [SerializeField] private float pilotCrushSpeed;
-
     private bool onGround;
-
-    private Sprite origSprite;
-
-    void OnCollisionEnter2D(Collision2D col) {
-        if (col.transform.tag == "Ground") {
-            float rs = Vector3.Project(col.contacts[0].relativeVelocity, -col.contacts[0].normal).magnitude; //relative speed
-            if (rs > crushSpeed) Destroy(gameObject);
-            if (rs > pilotCrushSpeed) transform.Find("CockpitHitbox").GetComponent<DamageModel>().damage(rs);
-        }
-    }
 
     void OnCollisionStay2D() {
         onGround = true;
@@ -40,32 +21,13 @@ public class PlaneController : MonoBehaviour {
     }
 
     void Start() {
-        origSprite = GetComponent<SpriteRenderer>().sprite;
         enginesOn = enginesStartOn;
     }
 
     void Update() {
-        if (transform.Find("CockpitHitbox").GetComponent<DamageModel>().isAlive()) {
+        if (transform.Find("CockpitHitbox").GetComponent<DamageModel>().isAlive() && !GetComponent<GForcesScript>().overGPilot()) {
             handleControls();
-            if (currentGs < rollOverThresh) {
-                rollover();
-            }
         }
-        if (GetComponent<SpriteRenderer>().sprite == origSprite) {
-            if (transform.Find("Gear") != null) transform.Find("Gear").GetComponent<GearScript>().unhideGear();
-            if (transform.Find("Flaps") != null) transform.Find("Flaps").GetComponent<FlapScript>().unhideFlaps();
-        }
-
-        GetComponent<Rigidbody2D>().centerOfMass = transform.Find("CoM").localPosition;
-
-        calculateGs();
-    }
-
-    private void rollover() {
-        transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y * -1, transform.localScale.z);
-        GetComponent<Animator>().SetTrigger("Rollover");
-        if (transform.Find("Gear") != null) transform.Find("Gear").GetComponent<GearScript>().hideGear();
-        if (transform.Find("Flaps") != null) transform.Find("Flaps").GetComponent<FlapScript>().hideFlaps();
     }
 
     public virtual int getWantedDir() {
@@ -82,18 +44,7 @@ public class PlaneController : MonoBehaviour {
         return val;
     }
 
-    private void calculateGs() {
-        Vector3 curVel = GetComponent<Rigidbody2D>().velocity;
-        Vector3 currentForces = curVel - prevVel;
-        
-        currentForces = Vector3.Project(currentForces, transform.up);
-
-        if (currentForces.magnitude != 0) currentGs = transform.localScale.y * ((currentForces.y / transform.up.y) + Mathf.Cos(Vector3.SignedAngle(transform.up, Vector3.up, transform.forward) / 180f * 3.14f));
-
-        prevVel = GetComponent<Rigidbody2D>().velocity;
-    }
-
-    protected virtual void handleControls() {
+    public virtual void handleControls() {
         if (Input.GetKey("w") && throttle < 1) throttle += throttleChangeSpeed * Time.deltaTime;
         if (Input.GetKey("s") && throttle > 0) throttle -= throttleChangeSpeed * Time.deltaTime;
 

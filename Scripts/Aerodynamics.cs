@@ -40,6 +40,8 @@ public class Aerodynamics : MonoBehaviour {
         handleDrag();
         handleLift();
         handleTorque();
+
+        GetComponent<Rigidbody2D>().centerOfMass = transform.Find("CoM").localPosition;
     }
 
     private void handleLift() {
