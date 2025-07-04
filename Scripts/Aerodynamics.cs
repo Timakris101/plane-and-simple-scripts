@@ -46,7 +46,7 @@ public class Aerodynamics : MonoBehaviour {
         FlapScript fs = null;
         if (transform.Find("Flaps") != null) fs = transform.Find("Flaps").GetComponent<FlapScript>();
         float liftForce = (cL.Evaluate(AoA()) + (fs == null ? 0 : (fs.getFlapEffectiveness() * (transform.Find("Flaps").localEulerAngles.z - 90f) / fs.getMaxDeflection()))) * airDensity * Mathf.Pow(GetComponent<Rigidbody2D>().velocity.magnitude, 2) * wingArea / 2f;
-        Vector2 liftDir = Vector3.Cross(GetComponent<Rigidbody2D>().velocity, -transform.forward).normalized;
+        Vector2 liftDir = transform.localScale.y * Vector3.Cross(GetComponent<Rigidbody2D>().velocity, -transform.forward).normalized;
         GetComponent<Rigidbody2D>().AddForceAtPosition(liftDir * liftForce, transform.Find("CoL").position);
     }
 
@@ -67,10 +67,9 @@ public class Aerodynamics : MonoBehaviour {
             return;
         }
         GetComponent<Rigidbody2D>().angularVelocity = dirToTurn * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude) * baseTorque;
-        bool fwdAxisAlignedWithWorld = Mathf.Abs(transform.eulerAngles.y) <= 1f && Mathf.Abs(transform.eulerAngles.y) <= 1f;
         bool positiveAoA = AoA() >= 0;
-        int correctionDir = fwdAxisAlignedWithWorld ^ positiveAoA ? 1 : -1;
-        if (AoA() > alignmentThresh || AoA() < -alignmentThresh) GetComponent<Rigidbody2D>().angularVelocity += correctionDir * Mathf.Abs(AoA()) * alignmentStrength * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude);
+        int correctionDir = positiveAoA ? -1 : 1;
+        if (AoA() > alignmentThresh || AoA() < -alignmentThresh) GetComponent<Rigidbody2D>().angularVelocity += correctionDir * Mathf.Abs(AoA()) * alignmentStrength * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude) * transform.localScale.y;
     }
 
     private void handleThrust() {
@@ -80,7 +79,7 @@ public class Aerodynamics : MonoBehaviour {
     private float AoA() {
         Vector2 velocity = GetComponent<Rigidbody2D>().velocity;
         if (velocity.magnitude < 1f) return 0;
-        return Vector3.SignedAngle(velocity, transform.right, transform.forward);
+        return Vector3.SignedAngle(velocity, transform.right, transform.forward) * transform.localScale.y;
     }
 
     private float wingAspectRatio() {

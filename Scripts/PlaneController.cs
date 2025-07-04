@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class PlaneController : MonoBehaviour {
     [Header("Thrust")]
-    [SerializeField] private float throttle;
-    private bool inWEP;
-    [SerializeField] private float throttleChangeSpeed;
-    private bool enginesOn;
-    [SerializeField] private bool enginesStartOn;
+    [SerializeField] protected float throttle;
+    protected bool inWEP;
+    [SerializeField] protected float throttleChangeSpeed;
+    protected bool enginesOn;
+    [SerializeField] protected bool enginesStartOn;
 
     [Header("GForces")]
     [SerializeField] private float rollOverThresh;
@@ -62,13 +62,13 @@ public class PlaneController : MonoBehaviour {
     }
 
     private void rollover() {
-        transform.RotateAround(transform.position, transform.right, 180f);
+        transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y * -1, transform.localScale.z);
         GetComponent<Animator>().SetTrigger("Rollover");
         if (transform.Find("Gear") != null) transform.Find("Gear").GetComponent<GearScript>().hideGear();
         if (transform.Find("Flaps") != null) transform.Find("Flaps").GetComponent<FlapScript>().hideFlaps();
     }
 
-    public int getWantedDir() {
+    public virtual int getWantedDir() {
         int val = 0;
         if (Input.GetKey("d")) {
             val = -1;
@@ -88,12 +88,12 @@ public class PlaneController : MonoBehaviour {
         
         currentForces = Vector3.Project(currentForces, transform.up);
 
-        if (currentForces.magnitude != 0) currentGs = (currentForces.y / transform.up.y) + Mathf.Cos(Vector3.SignedAngle(transform.right, Vector3.right, transform.forward) / 180f * 3.14f);
+        if (currentForces.magnitude != 0) currentGs = transform.localScale.y * ((currentForces.y / transform.up.y) + Mathf.Cos(Vector3.SignedAngle(transform.up, Vector3.up, transform.forward) / 180f * 3.14f));
 
         prevVel = GetComponent<Rigidbody2D>().velocity;
     }
 
-    private void handleControls() {
+    protected virtual void handleControls() {
         if (Input.GetKey("w") && throttle < 1) throttle += throttleChangeSpeed * Time.deltaTime;
         if (Input.GetKey("s") && throttle > 0) throttle -= throttleChangeSpeed * Time.deltaTime;
 
