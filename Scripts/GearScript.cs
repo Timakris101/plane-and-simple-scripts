@@ -15,7 +15,7 @@ public class GearScript : MonoBehaviour {
     [Header("Mats")]
     [SerializeField] private PhysicsMaterial2D brakeMat;
     [SerializeField] private PhysicsMaterial2D rollMat;
-    [SerializeField] private Sprite gearDeployedSprite;
+    [SerializeField] private Sprite gearDownSprite;
     [SerializeField] private Sprite gearUpSprite;
 
     private float timeBraking;
@@ -28,13 +28,14 @@ public class GearScript : MonoBehaviour {
     }
 
     void Start() {
-        GetComponent<Animator>().SetBool("gearDownAtStart", gearDownAtStart);
-        GetComponent<Animator>().SetBool("gearDeployed", gearDownAtStart);
+        GetComponent<Animator>().enabled = false;
         if (gearDownAtStart) {
-            GetComponent<SpriteRenderer>().sprite = gearDeployedSprite;
+            GetComponent<SpriteRenderer>().sprite = gearDownSprite;
         } else {
             GetComponent<SpriteRenderer>().sprite = gearUpSprite;
         }
+        GetComponent<Animator>().SetBool("gearDownAtStart", gearDownAtStart);
+        GetComponent<Animator>().SetBool("gearDeployed", gearDownAtStart);
     }
 
     public float getGearDrag() {
@@ -42,10 +43,12 @@ public class GearScript : MonoBehaviour {
     }
 
     public void gearDown() {
+        GetComponent<Animator>().enabled = true;
         GetComponent<Animator>().SetBool("gearDeployed", true);
     }
 
     public void gearUp() {
+        GetComponent<Animator>().enabled = true;
         GetComponent<Animator>().SetBool("gearDeployed", false);
     }
 
@@ -95,7 +98,7 @@ public class GearScript : MonoBehaviour {
 
     void Update() {
         unbrakeIfNoBrake();
-        GetComponent<BoxCollider2D>().enabled = GetComponent<SpriteRenderer>().sprite == gearDeployedSprite;
+        GetComponent<BoxCollider2D>().enabled = GetComponent<SpriteRenderer>().sprite == gearDownSprite;
         if (transform.parent != null) {
             if (isGearDown() && transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude > breakSpeed) breakGear();
         }
