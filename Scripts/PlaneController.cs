@@ -5,10 +5,10 @@ using UnityEngine;
 public class PlaneController : MonoBehaviour {
     [Header("Controls")]
     [SerializeField] protected float throttle;
-    protected bool inWEP;
-    [SerializeField] protected float throttleChangeSpeed;
-    protected bool enginesOn;
-    [SerializeField] protected bool enginesStartOn;
+    [SerializeField] protected bool inWEP;
+    [SerializeField] private float throttleChangeSpeed;
+    [SerializeField] private bool enginesOn;
+    [SerializeField] private bool enginesStartOn;
 
     private bool onGround;
 
@@ -20,7 +20,7 @@ public class PlaneController : MonoBehaviour {
         onGround = false;
     }
 
-    void Start() {
+    protected void Start() {
         enginesOn = enginesStartOn;
     }
 
