@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlaneController : MonoBehaviour {
-    [Header("Controls")]
-    [SerializeField] protected float throttle;
-    [SerializeField] protected bool inWEP;
-    [SerializeField] private float throttleChangeSpeed;
-    [SerializeField] private bool enginesOn;
+    protected float throttle;
+    protected bool inWEP;
+    private float throttleChangeSpeed = 1f;
+    private bool enginesOn;
     [SerializeField] private bool enginesStartOn;
 
     private bool onGround;
@@ -22,6 +21,7 @@ public class PlaneController : MonoBehaviour {
 
     protected void Start() {
         enginesOn = enginesStartOn;
+        throttle = enginesStartOn ? 1 : 0;
     }
 
     void Update() {

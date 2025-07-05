@@ -6,6 +6,7 @@ public class AiPlaneController : PlaneController {
 
     [SerializeField] private GameObject targetedObj;
     [SerializeField] private float angularThreshForGuns;
+    [SerializeField] private string mode;
     private GameObject primaryBullet;
 
     void Start() {
@@ -18,7 +19,12 @@ public class AiPlaneController : PlaneController {
     }
 
     public override int getWantedDir() {
-        return Vector3.SignedAngle((positionToTarget(primaryBullet) - transform.position).normalized, transform.right, transform.forward) > 0 ? -1 : 1;
+        mode = "pursuit";
+        if ((positionToTarget(primaryBullet) - transform.position).magnitude / (GetComponent<Rigidbody2D>().velocity - targetedObj.GetComponent<Rigidbody2D>().velocity).magnitude < 1f) mode = "abort";
+        if (transform.position.y < 100f) return Mathf.Abs(Vector3.SignedAngle(Vector3.up, transform.right, transform.forward)) < 1f ? 0 : 1;
+        if (mode == "pursuit") return Vector3.SignedAngle((positionToTarget(primaryBullet) - transform.position).normalized, transform.right, transform.forward) > 0 ? -1 : 1;
+        if (mode == "abort") return 1;
+        return 0;
     }
 
     public override void handleControls() {
