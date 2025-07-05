@@ -18,13 +18,15 @@ public class FlapScript : MonoBehaviour {
     }
 
     private void handleFlaps() {
-        if (flapsDown) {
-            if (deflection() < maxDeflection) {
-                transform.RotateAround(transform.Find("Rp").position, transform.forward * transform.parent.localScale.y, flapSpeed * Time.deltaTime);
-            }
-        } else {
-            if (deflection() > 0f) {
-                transform.RotateAround(transform.Find("Rp").position, transform.forward * transform.parent.localScale.y, -flapSpeed * Time.deltaTime);
+        if (transform.parent != null) {
+            if (flapsDown) {
+                if (deflection() < maxDeflection) {
+                    transform.RotateAround(transform.Find("Rp").position, transform.forward * transform.parent.localScale.y, flapSpeed * Time.deltaTime);
+                }
+            } else {
+                if (deflection() > 0f) {
+                    transform.RotateAround(transform.Find("Rp").position, transform.forward * transform.parent.localScale.y, -flapSpeed * Time.deltaTime);
+                }
             }
         }
     }
