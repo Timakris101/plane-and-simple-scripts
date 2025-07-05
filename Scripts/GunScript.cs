@@ -17,7 +17,7 @@ public class GunScript : MonoBehaviour {
 
     private void shoot() {
         ammunition--;
-        GameObject newBullet = Instantiate(bullet, transform.position, Quaternion.identity);
+        GameObject newBullet = Instantiate(bullet, transform.position, transform.rotation);
         newBullet.GetComponent<Rigidbody2D>().velocity = (newBullet.GetComponent<BulletScript>().getInitSpeed() + transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude) * transform.parent.right;
     }
 

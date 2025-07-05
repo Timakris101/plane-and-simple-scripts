@@ -7,6 +7,7 @@ public class PlaneController : MonoBehaviour {
     protected bool inWEP;
     private float throttleChangeSpeed = 1f;
     private bool enginesOn;
+    private bool unconcious;
     [SerializeField] private bool enginesStartOn;
 
     private bool onGround;
@@ -25,12 +26,16 @@ public class PlaneController : MonoBehaviour {
     }
 
     void Update() {
-        if (transform.Find("CockpitHitbox").GetComponent<DamageModel>().isAlive() && !GetComponent<GForcesScript>().overGPilot()) {
-            handleControls();
-        }
+        handleFeasibleControls();
+        unconcious = !(transform.Find("CockpitHitbox").GetComponent<DamageModel>().isAlive() && !GetComponent<GForcesScript>().overGPilot());
     }
 
-    public virtual int getWantedDir() {
+    public int getDir() {
+        if (!unconcious) return wantedDir();
+        return 0;
+    }
+
+    protected virtual int wantedDir() {
         int val = 0;
         if (Input.GetKey("d")) {
             val = -1;
@@ -44,7 +49,11 @@ public class PlaneController : MonoBehaviour {
         return val;
     }
 
-    public virtual void handleControls() {
+    public virtual void handleFeasibleControls() {
+        if (!unconcious) handleControls();
+    }
+
+    protected virtual void handleControls() {
         if (Input.GetKey("w") && throttle < 1) throttle += throttleChangeSpeed * Time.deltaTime;
         if (Input.GetKey("s") && throttle > 0) throttle -= throttleChangeSpeed * Time.deltaTime;
 

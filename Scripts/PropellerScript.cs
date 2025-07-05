@@ -8,7 +8,7 @@ public class PropellerScript : MonoBehaviour {
     [SerializeField] private float engineAccelRate;
     private bool engineOn;
 
-    void OnCollisionEnter2D(Collision2D col) {
+    void OnTriggerEnter2D(Collider2D col) {
         if (col.transform.tag == "Ground") Destroy(gameObject);
     }
 

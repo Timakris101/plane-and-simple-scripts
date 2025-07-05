@@ -18,7 +18,7 @@ public class AiPlaneController : PlaneController {
         }
     }
 
-    public override int getWantedDir() {
+    protected override int wantedDir() {
         mode = "pursuit";
         if ((positionToTarget(primaryBullet) - transform.position).magnitude / (GetComponent<Rigidbody2D>().velocity - targetedObj.GetComponent<Rigidbody2D>().velocity).magnitude < 1f) mode = "abort";
         if (transform.position.y < 100f) return Mathf.Abs(Vector3.SignedAngle(Vector3.up, transform.right, transform.forward)) < 1f ? 0 : 1;
@@ -27,7 +27,7 @@ public class AiPlaneController : PlaneController {
         return 0;
     }
 
-    public override void handleControls() {
+    protected override void handleControls() {
         throttle = 1f;
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<GunScript>() != null) {

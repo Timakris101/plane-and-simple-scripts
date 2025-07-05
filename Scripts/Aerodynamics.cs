@@ -64,7 +64,7 @@ public class Aerodynamics : MonoBehaviour {
     }
 
     private void handleTorque() {
-        int dirToTurn = GetComponent<PlaneController>().getWantedDir();
+        int dirToTurn = GetComponent<PlaneController>().getDir();
         if (GetComponent<Rigidbody2D>().velocity.magnitude < speedOfControlEffectiveness) {
             return;
         }
