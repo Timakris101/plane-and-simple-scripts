@@ -9,7 +9,7 @@ public class PropellerScript : MonoBehaviour {
     private bool engineOn;
 
     void OnCollisionEnter2D(Collision2D col) {
-        if (col.transform != transform.parent) Destroy(gameObject);
+        if (col.transform.tag == "Ground") Destroy(gameObject);
     }
 
     void Start() {
