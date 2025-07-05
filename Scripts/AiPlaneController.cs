@@ -6,13 +6,14 @@ public class AiPlaneController : PlaneController {
 
     [SerializeField] private GameObject targetedObj;
     [SerializeField] private float angularThreshForGuns;
+    [SerializeField] private float sixAngle;
     [SerializeField] private string mode;
     [SerializeField] private float minAltitude;
     [SerializeField] private float minSpeed;
     [SerializeField] private float gunRange;
     private GameObject primaryBullet;
 
-    void Start() {
+    new void Start() {
         base.Start();
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<GunScript>() != null) {
@@ -23,6 +24,10 @@ public class AiPlaneController : PlaneController {
 
     protected override int wantedDir() {
         mode = "pursuit";
+        
+        if (angleTo(targetedObj.transform.position) > sixAngle || angleTo(targetedObj.transform.position) < -sixAngle) mode = "defensive";
+
+        if ((positionToTarget(primaryBullet) - transform.position).magnitude / (GetComponent<Rigidbody2D>().velocity - targetedObj.GetComponent<Rigidbody2D>().velocity).magnitude < 1f) mode = "abort";
 
         if (transform.position.y < minAltitude) return pointTowards(transform.position + Vector3.up);
 
@@ -30,9 +35,7 @@ public class AiPlaneController : PlaneController {
 
         if (targetedObj == null || targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude < 1f) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
 
-        if ((positionToTarget(primaryBullet) - transform.position).magnitude / (GetComponent<Rigidbody2D>().velocity - targetedObj.GetComponent<Rigidbody2D>().velocity).magnitude < 1f) mode = "abort";
-
-        if (mode == "pursuit") return pointTowards(positionToTarget(primaryBullet));
+        if (mode == "pursuit" || mode == "defensive") return pointTowards(positionToTarget(primaryBullet));
 
         if (mode == "abort") return pointTowards(transform.position * 2 - positionToTarget(primaryBullet));
 
@@ -40,11 +43,17 @@ public class AiPlaneController : PlaneController {
     }
 
     private int pointTowards(Vector3 pos) {
-        return Vector3.SignedAngle((pos - transform.position).normalized, transform.right, transform.forward) > 0 ? -1 : 1;
+        return  angleTo(pos) > 0 ? -1 : 1;
+    }
+
+    private float angleTo(Vector3 pos) {
+        return Vector3.SignedAngle((pos - transform.position).normalized, transform.right, transform.forward);
     }
 
     protected override void handleControls() {
         throttle = 1f;
+        if (mode == "defensive") throttle = 0;
+
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<GunScript>() != null) {
                 if (targetInSights(transform.GetChild(i).GetComponent<GunScript>().getBullet()) && (transform.position - positionToTarget(transform.GetChild(i).GetComponent<GunScript>().getBullet())).magnitude < gunRange) {
