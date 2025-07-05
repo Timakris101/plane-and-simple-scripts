@@ -30,7 +30,7 @@ public class DamageModel : MonoBehaviour {
         health -= amt;
         foreach (string effect in hitEffects) {
             if (effect == "tail") {
-                aero.setBaseTorque(health <= 0 ? 0 : aero.getBaseTorque() * (1 - amt / maxHealth));
+                aero.setBaseTorque(health <= 0 ? aero.getBaseTorque() : aero.getBaseTorque() * (1 - amt / maxHealth));
             }
             if (effect == "wings") {
                 aero.setWingArea(health <= 0 ? 0 : aero.getWingArea() * (1 - amt / maxHealth));
