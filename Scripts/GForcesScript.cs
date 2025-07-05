@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class GForcesScript : MonoBehaviour {
     [SerializeField] private float rollOverThresh;
-    [SerializeField] private float currentGs;
+    [SerializeField] private Vector3 currentGs;
+    [SerializeField] private float feltGs;
     private Vector3 prevVel;
     private Sprite origSprite;
     [SerializeField] private float sleepyGs;
@@ -17,18 +18,21 @@ public class GForcesScript : MonoBehaviour {
     }
 
     void Update() {
-        if (currentGs < rollOverThresh) {
+        if (feltGs < rollOverThresh) {
             rollover();
         }
         if (GetComponent<SpriteRenderer>().sprite == origSprite) {
             if (transform.Find("Gear") != null) transform.Find("Gear").GetComponent<GearScript>().unhideGear();
             if (transform.Find("Flaps") != null) transform.Find("Flaps").GetComponent<FlapScript>().unhideFlaps();
         }
-        calculateGs();
 
         if (overGPlaneToDeath()) Destroy(gameObject);
         if (overGPlane()) transform.Find("WingHitbox").GetComponent<DamageModel>().kill();
         if (overGPilotToDeath()) transform.Find("CockpitHitbox").GetComponent<DamageModel>().kill();
+    }
+
+    void FixedUpdate() {
+        calculateGs();
     }
 
     private void rollover() {
@@ -41,27 +45,26 @@ public class GForcesScript : MonoBehaviour {
     private void calculateGs() {
         Vector3 curVel = GetComponent<Rigidbody2D>().velocity;
         Vector3 currentForces = curVel - prevVel;
-        
-        currentForces = Vector3.Project(currentForces, transform.up);
 
-        if (currentForces.magnitude != 0) currentGs = transform.localScale.y * ((currentForces.y / transform.up.y) + Mathf.Cos(Vector3.SignedAngle(transform.up, Vector3.up, transform.forward) / 180f * 3.14f));
+        if (currentForces.magnitude != 0) currentGs = ((currentForces / Physics2D.gravity.magnitude) + (transform.localScale.y * Vector3.up));
+        feltGs = Vector3.Project(currentGs, transform.up).y / transform.up.y;
 
         prevVel = GetComponent<Rigidbody2D>().velocity;
     }
 
     public bool overGPlaneToDeath() {
-        return Mathf.Abs(currentGs) > Mathf.Abs(planeDestroyingGs);
+        return Mathf.Abs(currentGs.magnitude) > Mathf.Abs(planeDestroyingGs);
     }
 
     public bool overGPlane() {
-        return Mathf.Abs(currentGs) > Mathf.Abs(planeStructDestroyingGs);
+        return Mathf.Abs(currentGs.magnitude) > Mathf.Abs(planeStructDestroyingGs);
     }
 
     public bool overGPilotToDeath() {
-        return Mathf.Abs(currentGs) > Mathf.Abs(killingGs);
+        return Mathf.Abs(feltGs) > Mathf.Abs(killingGs);
     }
 
     public bool overGPilot() {
-        return Mathf.Abs(currentGs) > Mathf.Abs(sleepyGs);
+        return Mathf.Abs(feltGs) > Mathf.Abs(sleepyGs);
     }
 }
