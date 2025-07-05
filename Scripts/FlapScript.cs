@@ -13,20 +13,24 @@ public class FlapScript : MonoBehaviour {
     void Update() {
         handleFlaps();
         if (transform.parent != null) {
-            if (transform.localEulerAngles.z - 90f >= maxDeflection && transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude > breakSpeed) breakFlaps();
+            if (deflection() >= maxDeflection && transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude > breakSpeed) breakFlaps();
         }
     }
 
     private void handleFlaps() {
         if (flapsDown) {
-            if (transform.localEulerAngles.z - 90f < maxDeflection) {
-                transform.RotateAround(transform.Find("Rp").position, transform.forward, flapSpeed * Time.deltaTime);
+            if (deflection() < maxDeflection) {
+                transform.RotateAround(transform.Find("Rp").position, transform.forward * transform.parent.localScale.y, flapSpeed * Time.deltaTime);
             }
         } else {
-            if (transform.localEulerAngles.z - 90f > 0f) {
-                transform.RotateAround(transform.Find("Rp").position, transform.forward, -flapSpeed * Time.deltaTime);
+            if (deflection() > 0f) {
+                transform.RotateAround(transform.Find("Rp").position, transform.forward * transform.parent.localScale.y, -flapSpeed * Time.deltaTime);
             }
         }
+    }
+
+    public float deflection() {
+        return transform.localEulerAngles.z - 90f;
     }
 
     public void hideFlaps() {
