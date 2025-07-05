@@ -43,12 +43,13 @@ public class GForcesScript : MonoBehaviour {
     }
 
     private void calculateGs() {
-        Vector3 curVel = GetComponent<Rigidbody2D>().velocity;
-        Vector3 currentForces = curVel - prevVel;
+        if (prevVel.magnitude != 0) {
+            Vector3 curVel = GetComponent<Rigidbody2D>().velocity;
+            Vector3 currentForces = curVel - prevVel;
 
-        if (currentForces.magnitude != 0) currentGs = ((currentForces / Physics2D.gravity.magnitude) + (transform.localScale.y * Vector3.up));
-        feltGs = Vector3.Project(currentGs, transform.up).y / transform.up.y;
-
+            if (currentForces.magnitude != 0) currentGs = transform.localScale.y * (currentForces + Vector3.up);
+            feltGs = Vector3.Project(currentGs, transform.up).y / transform.up.y;
+        }
         prevVel = GetComponent<Rigidbody2D>().velocity;
     }
 
