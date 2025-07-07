@@ -45,7 +45,7 @@ public class DamageModel : MonoBehaviour {
                 aero.setMaxThrust(health <= 0 ? 0 : aero.getMaxThrust() - amt / maxHealth);
             }
             if (effect == "pilot") {
-                if (health == 0) {
+                if (health <= 0) {
                     aero.setBaseTorque(0);
                     aero.setAlignmentThresh(0);
                 }
