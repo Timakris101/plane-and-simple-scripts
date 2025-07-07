@@ -20,24 +20,34 @@ public class AiPlaneController : PlaneController {
                 primaryBullet = transform.GetChild(i).GetComponent<GunScript>().getBullet();
             }
         }
+        mode = "pursuit";
     }
 
     protected override int wantedDir() {
-        mode = "pursuit";
-        
-        if (angleTo(targetedObj.transform.position) > sixAngle || angleTo(targetedObj.transform.position) < -sixAngle) mode = "defensive";
+        Debug.Log(angleTo(targetedObj.transform.position));
+        if (angleTo(targetedObj.transform.position) > 180f - sixAngle || angleTo(targetedObj.transform.position) < -(180f - sixAngle)) {
+            mode = "defensive";
+        } else {
+            mode = "pursuit";
+        }
 
-        if ((positionToTarget(primaryBullet) - transform.position).magnitude / (GetComponent<Rigidbody2D>().velocity - targetedObj.GetComponent<Rigidbody2D>().velocity).magnitude < 1f) mode = "abort";
+        if ((mode == "defensive" || mode == "overshoot") && Vector3.Project(targetedObj.transform.position - transform.position, Vector3.up).y < 0 && GetComponent<Rigidbody2D>().velocity.magnitude > targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude) mode = "hammerhead";
+
+        if ((mode == "defensive" || mode == "hammerhead") && GetComponent<Rigidbody2D>().velocity.magnitude < targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude) mode = "overshoot";
 
         if (transform.position.y < minAltitude) return pointTowards(transform.position + Vector3.up);
 
-        if (GetComponent<Rigidbody2D>().velocity.magnitude < minSpeed) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
-
         if (targetedObj == null || targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude < 1f) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
 
-        if (mode == "pursuit" || mode == "defensive") return pointTowards(positionToTarget(primaryBullet));
+        if (mode == "pursuit" || mode == "overshoot" || mode == "defensive") return pointTowards(positionToTarget(primaryBullet));
 
-        if (mode == "abort") return pointTowards(transform.position * 2 - positionToTarget(primaryBullet));
+        if (mode == "hammerhead") {
+            if (GetComponent<Rigidbody2D>().velocity.magnitude < 1f) {
+                mode = "pursuit";
+            } else {
+                return pointTowards(transform.position + Vector3.up);
+            }
+        }
 
         return 0;
     }
@@ -52,8 +62,7 @@ public class AiPlaneController : PlaneController {
 
     protected override void handleControls() {
         throttle = 1f;
-        if (mode == "defensive") throttle = 0;
-
+        if (mode == "overshoot") throttle = 0f;
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<GunScript>() != null) {
                 if (targetInSights(transform.GetChild(i).GetComponent<GunScript>().getBullet()) && (transform.position - positionToTarget(transform.GetChild(i).GetComponent<GunScript>().getBullet())).magnitude < gunRange) {
