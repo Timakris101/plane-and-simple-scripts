@@ -32,7 +32,20 @@ public class Aerodynamics : MonoBehaviour {
     private PlaneController pc;
 
     void Start() {
-        pc = GetComponent<PlaneController>();
+        setPlaneController();         
+    }
+
+    void Update() {
+        setPlaneController();
+    }
+
+    void setPlaneController() {
+        foreach (PlaneController c in GetComponents<PlaneController>()) {
+            if (c.enabled) {
+                pc = c;
+                break;
+            }
+        } 
     }
 
     void FixedUpdate() {
@@ -64,7 +77,7 @@ public class Aerodynamics : MonoBehaviour {
     }
 
     private void handleTorque() {
-        int dirToTurn = GetComponent<PlaneController>().getDir();
+        int dirToTurn = pc.getDir();
         if (GetComponent<Rigidbody2D>().velocity.magnitude < speedOfControlEffectiveness) {
             return;
         }
