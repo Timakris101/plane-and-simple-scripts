@@ -18,9 +18,6 @@ public class GForcesScript : MonoBehaviour {
     }
 
     void Update() {
-        if (feltGs < rollOverThresh) {
-            rollover();
-        }
         if (GetComponent<SpriteRenderer>().sprite == origSprite) {
             if (transform.Find("Gear") != null) transform.Find("Gear").GetComponent<GearScript>().unhideGear();
             if (transform.Find("Flaps") != null) transform.Find("Flaps").GetComponent<FlapScript>().unhideFlaps();
@@ -32,6 +29,9 @@ public class GForcesScript : MonoBehaviour {
     }
 
     void FixedUpdate() {
+        if (feltGs < rollOverThresh) {
+            rollover();
+        }
         calculateGs();
     }
 
