@@ -49,6 +49,7 @@ public class Aerodynamics : MonoBehaviour {
     }
 
     void FixedUpdate() {
+        setPlaneController();
         handleThrust();
         handleDrag();
         handleLift();
@@ -88,7 +89,11 @@ public class Aerodynamics : MonoBehaviour {
     }
 
     private void handleThrust() {
-        if (transform.Find("Propeller") != null) if (pc.getEnginesOn()) GetComponent<Rigidbody2D>().AddForce(transform.right * (pc.getInWEP() ? WEP : Mathf.Min(idle + pc.getThrottle(), 1)) * maxThrust);
+        if (transform.Find("Propeller") != null) {
+            if (pc.getEnginesOn()) {
+                GetComponent<Rigidbody2D>().AddForce(transform.right * (pc.getInWEP() ? WEP : Mathf.Min(idle + pc.getThrottle(), 1)) * maxThrust);
+            }
+        }
     }
 
     private float AoA() {
@@ -119,6 +124,10 @@ public class Aerodynamics : MonoBehaviour {
 
     public float getAlignmentThresh() {
         return alignmentThresh;
+    }
+
+    public void setSpeedOfControlEff(float val) {
+        speedOfControlEffectiveness = val;
     }
 
     public void setWingArea(float val) {

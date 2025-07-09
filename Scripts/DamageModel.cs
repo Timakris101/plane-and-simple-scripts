@@ -9,6 +9,12 @@ public class DamageModel : MonoBehaviour {
     [SerializeField] private float maxHealth;
     [SerializeField] private float health;
 
+    [Header("Tail")]
+    [SerializeField] private GameObject tail;
+
+    [Header("Wing")]
+    [SerializeField] private GameObject wing;
+
     private Aerodynamics aero;
 
     void Start() {
@@ -30,8 +36,16 @@ public class DamageModel : MonoBehaviour {
         health -= amt;
         foreach (string effect in hitEffects) {
             if (effect == "tail") {
-                aero.setBaseTorque(health <= 0 ? aero.getBaseTorque() : aero.getBaseTorque() * (1 - amt / maxHealth));
+                aero.setBaseTorque(health <= 0 ? 0 : aero.getBaseTorque() * (1 - amt / maxHealth));
+                if (health <= 0 && !transform.parent.GetComponent<Animator>().GetBool("Tailless")) {
+                    GameObject obj = Instantiate(tail, transform.position, transform.rotation);
+                    obj.transform.localScale = transform.parent.localScale;
+                    transform.parent.GetComponent<Animator>().SetBool("Tailless", true);
+                    transform.parent.GetComponent<Aerodynamics>().setSpeedOfControlEff(Mathf.Infinity);
+                    transform.parent.GetComponent<Rigidbody2D>().angularVelocity += Random.Range(-60f, 60f);
+                }
             }
+
             if (effect == "wings") {
                 aero.setWingArea(health <= 0 ? 0 : aero.getWingArea() * (1 - amt / maxHealth));
                 if (health / maxHealth < Random.Range(0f, .5f)) {
@@ -40,10 +54,18 @@ public class DamageModel : MonoBehaviour {
                 if (health / maxHealth < Random.Range(0f, .75f)) {
                     if (transform.parent.Find("Flaps") != null) transform.parent.Find("Flaps").GetComponent<FlapScript>().breakFlaps();
                 }
+                if (health <= 0 && !transform.parent.GetComponent<Animator>().GetBool("Wingless")) {
+                    GameObject obj = Instantiate(wing, transform.position, transform.rotation);
+                    obj.transform.localScale = transform.parent.localScale;
+                    transform.parent.GetComponent<Animator>().SetBool("Wingless", true);
+                    if (transform.childCount != 0) transform.GetChild(0).parent = null;
+                }
             }
+
             if (effect == "engine") {
                 aero.setMaxThrust(health <= 0 ? 0 : aero.getMaxThrust() - amt / maxHealth);
             }
+
             if (effect == "pilot") {
                 if (health <= 0) {
                     aero.setBaseTorque(0);
