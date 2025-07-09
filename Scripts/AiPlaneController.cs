@@ -24,7 +24,6 @@ public class AiPlaneController : PlaneController {
     }
 
     protected override int wantedDir() {
-        Debug.Log(angleTo(targetedObj.transform.position));
         if (angleTo(targetedObj.transform.position) > 180f - sixAngle || angleTo(targetedObj.transform.position) < -(180f - sixAngle)) {
             mode = "defensive";
         } else {
