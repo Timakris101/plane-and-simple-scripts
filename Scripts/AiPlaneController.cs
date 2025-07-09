@@ -9,7 +9,6 @@ public class AiPlaneController : PlaneController {
     [SerializeField] private float sixAngle;
     [SerializeField] private string mode;
     [SerializeField] private float minAltitude;
-    [SerializeField] private float minSpeed;
     [SerializeField] private float gunRange;
     private GameObject primaryBullet;
 
