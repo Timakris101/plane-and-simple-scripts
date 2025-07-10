@@ -16,6 +16,7 @@ public class DamageModel : MonoBehaviour {
     [SerializeField] private GameObject wing;
 
     private Aerodynamics aero;
+    private float taillessRotAspect;
 
     void Start() {
         health = maxHealth;
@@ -42,7 +43,13 @@ public class DamageModel : MonoBehaviour {
                     obj.transform.localScale = transform.parent.localScale;
                     transform.parent.GetComponent<Animator>().SetBool("Tailless", true);
                     transform.parent.GetComponent<Aerodynamics>().setSpeedOfControlEff(Mathf.Infinity);
-                    transform.parent.GetComponent<Rigidbody2D>().angularVelocity += Random.Range(-60f, 60f);
+
+                    transform.parent.GetComponent<BoxCollider2D>().size = new Vector2(transform.parent.GetComponent<BoxCollider2D>().size.x - obj.GetComponent<BoxCollider2D>().size.x, transform.parent.GetComponent<BoxCollider2D>().size.y);
+                    transform.parent.GetComponent<BoxCollider2D>().offset = new Vector2(transform.parent.GetComponent<BoxCollider2D>().offset.x + obj.GetComponent<BoxCollider2D>().size.x / 2, transform.parent.GetComponent<BoxCollider2D>().offset.y);
+                }
+                if (health <= 0) {
+                    if (taillessRotAspect == 0) taillessRotAspect = Random.Range(-1f, 1f);
+                    transform.parent.GetComponent<Rigidbody2D>().angularVelocity = taillessRotAspect * transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude;
                 }
             }
 
@@ -59,6 +66,9 @@ public class DamageModel : MonoBehaviour {
                     obj.transform.localScale = transform.parent.localScale;
                     transform.parent.GetComponent<Animator>().SetBool("Wingless", true);
                     if (transform.childCount != 0) transform.GetChild(0).parent = null;
+                }
+                if (health <= 0) {
+                    transform.parent.GetComponent<Animator>().speed = transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude / 30f;
                 }
             }
 
