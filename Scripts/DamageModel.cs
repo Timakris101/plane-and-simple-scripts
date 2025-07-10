@@ -24,7 +24,17 @@ public class DamageModel : MonoBehaviour {
     }
 
     void Update() {
-        
+        if (health <= 0) {
+            foreach (string effect in hitEffects) {
+                if (effect == "tail") {
+                    if (taillessRotAspect == 0) taillessRotAspect = Random.Range(-1f, 1f);
+                    transform.parent.GetComponent<Rigidbody2D>().angularVelocity = taillessRotAspect * transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude;
+                }
+                if (effect == "wings") {
+                    if (transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude < 1f) transform.parent.GetComponent<Animator>().speed = 0f;
+                }
+            }   
+        }
     }
 
     public void hit(float amt) {
@@ -47,10 +57,6 @@ public class DamageModel : MonoBehaviour {
                     transform.parent.GetComponent<BoxCollider2D>().size = new Vector2(transform.parent.GetComponent<BoxCollider2D>().size.x - obj.GetComponent<BoxCollider2D>().size.x, transform.parent.GetComponent<BoxCollider2D>().size.y);
                     transform.parent.GetComponent<BoxCollider2D>().offset = new Vector2(transform.parent.GetComponent<BoxCollider2D>().offset.x + obj.GetComponent<BoxCollider2D>().size.x / 2, transform.parent.GetComponent<BoxCollider2D>().offset.y);
                 }
-                if (health <= 0) {
-                    if (taillessRotAspect == 0) taillessRotAspect = Random.Range(-1f, 1f);
-                    transform.parent.GetComponent<Rigidbody2D>().angularVelocity = taillessRotAspect * transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude;
-                }
             }
 
             if (effect == "wings") {
@@ -66,9 +72,6 @@ public class DamageModel : MonoBehaviour {
                     obj.transform.localScale = transform.parent.localScale;
                     transform.parent.GetComponent<Animator>().SetBool("Wingless", true);
                     if (transform.childCount != 0) transform.GetChild(0).parent = null;
-                }
-                if (health <= 0) {
-                    transform.parent.GetComponent<Animator>().speed = transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude / 30f;
                 }
             }
 
