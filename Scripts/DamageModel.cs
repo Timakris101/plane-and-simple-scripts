@@ -31,7 +31,7 @@ public class DamageModel : MonoBehaviour {
                     transform.parent.GetComponent<Rigidbody2D>().angularVelocity = taillessRotAspect * transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude;
                 }
                 if (effect == "wings") {
-                    if (transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude < 1f) transform.parent.GetComponent<Animator>().speed = 0f;
+                    if (transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude < 1f) transform.parent.GetComponent<Animator>().speed = transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude / 1000f;
                 }
             }   
         }
