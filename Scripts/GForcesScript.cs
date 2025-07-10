@@ -29,7 +29,7 @@ public class GForcesScript : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        if (feltGs < rollOverThresh) {
+        if (feltGs < rollOverThresh && GetComponent<Rigidbody2D>().velocity.magnitude > 1f) {
             rollover();
         }
         calculateGs();
