@@ -12,6 +12,10 @@ public class GForcesScript : MonoBehaviour {
     [SerializeField] private float killingGs;
     [SerializeField] private float planeStructDestroyingGs;
     [SerializeField] private float planeDestroyingGs;
+
+    [Header("DestructiveEffects")]
+    [SerializeField] private GameObject fire;
+    [SerializeField] private GameObject explosion;
     
     void Start() {
         origSprite = GetComponent<SpriteRenderer>().sprite;
@@ -22,15 +26,21 @@ public class GForcesScript : MonoBehaviour {
             if (transform.Find("Gear") != null) transform.Find("Gear").GetComponent<GearScript>().unhideGear();
             if (transform.Find("Flaps") != null) transform.Find("Flaps").GetComponent<FlapScript>().unhideFlaps();
         }
-
-        if (overGPlaneToDeath()) Destroy(gameObject);
-        if (overGPlane()) transform.Find("WingHitbox").GetComponent<DamageModel>().kill();
-        if (overGPilotToDeath()) transform.Find("CockpitHitbox").GetComponent<DamageModel>().kill();
     }
 
     void FixedUpdate() {
         if (feltGs < rollOverThresh && GetComponent<Rigidbody2D>().velocity.magnitude > 1f) {
             rollover();
+        }
+        if (overGPlaneToDeath()) {
+            Instantiate(explosion, transform.position, Quaternion.identity);
+            Instantiate(fire, transform, false);
+        }
+        if (overGPlane()) {
+            transform.Find("WingHitbox").GetComponent<DamageModel>().kill();
+        }
+        if (overGPilotToDeath()) {
+            transform.Find("CockpitHitbox").GetComponent<DamageModel>().kill();
         }
         calculateGs();
     }
@@ -54,15 +64,15 @@ public class GForcesScript : MonoBehaviour {
     }
 
     public bool overGPlaneToDeath() {
-        return Mathf.Abs(currentGs.magnitude) > Mathf.Abs(planeDestroyingGs);
+        return currentGs.magnitude > planeDestroyingGs;
     }
 
     public bool overGPlane() {
-        return Mathf.Abs(currentGs.magnitude) > Mathf.Abs(planeStructDestroyingGs);
+        return currentGs.magnitude > planeStructDestroyingGs;
     }
 
     public bool overGPilotToDeath() {
-        return Mathf.Abs(feltGs) > Mathf.Abs(killingGs);
+        return currentGs.magnitude > killingGs;
     }
 
     public bool overGPilot() {
