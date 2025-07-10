@@ -23,6 +23,8 @@ public class AiPlaneController : PlaneController {
     }
 
     protected override int wantedDir() {
+        if (targetedObj == null || targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude < 1f) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
+
         if ((angleTo(targetedObj.transform.position) > 180f - sixAngle || angleTo(targetedObj.transform.position) < -(180f - sixAngle)) && targetedObj.transform.right.x / transform.right.x > 0) {
             mode = "defensive";
         } else {
@@ -34,8 +36,6 @@ public class AiPlaneController : PlaneController {
         if ((mode == "defensive" || mode == "hammerhead") && GetComponent<Rigidbody2D>().velocity.magnitude < targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude) mode = "overshoot";
 
         if (transform.position.y < minAltitude) return pointTowards(transform.position + Vector3.up);
-
-        if (targetedObj == null || targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude < 1f) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
 
         if (mode == "pursuit" || mode == "overshoot" || mode == "defensive") return pointTowards(positionToTarget(primaryBullet));
 
@@ -63,10 +63,12 @@ public class AiPlaneController : PlaneController {
         if (mode == "overshoot") throttle = 0f;
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<GunScript>() != null) {
-                if (targetInSights(transform.GetChild(i).GetComponent<GunScript>().getBullet()) && (transform.position - positionToTarget(transform.GetChild(i).GetComponent<GunScript>().getBullet())).magnitude < gunRange) {
-                    transform.GetChild(i).GetComponent<GunScript>().setShooting(true);
-                } else {
-                    transform.GetChild(i).GetComponent<GunScript>().setShooting(false);
+                if (targetedObj != null) {
+                    if (targetInSights(transform.GetChild(i).GetComponent<GunScript>().getBullet()) && (transform.position - positionToTarget(transform.GetChild(i).GetComponent<GunScript>().getBullet())).magnitude < gunRange) {
+                        transform.GetChild(i).GetComponent<GunScript>().setShooting(true);
+                    } else {
+                        transform.GetChild(i).GetComponent<GunScript>().setShooting(false);
+                    }
                 }
             }
         }
