@@ -14,9 +14,9 @@ public class DamageModel : MonoBehaviour {
 
     [Header("Wing")]
     [SerializeField] private GameObject wing;
+    [SerializeField] private float animatorSpeedFactor;
 
     private Aerodynamics aero;
-    private float taillessRotAspect;
 
     void Start() {
         health = maxHealth;
@@ -27,7 +27,7 @@ public class DamageModel : MonoBehaviour {
         if (health <= 0) {
             foreach (string effect in hitEffects) {
                 if (effect == "wings") {
-                    if (transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude < 1f) transform.parent.GetComponent<Animator>().speed = transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude / 1000f;
+                    transform.parent.GetComponent<Animator>().speed = transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude / animatorSpeedFactor;
                 }
             }   
         }
@@ -46,6 +46,7 @@ public class DamageModel : MonoBehaviour {
                 aero.setBaseTorque(health <= 0 ? 0 : aero.getBaseTorque() * (1 - amt / maxHealth));
                 if (health <= 0 && !transform.parent.GetComponent<Animator>().GetBool("Tailless")) {
                     GameObject obj = Instantiate(tail, transform.position, transform.rotation);
+                    obj.GetComponent<Rigidbody2D>().velocity = transform.parent.GetComponent<Rigidbody2D>().velocity;
                     obj.transform.localScale = transform.parent.localScale;
                     transform.parent.GetComponent<Animator>().SetBool("Tailless", true);
                     transform.parent.GetComponent<Aerodynamics>().setSpeedOfControlEff(Mathf.Infinity);
@@ -65,6 +66,7 @@ public class DamageModel : MonoBehaviour {
                 }
                 if (health <= 0 && !transform.parent.GetComponent<Animator>().GetBool("Wingless")) {
                     GameObject obj = Instantiate(wing, transform.position, transform.rotation);
+                    obj.GetComponent<Rigidbody2D>().velocity = transform.parent.GetComponent<Rigidbody2D>().velocity;
                     obj.transform.localScale = transform.parent.localScale;
                     transform.parent.GetComponent<Animator>().SetBool("Wingless", true);
                     if (transform.childCount != 0) transform.GetChild(0).parent = null;
