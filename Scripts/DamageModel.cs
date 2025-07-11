@@ -43,6 +43,10 @@ public class DamageModel : MonoBehaviour {
         }
     }
 
+    public void setHitChance(float val) {
+        hitChance = val;
+    }
+
     public void setMaxHealth(float val) {
         maxHealth = val;
         if (health > val) health = val;

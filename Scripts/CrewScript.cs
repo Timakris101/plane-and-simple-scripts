@@ -6,7 +6,6 @@ public class CrewScript : MonoBehaviour {
 
     [SerializeField] private float chuteSpeed;
     [SerializeField] private float chuteEff;
-    [SerializeField] private float maxHealth;
     private bool onGround;
 
     void OnCollisionEnter2D(Collision2D col) {
@@ -22,7 +21,7 @@ public class CrewScript : MonoBehaviour {
     void Start() {
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;
-            transform.GetChild(i).GetComponent<DamageModel>().setMaxHealth(maxHealth);
+            transform.GetChild(i).GetComponent<DamageModel>().setHitChance(1f);
         }
     }
 
