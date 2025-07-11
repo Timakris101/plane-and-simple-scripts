@@ -39,6 +39,7 @@ public class DamageModel : MonoBehaviour {
                 if (effect == "pilot" && transform.parent.GetComponent<Aerodynamics>() != null) { //if pilothitbox is on plane and not on crew
                     aero.setBaseTorque(0);
                     aero.setAlignmentThresh(0);
+                    if (transform.parent.Find("Camera") != null) transform.parent.Find("Camera").parent = null;
                 }
                 if (effect == "tail") {
                     aero.setSpeedOfControlEff(Mathf.Infinity);
