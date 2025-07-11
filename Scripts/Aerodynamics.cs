@@ -27,7 +27,8 @@ public class Aerodynamics : MonoBehaviour {
     [SerializeField] private float speedOfControlEffectiveness;
 
     [Header("Atmosphere")]
-    [SerializeField] private float airDensity;
+    private static float seaLevelAirDensity = 20f;
+    private static float scaleHeight = 8500f;
 
     private PlaneController pc;
 
@@ -58,10 +59,14 @@ public class Aerodynamics : MonoBehaviour {
         GetComponent<Rigidbody2D>().centerOfMass = transform.Find("CoM").localPosition;
     }
 
+    private float getAirDensity() {
+        return seaLevelAirDensity / Mathf.Exp(transform.position.y / scaleHeight);
+    }
+
     private void handleLift() {
         FlapScript fs = null;
         if (transform.Find("Flaps") != null) fs = transform.Find("Flaps").GetComponent<FlapScript>();
-        float liftForce = (cL.Evaluate(AoA()) + (fs == null ? 0 : (fs.getFlapEffectiveness() * fs.deflection() / fs.getMaxDeflection()))) * airDensity * Mathf.Pow(GetComponent<Rigidbody2D>().velocity.magnitude, 2) * wingArea / 2f;
+        float liftForce = (cL.Evaluate(AoA()) + (fs == null ? 0 : (fs.getFlapEffectiveness() * fs.deflection() / fs.getMaxDeflection()))) * getAirDensity() * Mathf.Pow(GetComponent<Rigidbody2D>().velocity.magnitude, 2) * wingArea / 2f;
         Vector2 liftDir = transform.localScale.y * Vector3.Cross(GetComponent<Rigidbody2D>().velocity, -transform.forward).normalized;
         GetComponent<Rigidbody2D>().AddForceAtPosition(liftDir * liftForce, transform.Find("CoL").position);
     }
@@ -72,7 +77,7 @@ public class Aerodynamics : MonoBehaviour {
         float inducedDragCoef = Mathf.Pow(cL.Evaluate(AoA()), 2) / (Mathf.PI * wingAspectRatio() * wingEfficiency);
         float totalDragCoef = inducedDragCoef + cD.Evaluate(AoA()) + (transform.Find("Flaps") == null ? 0 : (fs.getFlapDrag() * fs.deflection() / fs.getMaxDeflection())) + (transform.Find("Gear") == null ? 0 : transform.Find("Gear").GetComponent<GearScript>().getGearDrag());
 
-        float dragForce = totalDragCoef * airDensity * Mathf.Pow(GetComponent<Rigidbody2D>().velocity.magnitude, 2) * frontArea;
+        float dragForce = totalDragCoef * getAirDensity() * Mathf.Pow(GetComponent<Rigidbody2D>().velocity.magnitude, 2) * frontArea;
 
         GetComponent<Rigidbody2D>().AddForce(-GetComponent<Rigidbody2D>().velocity.normalized * dragForce);
     }
