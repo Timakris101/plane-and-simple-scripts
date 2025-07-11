@@ -37,10 +37,10 @@ public class GForcesScript : MonoBehaviour {
             Instantiate(fire, transform, false);
         }
         if (overGPlane()) {
-            transform.Find("WingHitbox").GetComponent<DamageModel>().kill();
+            if (transform.Find("WingHitbox") != null) transform.Find("WingHitbox").GetComponent<DamageModel>().kill();
         }
         if (overGPilotToDeath()) {
-            transform.Find("CockpitHitbox").GetComponent<DamageModel>().kill();
+            if (transform.Find("PilotHitbox") != null) transform.Find("PilotHitbox").GetComponent<DamageModel>().kill();
         }
         calculateGs();
     }

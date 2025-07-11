@@ -58,6 +58,18 @@ public class AiPlaneController : PlaneController {
         return Vector3.SignedAngle((pos - transform.position).normalized, transform.right, transform.forward);
     }
 
+    protected override void handleNonPilotControls() {
+        bool criticalSystemDestroyed = false;
+        for (int i = 0; i < transform.childCount; i++) {
+            if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;
+            if (!transform.GetChild(i).GetComponent<DamageModel>().isAlive()) {
+                criticalSystemDestroyed = true;
+                break;
+            }
+        }
+        if (criticalSystemDestroyed) GetComponent<BailoutHandler>().bailOut();
+    }
+
     protected override void handleControls() {
         throttle = 1f;
         if (mode == "overshoot") throttle = 0f;

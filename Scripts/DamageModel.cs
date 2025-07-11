@@ -8,6 +8,7 @@ public class DamageModel : MonoBehaviour {
     [SerializeField] private string[] hitEffects;
     [SerializeField] private float maxHealth;
     [SerializeField] private float health;
+    [SerializeField] private bool crewRole;
 
     [Header("Tail")]
     [SerializeField] private GameObject tail;
@@ -18,19 +19,33 @@ public class DamageModel : MonoBehaviour {
 
     private Aerodynamics aero;
 
+    public bool isCrewRole() {
+        return crewRole;
+    }
+
     void Start() {
         health = maxHealth;
         aero = transform.parent.GetComponent<Aerodynamics>();
     }
 
     void Update() {
+        if (health > maxHealth) health = maxHealth;
         if (health <= 0) {
             foreach (string effect in hitEffects) {
                 if (effect == "wings") {
                     transform.parent.GetComponent<Animator>().speed = transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude / animatorSpeedFactor;
                 }
+                if (effect == "pilot" && transform.parent.GetComponent<Aerodynamics>() != null) { //if pilothitbox is on plane and not on crew
+                    aero.setBaseTorque(0);
+                    aero.setAlignmentThresh(0);
+                }
             }   
         }
+    }
+
+    public void setMaxHealth(float val) {
+        maxHealth = val;
+        if (health > val) health = val;
     }
 
     public void hit(float amt) {
@@ -75,13 +90,6 @@ public class DamageModel : MonoBehaviour {
 
             if (effect == "engine") {
                 aero.setMaxThrust(health <= 0 ? 0 : aero.getMaxThrust() - amt / maxHealth);
-            }
-
-            if (effect == "pilot") {
-                if (health <= 0) {
-                    aero.setBaseTorque(0);
-                    aero.setAlignmentThresh(0);
-                }
             }
         }
     }

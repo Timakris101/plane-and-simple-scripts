@@ -8,6 +8,7 @@ public class PlaneController : MonoBehaviour {
     private float throttleChangeSpeed = 1f;
     private bool enginesOn;
     private bool unconcious;
+    private bool pilotGone;
     [SerializeField] private bool enginesStartOn;
 
     private bool onGround;
@@ -27,11 +28,15 @@ public class PlaneController : MonoBehaviour {
 
     void Update() {
         handleFeasibleControls();
-        unconcious = !(transform.Find("CockpitHitbox").GetComponent<DamageModel>().isAlive() && !GetComponent<GForcesScript>().overGPilot());
+        if (transform.Find("PilotHitbox") == null) {
+            pilotGone = true;
+            return;
+        }
+        unconcious = !(transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive() && !GetComponent<GForcesScript>().overGPilot());
     }
 
     public int getDir() {
-        if (!unconcious) return wantedDir();
+        if (!unconcious && !pilotGone) return wantedDir();
         return 0;
     }
 
@@ -50,7 +55,29 @@ public class PlaneController : MonoBehaviour {
     }
 
     public virtual void handleFeasibleControls() {
-        if (!unconcious) handleControls();
+        if (!unconcious && !pilotGone) handleControls();
+        if (pilotGone) setGuns(false);
+
+        bool anyCrewAlive = false;
+        for (int i = 0; i < transform.childCount; i++) {
+            if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;
+            
+            if (transform.GetChild(i).GetComponent<DamageModel>().isCrewRole()) {
+                if (transform.GetChild(i).GetComponent<DamageModel>().isAlive()) {
+                    anyCrewAlive = true;
+                    break;
+                }
+            }
+        }
+        if (anyCrewAlive) {
+            handleNonPilotControls();
+        }
+    }
+
+    protected virtual void handleNonPilotControls() {
+        if (Input.GetKeyDown("j")) {
+            GetComponent<BailoutHandler>().bailOut();
+        }
     }
 
     protected virtual void handleControls() {
@@ -67,8 +94,12 @@ public class PlaneController : MonoBehaviour {
         if (Input.GetKeyDown("g") && transform.Find("Gear") && !onGround) transform.Find("Gear").GetComponent<GearScript>().toggleGear();
         if (Input.GetKey("s") && throttle - throttleChangeSpeed * Time.deltaTime < 0 && transform.Find("Gear")) transform.Find("Gear").GetComponent<GearScript>().brake();
 
+        setGuns(Input.GetMouseButton(0));
+    }
+
+    private void setGuns(bool shooting) {
         for (int i = 0; i < transform.childCount; i++) {
-            if (transform.GetChild(i).GetComponent<GunScript>() != null) transform.GetChild(i).GetComponent<GunScript>().setShooting(Input.GetMouseButton(0));
+            if (transform.GetChild(i).GetComponent<GunScript>() != null) transform.GetChild(i).GetComponent<GunScript>().setShooting(shooting);
         }
     }
 
