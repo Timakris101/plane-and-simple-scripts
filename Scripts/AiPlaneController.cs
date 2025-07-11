@@ -22,6 +22,13 @@ public class AiPlaneController : PlaneController {
         mode = "pursuit";
     }
 
+    new void Update() {
+        base.Update();
+        if (targetedObj != null) {
+            if (targetedObj.GetComponent<PlaneController>().planeDead()) targetedObj = null;
+        }
+    }
+
     protected override int wantedDir() {
         if (targetedObj == null || targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude < 1f) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
 
@@ -62,9 +69,12 @@ public class AiPlaneController : PlaneController {
         bool criticalSystemDestroyed = false;
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;
-            if (!transform.GetChild(i).GetComponent<DamageModel>().isAlive()) {
-                criticalSystemDestroyed = true;
-                break;
+
+            if (!transform.GetChild(i).GetComponent<DamageModel>().isCrewRole()) {
+                if (!transform.GetChild(i).GetComponent<DamageModel>().isAlive()) {
+                    criticalSystemDestroyed = true;
+                    break;
+                }
             }
         }
         if (criticalSystemDestroyed) GetComponent<BailoutHandler>().bailOut();
@@ -81,6 +91,8 @@ public class AiPlaneController : PlaneController {
                     } else {
                         transform.GetChild(i).GetComponent<GunScript>().setShooting(false);
                     }
+                } else {
+                    transform.GetChild(i).GetComponent<GunScript>().setShooting(false);
                 }
             }
         }

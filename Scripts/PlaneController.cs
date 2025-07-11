@@ -26,13 +26,30 @@ public class PlaneController : MonoBehaviour {
         throttle = enginesStartOn ? 1 : 0;
     }
 
-    void Update() {
+    public bool planeDead() {
+        if (pilotGone) return true;
+        if (!transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive()) return true;
+
+        for (int i = 0; i < transform.childCount; i++) {
+            if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;
+            
+            if (!transform.GetChild(i).GetComponent<DamageModel>().isCrewRole()) {
+                if (!transform.GetChild(i).GetComponent<DamageModel>().isAlive()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    protected void Update() {
         handleFeasibleControls();
         if (transform.Find("PilotHitbox") == null) {
             pilotGone = true;
             return;
         }
-        unconcious = !(transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive() && !GetComponent<GForcesScript>().overGPilot());
+        unconcious = !transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive() || GetComponent<GForcesScript>().overGPilot();
     }
 
     public int getDir() {
