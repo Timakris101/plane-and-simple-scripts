@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AiPlaneController : PlaneController {
 
-    [SerializeField] private GameObject targetedObj;
+    private GameObject targetedObj;
     [SerializeField] private float angularThreshForGuns;
     [SerializeField] private float sixAngle;
     [SerializeField] private string mode;
@@ -12,15 +12,36 @@ public class AiPlaneController : PlaneController {
     [SerializeField] private float gunRange;
     private GameObject primaryBullet;
 
+    [Header("Alliance")]
+    [SerializeField] private string alliance;
+
+    private void findTarget() {
+        GameObject[] allPlanes = GameObject.FindGameObjectsWithTag("Plane");
+        targetedObj = null;
+        foreach (GameObject plane in allPlanes) {
+            if (plane == gameObject) continue;
+            
+            if (plane.GetComponent<AiPlaneController>().getAlliance() != alliance && !plane.GetComponent<PlaneController>().planeDead()) {
+                if (targetedObj == null) targetedObj = plane;
+
+                if (Vector3.Distance(plane.transform.position, transform.position) < Vector3.Distance(targetedObj.transform.position, transform.position)) {
+                    targetedObj = plane;
+                }
+            }
+        }
+    }
+
+    public string getAlliance() {
+        return alliance;
+    }
+
     protected override int wantedDir() {
+        findTarget();
+        
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<GunScript>() != null) {
                 primaryBullet = transform.GetChild(i).GetComponent<GunScript>().getBullet();
             }
-        }
-
-        if (targetedObj != null) {
-            if (targetedObj.GetComponent<PlaneController>().planeDead()) targetedObj = null;
         }
 
         if (targetedObj == null || targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude < 1f) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
@@ -74,9 +95,7 @@ public class AiPlaneController : PlaneController {
     }
 
     protected override void handleControls() {
-        if (targetedObj != null) {
-            if (targetedObj.GetComponent<PlaneController>().planeDead()) targetedObj = null;
-        }
+        findTarget();
         throttle = 1f;
         if (mode == "overshoot") throttle = 0f;
         for (int i = 0; i < transform.childCount; i++) {
