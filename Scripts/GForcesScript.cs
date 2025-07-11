@@ -16,6 +16,7 @@ public class GForcesScript : MonoBehaviour {
     [Header("DestructiveEffects")]
     [SerializeField] private GameObject fire;
     [SerializeField] private GameObject explosion;
+    private bool destroyed = false;
     
     void Start() {
         origSprite = GetComponent<SpriteRenderer>().sprite;
@@ -32,7 +33,8 @@ public class GForcesScript : MonoBehaviour {
         if (feltGs < rollOverThresh && GetComponent<Rigidbody2D>().velocity.magnitude > 1f) {
             rollover();
         }
-        if (overGPlaneToDeath()) {
+        if (overGPlaneToDeath() && !destroyed) {
+            destroyed = true;
             Instantiate(explosion, transform.position, Quaternion.identity);
             Instantiate(fire, transform, false);
         }
