@@ -77,7 +77,7 @@ public class AiPlaneController : PlaneController {
                 }
             }
         }
-        if (criticalSystemDestroyed) GetComponent<BailoutHandler>().bailOut();
+        if (criticalSystemDestroyed) GetComponent<BailoutHandler>().callBailOut();
     }
 
     protected override void handleControls() {

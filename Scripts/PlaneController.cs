@@ -27,7 +27,7 @@ public class PlaneController : MonoBehaviour {
     }
 
     public bool planeDead() {
-        if (pilotGone) return true;
+        if (transform.Find("PilotHitbox") == null) return true;
         if (!transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive()) return true;
 
         for (int i = 0; i < transform.childCount; i++) {
@@ -92,8 +92,8 @@ public class PlaneController : MonoBehaviour {
     }
 
     protected virtual void handleNonPilotControls() {
-        if (Input.GetKeyDown("j")) {
-            GetComponent<BailoutHandler>().bailOut();
+        if (Input.GetKey("j")) {
+            GetComponent<BailoutHandler>().callBailOut();
         }
     }
 

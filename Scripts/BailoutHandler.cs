@@ -6,6 +6,29 @@ public class BailoutHandler : MonoBehaviour {
 
     [SerializeField] private GameObject crew;
     [SerializeField] private string following;
+    [SerializeField] private float bailOutDelay;
+    private int bailCalled;
+    private int counter;
+    private float bailOutTimer;
+
+    void Update() {
+        counter++;
+        if (counter > bailCalled + 1) {
+            bailCalled = 0;
+            counter = 0;
+            bailOutTimer = 0;
+        }
+    }
+
+    public void callBailOut() {
+        bailCalled++;
+
+        bailOutTimer += Time.deltaTime;
+        if (bailOutTimer > bailOutDelay) {
+            bailOutTimer = 0;
+            bailOut();
+        }
+    }
 
     public void bailOut() {
         for (int i = 0; i < transform.childCount; i++) {
