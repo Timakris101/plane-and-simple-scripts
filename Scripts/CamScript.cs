@@ -6,8 +6,8 @@ public class CamScript : MonoBehaviour {
 
     private Vector3 offset;
 
-    [SerializeField] private int minP = 10; //min for perspective
-    [SerializeField] private int maxP = 90; //max for perspective
+    [SerializeField] private int minP; //min for perspective
+    [SerializeField] private int maxP; //max for perspective
 
     [SerializeField] private float freeCamSpeed;
 
