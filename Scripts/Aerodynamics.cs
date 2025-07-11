@@ -166,4 +166,12 @@ public class Aerodynamics : MonoBehaviour {
     public void setFrontArea(float val) {
         frontArea = val;
     }
+
+    public void setAlignmentStrength(float val) {
+        alignmentStrength = val;
+    }
+
+    public float getAlignmentStrength() {
+        return alignmentStrength;
+    }
 }
