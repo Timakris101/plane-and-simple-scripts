@@ -12,8 +12,10 @@ public class CamScript : MonoBehaviour {
     [SerializeField] private float freeCamSpeed;
 
     void Start() {
-        offset = transform.position - transform.parent.position;
-        offset = new Vector3(0, 0, offset.z);
+        if (transform.parent != null) {
+            offset = transform.position - transform.parent.position;
+            offset = new Vector3(0, 0, offset.z);
+        }
 
         Camera camera = gameObject.GetComponent<Camera>();
     }
