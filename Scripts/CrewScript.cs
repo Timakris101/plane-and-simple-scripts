@@ -15,10 +15,6 @@ public class CrewScript : MonoBehaviour {
                 if (transform.GetChild(i).GetComponent<Animator>() == null) continue;
                 transform.GetChild(i).GetComponent<Animator>().SetBool("OnGround", true);
             }
-            if (GetComponent<Animator>().GetBool("Dead") && !onGround) {
-                transform.localEulerAngles += new Vector3(0, 0, 45f);
-                GetComponent<Rigidbody2D>().angularVelocity = 1f;
-            }
             onGround = true;
         }
     }
@@ -31,6 +27,12 @@ public class CrewScript : MonoBehaviour {
     }
 
     void Update() {
+        if (GetComponent<Animator>().GetBool("Dead") && onGround && Mathf.Abs(transform.localEulerAngles.z) < 1f) {
+            transform.localEulerAngles = new Vector3(0, 0, 90f);
+        }
+        if (!GetComponent<Animator>().GetBool("Dead") && onGround && transform.localEulerAngles.z != 0) {
+            transform.localEulerAngles = new Vector3(0, 0, 0);
+        }
         handleHealth();
         if (!onGround) {
             handleSpeed();
