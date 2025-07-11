@@ -14,6 +14,7 @@ public class DamageModel : MonoBehaviour {
     [SerializeField] private GameObject tail;
 
     [Header("Wing")]
+    [SerializeField] private float ripSpeed;
     [SerializeField] private GameObject wing;
     [SerializeField] private float animatorSpeedFactor;
 
@@ -40,6 +41,13 @@ public class DamageModel : MonoBehaviour {
                     aero.setAlignmentThresh(0);
                 }
             }   
+        }
+        foreach (string effect in hitEffects) {
+            if (effect == "wings") {
+                if (transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude > ripSpeed) {
+                    kill();
+                }
+            }
         }
     }
 
