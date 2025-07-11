@@ -40,6 +40,14 @@ public class DamageModel : MonoBehaviour {
                     aero.setBaseTorque(0);
                     aero.setAlignmentThresh(0);
                 }
+                if (effect == "tail") {
+                    aero.setSpeedOfControlEff(Mathf.Infinity);
+                    if (transform.parent.GetComponent<Rigidbody2D>().angularVelocity > 0) {
+                        transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(.25f, .5f) * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude, 2f);
+                    } else {
+                        transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(-.25f, -.5f) * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude, 2f);
+                    }
+                }
             }   
         }
         foreach (string effect in hitEffects) {
@@ -76,7 +84,6 @@ public class DamageModel : MonoBehaviour {
                     obj.GetComponent<Rigidbody2D>().velocity = transform.parent.GetComponent<Rigidbody2D>().velocity;
                     obj.transform.localScale = transform.parent.localScale;
                     transform.parent.GetComponent<Animator>().SetBool("Tailless", true);
-                    transform.parent.GetComponent<Aerodynamics>().setSpeedOfControlEff(Mathf.Infinity);
 
                     transform.parent.GetComponent<BoxCollider2D>().size = new Vector2(transform.parent.GetComponent<BoxCollider2D>().size.x - obj.GetComponent<BoxCollider2D>().size.x, transform.parent.GetComponent<BoxCollider2D>().size.y);
                     transform.parent.GetComponent<BoxCollider2D>().offset = new Vector2(transform.parent.GetComponent<BoxCollider2D>().offset.x + obj.GetComponent<BoxCollider2D>().size.x / 2, transform.parent.GetComponent<BoxCollider2D>().offset.y);
