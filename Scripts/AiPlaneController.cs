@@ -12,24 +12,17 @@ public class AiPlaneController : PlaneController {
     [SerializeField] private float gunRange;
     private GameObject primaryBullet;
 
-    new void Start() {
-        base.Start();
+    protected override int wantedDir() {
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<GunScript>() != null) {
                 primaryBullet = transform.GetChild(i).GetComponent<GunScript>().getBullet();
             }
         }
-        mode = "pursuit";
-    }
 
-    new void Update() {
-        base.Update();
         if (targetedObj != null) {
             if (targetedObj.GetComponent<PlaneController>().planeDead()) targetedObj = null;
         }
-    }
 
-    protected override int wantedDir() {
         if (targetedObj == null || targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude < 1f) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
 
         if ((angleTo(targetedObj.transform.position) > 180f - sixAngle || angleTo(targetedObj.transform.position) < -(180f - sixAngle)) && targetedObj.transform.right.x / transform.right.x > 0) {
@@ -81,6 +74,9 @@ public class AiPlaneController : PlaneController {
     }
 
     protected override void handleControls() {
+        if (targetedObj != null) {
+            if (targetedObj.GetComponent<PlaneController>().planeDead()) targetedObj = null;
+        }
         throttle = 1f;
         if (mode == "overshoot") throttle = 0f;
         for (int i = 0; i < transform.childCount; i++) {
@@ -103,6 +99,10 @@ public class AiPlaneController : PlaneController {
     }
 
     private Vector3 positionToTarget(GameObject bullet) {
-        return targetedObj.transform.position + (Vector3) targetedObj.GetComponent<Rigidbody2D>().velocity * ((targetedObj.transform.position - transform.position) / (bullet.GetComponent<BulletScript>().getInitSpeed() + GetComponent<Rigidbody2D>().velocity.magnitude)).magnitude;
+        return targetedObj.transform.position + (Vector3) (targetedObj.GetComponent<Rigidbody2D>().velocity - GetComponent<Rigidbody2D>().velocity) * (targetedObj.transform.position - transform.position).magnitude / (bullet.GetComponent<BulletScript>().getInitSpeed());
+    }
+
+    public GameObject getTargetedObj() {
+        return targetedObj;
     }
 }

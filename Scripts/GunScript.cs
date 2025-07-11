@@ -18,7 +18,8 @@ public class GunScript : MonoBehaviour {
     private void shoot() {
         ammunition--;
         GameObject newBullet = Instantiate(bullet, transform.position, transform.rotation);
-        newBullet.GetComponent<Rigidbody2D>().velocity = (newBullet.GetComponent<BulletScript>().getInitSpeed() + transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude) * transform.parent.right;
+        Vector3 baseVel = transform.parent.GetComponent<Rigidbody2D>() == null ? transform.parent.parent.GetComponent<Rigidbody2D>().velocity : transform.parent.GetComponent<Rigidbody2D>().velocity; //looks up hierarchy by 2
+        newBullet.GetComponent<Rigidbody2D>().velocity = newBullet.GetComponent<BulletScript>().getInitSpeed() * transform.right + baseVel;
     }
 
     void Update() {

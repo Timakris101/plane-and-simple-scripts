@@ -13,6 +13,8 @@ public class CamScript : MonoBehaviour {
 
     [SerializeField] private bool spectator;
 
+    [SerializeField] private float freeCamSpeed;
+
     void Start() {
         offset = transform.position - transform.parent.position;
         offset = new Vector3(0, 0, offset.z);
@@ -21,13 +23,28 @@ public class CamScript : MonoBehaviour {
     }
 
     void Update() {
-        transform.position = transform.parent.position + offset;
+        if (transform.parent != null) {
+            transform.position = transform.parent.position + offset;
+        } else {
+            if (Input.GetKey("w")) {
+                transform.position += new Vector3(0, 1, 0) * freeCamSpeed * Time.deltaTime;
+            }
+            if (Input.GetKey("a")) {
+                transform.position += new Vector3(-1, 0, 0) * freeCamSpeed * Time.deltaTime;
+            }
+            if (Input.GetKey("s")) {
+                transform.position += new Vector3(0, -1, 0) * freeCamSpeed * Time.deltaTime;
+            }
+            if (Input.GetKey("d")) {
+                transform.position += new Vector3(1, 0, 0) * freeCamSpeed * Time.deltaTime;
+            }
+        }
         transform.eulerAngles = new Vector3(0, 0, 0);
 
         Camera camera = gameObject.GetComponent<Camera>();
         
-        if (otherObjToKeepInFrame != null && spectator) {
-            camera.fieldOfView = 2 * Mathf.Atan((transform.position - otherObjToKeepInFrame.transform.position).magnitude / offset.magnitude) * 180f / 3.14f;
+        if (otherObjToKeepInFrame != null && spectator && transform.parent != null) {
+            camera.fieldOfView = 2 * Mathf.Atan(((transform.position - offset) - otherObjToKeepInFrame.transform.position).magnitude / offset.magnitude) * 180f / 3.14f;
         } else {
             camera.fieldOfView -= 2 * Mathf.Atan(Input.mouseScrollDelta.y); //adds mouse scroll to cam fov, tangent for smooth cam movement
         }

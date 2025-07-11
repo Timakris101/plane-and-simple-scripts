@@ -5,7 +5,6 @@ using UnityEngine;
 public class BailoutHandler : MonoBehaviour {
 
     [SerializeField] private GameObject crew;
-    [SerializeField] private string following;
     [SerializeField] private float bailOutDelay;
     private int bailCalled;
     private int counter;
@@ -41,9 +40,7 @@ public class BailoutHandler : MonoBehaviour {
                 GameObject newCrew = Instantiate(crew, hitbox.transform.position, Quaternion.identity);
                 newCrew.GetComponent<Rigidbody2D>().velocity = GetComponent<Rigidbody2D>().velocity;
 
-                if (hitbox.name.Contains(following)) {
-                    transform.Find("Camera").parent = newCrew.transform;
-                }
+                if (transform.Find("Camera") != null) transform.Find("Camera").parent = null;
 
                 hitbox.GetComponent<BoxCollider2D>().size = newCrew.GetComponent<BoxCollider2D>().size;
                 hitbox.GetComponent<BoxCollider2D>().offset = newCrew.GetComponent<BoxCollider2D>().offset;

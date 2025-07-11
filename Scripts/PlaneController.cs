@@ -21,9 +21,10 @@ public class PlaneController : MonoBehaviour {
         onGround = false;
     }
 
-    protected void Start() {
+    void Start() {
         enginesOn = enginesStartOn;
         throttle = enginesStartOn ? 1 : 0;
+        setGunnersToManual(false);
     }
 
     public bool planeDead() {
@@ -43,7 +44,7 @@ public class PlaneController : MonoBehaviour {
         return false;
     }
 
-    protected void Update() {
+    void Update() {
         handleFeasibleControls();
         if (transform.Find("PilotHitbox") == null) {
             pilotGone = true;
@@ -53,7 +54,13 @@ public class PlaneController : MonoBehaviour {
     }
 
     public int getDir() {
-        if (!unconcious && !pilotGone) return wantedDir();
+        if (!unconcious && !pilotGone) {
+            if (gunnersAreManual()) {
+                return GetComponent<AiPlaneController>().wantedDir();
+            } else {
+                return wantedDir();
+            }
+        }
         return 0;
     }
 
@@ -72,7 +79,13 @@ public class PlaneController : MonoBehaviour {
     }
 
     public virtual void handleFeasibleControls() {
-        if (!unconcious && !pilotGone) handleControls();
+        if (!unconcious && !pilotGone) {
+            if (gunnersAreManual()) {
+                GetComponent<AiPlaneController>().handleControls();
+            } else {
+                handleControls();
+            }
+        }
         if (pilotGone) setGuns(false);
 
         bool anyCrewAlive = false;
@@ -88,12 +101,19 @@ public class PlaneController : MonoBehaviour {
         }
         if (anyCrewAlive) {
             handleNonPilotControls();
+            handleSwapping();
         }
     }
 
     protected virtual void handleNonPilotControls() {
         if (Input.GetKey("j")) {
             GetComponent<BailoutHandler>().callBailOut();
+        }
+    }
+
+    private void handleSwapping() {
+        if (Input.GetKeyDown("v")) {
+            toggleGunners();
         }
     }
 
@@ -112,6 +132,27 @@ public class PlaneController : MonoBehaviour {
         if (Input.GetKey("s") && throttle - throttleChangeSpeed * Time.deltaTime < 0 && transform.Find("Gear")) transform.Find("Gear").GetComponent<GearScript>().brake();
 
         setGuns(Input.GetMouseButton(0));
+    }
+
+    private void toggleGunners() {
+        for (int i = 0; i < transform.childCount; i++) {
+            if (transform.GetChild(i).GetComponent<GunnerScript>() != null) {
+                transform.GetChild(i).GetComponent<GunnerScript>().setManualControl(!gunnersAreManual());
+            }
+        }
+    }
+
+    private void setGunnersToManual(bool manual) {
+        for (int i = 0; i < transform.childCount; i++) {
+            if (transform.GetChild(i).GetComponent<GunnerScript>() != null) transform.GetChild(i).GetComponent<GunnerScript>().setManualControl(manual);
+        }
+    }
+
+    private bool gunnersAreManual() {
+        for (int i = 0; i < transform.childCount; i++) {
+            if (transform.GetChild(i).GetComponent<GunnerScript>() != null) return transform.GetChild(i).GetComponent<GunnerScript>().getManualControl();
+        }
+        return false;
     }
 
     private void setGuns(bool shooting) {
