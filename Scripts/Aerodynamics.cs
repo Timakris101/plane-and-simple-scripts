@@ -38,6 +38,22 @@ public class Aerodynamics : MonoBehaviour {
 
     void Update() {
         setPlaneController();
+        checkPilotStatusAndModify();
+    }
+
+    private void checkPilotStatusAndModify() {
+        bool pilotGoneOrDead = false;
+        if (transform.Find("PilotHitbox") != null) {
+            if (!transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive()) {
+                pilotGoneOrDead = true;
+            }
+        } else {
+            pilotGoneOrDead = true;
+        }
+        if (pilotGoneOrDead) {
+            setBaseTorque(0);
+            setAlignmentThresh(0);
+        }
     }
 
     void setPlaneController() {

@@ -54,14 +54,11 @@ public class PlaneController : MonoBehaviour {
     }
 
     public int getDir() {
-        if (!unconcious && !pilotGone) {
-            if (gunnersAreManual()) {
-                return GetComponent<AiPlaneController>().wantedDir();
-            } else {
-                return wantedDir();
-            }
+        if (gunnersAreManual()) {
+            return GetComponent<AiPlaneController>().wantedDir();
+        } else {
+            return wantedDir();
         }
-        return 0;
     }
 
     protected virtual int wantedDir() {
