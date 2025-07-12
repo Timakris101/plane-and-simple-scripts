@@ -41,8 +41,13 @@ public class GForcesScript : MonoBehaviour {
         if (overGPlane()) {
             if (transform.Find("WingHitbox") != null) transform.Find("WingHitbox").GetComponent<DamageModel>().kill();
         }
-        if (overGPilotToDeath()) {
-            if (transform.Find("PilotHitbox") != null) transform.Find("PilotHitbox").GetComponent<DamageModel>().kill();
+        if (overGPersonToDeath()) {
+            for (int i = 0; i < transform.childCount; i++) {
+                if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;
+                if (!transform.GetChild(i).GetComponent<DamageModel>().isCrewRole()) continue;
+
+                transform.GetChild(i).GetComponent<DamageModel>().kill();
+            }
         }
         calculateGs();
     }
@@ -73,11 +78,11 @@ public class GForcesScript : MonoBehaviour {
         return currentGs.magnitude > planeStructDestroyingGs;
     }
 
-    public bool overGPilotToDeath() {
+    public bool overGPersonToDeath() {
         return currentGs.magnitude > killingGs;
     }
 
-    public bool overGPilot() {
+    public bool overGPerson() {
         return Mathf.Abs(feltGs) > Mathf.Abs(sleepyGs);
     }
 }

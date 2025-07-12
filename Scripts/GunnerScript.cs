@@ -12,7 +12,7 @@ public class GunnerScript : MonoBehaviour {
 
     void Update() {
         if (transform.parent.gameObject.layer == LayerMask.NameToLayer("Vehicle")) { //if in plane
-            if (GetComponent<DamageModel>().isAlive()) {
+            if (GetComponent<DamageModel>().isAlive() && !transform.parent.GetComponent<GForcesScript>().overGPerson()) { //if concious and alive
                 setTargetedObj(transform.parent.GetComponent<AiPlaneController>().getTargetedObj());
 
                 if (!manualControl) {

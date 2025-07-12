@@ -50,15 +50,18 @@ public class PlaneController : MonoBehaviour {
             pilotGone = true;
             return;
         }
-        unconcious = !transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive() || GetComponent<GForcesScript>().overGPilot();
+        unconcious = !transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive() || GetComponent<GForcesScript>().overGPerson();
     }
 
     public int getDir() {
-        if (gunnersAreManual()) {
-            return GetComponent<AiPlaneController>().wantedDir();
-        } else {
-            return wantedDir();
+        if (!unconcious && !pilotGone) {
+            if (gunnersAreManual()) {
+                return GetComponent<AiPlaneController>().wantedDir();
+            } else {
+                return wantedDir();
+            }
         }
+        return 0;
     }
 
     protected virtual int wantedDir() {
