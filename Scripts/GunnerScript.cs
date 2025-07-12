@@ -9,9 +9,14 @@ public class GunnerScript : MonoBehaviour {
     [SerializeField] private float angularThreshForGuns;
     [SerializeField] private float minDeflection;
     [SerializeField] private float maxDeflection;
+    private Sprite origSprite;
+
+    void Start() {
+        origSprite = transform.parent.GetComponent<SpriteRenderer>().sprite;
+    }
 
     void Update() {
-        if (transform.parent.gameObject.layer == LayerMask.NameToLayer("Vehicle")) { //if in plane
+        if (transform.parent.gameObject.layer == LayerMask.NameToLayer("Vehicle") && transform.parent.GetComponent<SpriteRenderer>().sprite == origSprite) { //if in plane and plane is whole
             if (GetComponent<DamageModel>().isAlive() && !transform.parent.GetComponent<GForcesScript>().overGPerson()) { //if concious and alive
                 setTargetedObj(transform.parent.GetComponent<AiPlaneController>().getTargetedObj());
 
@@ -23,9 +28,11 @@ public class GunnerScript : MonoBehaviour {
                         attemptToShoot(false);
                     }
                 } else {
-                    Vector3 screenToWorld = transform.parent.Find("Camera").GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -transform.parent.Find("Camera").position.z));
-                    pointGunAt(new Vector3(screenToWorld.x, screenToWorld.y, 0));
-                    attemptToShoot(Input.GetMouseButton(0));
+                    if (transform.parent.Find("Camera") != null) {
+                        Vector3 screenToWorld = transform.parent.Find("Camera").GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -transform.parent.Find("Camera").position.z));
+                        pointGunAt(new Vector3(screenToWorld.x, screenToWorld.y, 0));
+                        attemptToShoot(Input.GetMouseButton(0));
+                    }
                 }
             }
         } else {
