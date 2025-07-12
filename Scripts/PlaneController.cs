@@ -28,20 +28,31 @@ public class PlaneController : MonoBehaviour {
     }
 
     public bool planeDead() {
-        if (transform.Find("PilotHitbox") == null) return true;
-        if (!transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive()) return true;
+        bool anyCrewAlive = false;
+        for (int i = 0; i < transform.childCount; i++) {
+            if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;
+            
+            if (transform.GetChild(i).GetComponent<DamageModel>().isCrewRole()) {
+                if (transform.GetChild(i).GetComponent<DamageModel>().isAlive()) {
+                    anyCrewAlive = true;
+                    break;
+                }
+            }
+        }
 
+        bool criticalSystemDamage = false;
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;
             
             if (!transform.GetChild(i).GetComponent<DamageModel>().isCrewRole()) {
                 if (!transform.GetChild(i).GetComponent<DamageModel>().isAlive()) {
-                    return true;
+                    criticalSystemDamage = true;
+                    break;
                 }
             }
         }
 
-        return false;
+        return criticalSystemDamage || !anyCrewAlive;
     }
 
     void Update() {
@@ -102,6 +113,8 @@ public class PlaneController : MonoBehaviour {
         if (anyCrewAlive) {
             handleNonPilotControls();
             handleSwapping();
+        } else {
+            if (transform.Find("Camera") != null) transform.Find("Camera").parent = null;
         }
     }
 
