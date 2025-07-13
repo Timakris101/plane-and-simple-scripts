@@ -166,7 +166,7 @@ public class CamScript : MonoBehaviour {
         }
     }
 
-    private void takeControlOfPlane(GameObject plane) {
+    public void takeControlOfPlane(GameObject plane) {
         if (plane != null && plane.GetComponent<AiPlaneController>().enabled) {
             planeToControl = plane;
             PlaneController[] controllers = plane.GetComponents<PlaneController>();

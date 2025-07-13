@@ -24,8 +24,11 @@ public class DamageModel : MonoBehaviour {
         return crewRole;
     }
 
-    void Start() {
+    void Awake() {
         health = maxHealth;
+    }
+
+    void Start() {
         aero = transform.parent.GetComponent<Aerodynamics>();
     }
 
