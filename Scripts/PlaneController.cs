@@ -28,18 +28,6 @@ public class PlaneController : MonoBehaviour {
     }
 
     public bool planeDead() {
-        bool anyCrewAlive = false;
-        for (int i = 0; i < transform.childCount; i++) {
-            if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;
-            
-            if (transform.GetChild(i).GetComponent<DamageModel>().isCrewRole()) {
-                if (transform.GetChild(i).GetComponent<DamageModel>().isAlive()) {
-                    anyCrewAlive = true;
-                    break;
-                }
-            }
-        }
-
         bool criticalSystemDamage = false;
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;
@@ -52,7 +40,7 @@ public class PlaneController : MonoBehaviour {
             }
         }
 
-        return criticalSystemDamage || !anyCrewAlive;
+        return criticalSystemDamage || allCrewGoneFromPlane();
     }
 
     void Update() {
@@ -62,6 +50,32 @@ public class PlaneController : MonoBehaviour {
             return;
         }
         unconcious = !transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive() || GetComponent<GForcesScript>().overGPerson();
+        if (transform.Find("Camera") == null) {
+            foreach (PlaneController controller in GetComponents<PlaneController>()) {
+                if (controller == GetComponent<AiPlaneController>()) {
+                    controller.enabled = true;
+                } else {
+                    controller.enabled = false;
+                }
+            }
+        }
+    }
+
+    public void removeCam() {
+        if (transform.Find("Camera") != null) transform.Find("Camera").parent = null;
+    }
+
+    public bool allCrewGoneFromPlane() {
+        for (int i = 0; i < transform.childCount; i++) {
+            if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;
+            
+            if (transform.GetChild(i).GetComponent<DamageModel>().isCrewRole()) {
+                if (transform.GetChild(i).GetComponent<DamageModel>().isAlive()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public int getDir() {
@@ -99,22 +113,11 @@ public class PlaneController : MonoBehaviour {
         }
         if (pilotGone) setGuns(false);
 
-        bool anyCrewAlive = false;
-        for (int i = 0; i < transform.childCount; i++) {
-            if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;
-            
-            if (transform.GetChild(i).GetComponent<DamageModel>().isCrewRole()) {
-                if (transform.GetChild(i).GetComponent<DamageModel>().isAlive()) {
-                    anyCrewAlive = true;
-                    break;
-                }
-            }
-        }
-        if (anyCrewAlive) {
+        if (!allCrewGoneFromPlane()) {
             handleNonPilotControls();
             handleSwapping();
         } else {
-            if (transform.Find("Camera") != null) transform.Find("Camera").parent = null;
+            removeCam();
         }
     }
 

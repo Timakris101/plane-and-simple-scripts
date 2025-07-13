@@ -5,27 +5,94 @@ using UnityEngine;
 public class CamScript : MonoBehaviour {
 
     private Vector3 offset;
-
+    [Header("CamStats")]
     [SerializeField] private int minP; //min for perspective
     [SerializeField] private int maxP; //max for perspective
-
     [SerializeField] private float freeCamSpeedScaler;
 
-    void Start() {
-        if (transform.parent != null) {
-            offset = transform.position - transform.parent.position;
-            offset = new Vector3(0, 0, offset.z);
-        }
+    [Header("Plane")]
+    [SerializeField] private GameObject planeToControl;
+    [SerializeField] private GameObject spectatedPlane;
+    [SerializeField] private string startingAlliance;
 
-        Camera camera = gameObject.GetComponent<Camera>();
+    void Start() {
+        offset = new Vector3(0, 0, transform.position.z);
+
+        if (planeToControl == null) takeControlOfPlane(findNewPlane(startingAlliance));
     }
 
     void Update() {
-        Camera camera = gameObject.GetComponent<Camera>();
+        handleArrow();
+        handlePlaneSwitching();
+        handleCam();
+    }
 
+    private void handleArrow() {
+        if (nearestEnemy() != null && !planeToControl.GetComponent<PlaneController>().allCrewGoneFromPlane()) {
+            Vector3 screenPos = GetComponent<Camera>().WorldToScreenPoint(nearestEnemy().transform.position);
+            screenPos = (new Vector3(screenPos.x / Screen.width, screenPos.y / Screen.height, 0));
+            if (screenPos.x > 0 && screenPos.x < 1 && screenPos.y > 0 && screenPos.y < 1) {
+                transform.Find("Canvas").Find("ArrowHolder").GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = false;
+            } else {
+                transform.Find("Canvas").Find("ArrowHolder").GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = true;
+            }
+            
+            transform.Find("Canvas").Find("ArrowHolder").right = (nearestEnemy().transform.position - planeToControl.transform.position).normalized;
+        } else {
+            transform.Find("Canvas").Find("ArrowHolder").GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = false;
+        }
+    }
+
+    private void matchParentToPlane() {
+        if (planeToControl != null) {
+            transform.parent = planeToControl.transform;
+        } else {
+            transform.parent = null;
+        }
+    }
+
+    private void handlePlaneSwitching() {
+        if (Input.GetKeyDown("n")) {
+            if (Input.GetKey(KeyCode.LeftShift)) {
+                if (planeToControl == null) {
+                    scrollSpectatablePlanes();
+                } else {
+                    spectatedPlane = planeToControl;
+                    planeToControl = null;
+                }
+            } else {
+                if (spectatedPlane == null) {
+                    scrollCrewedPlanes();
+                } else {
+                    takeControlOfPlane(spectatedPlane);
+                    spectatedPlane = null;
+                }
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            planeToControl = null;
+            spectatedPlane = null;
+        }
+        if (planeToControl != null) {
+            if (planeToControl.GetComponent<PlaneController>().allCrewGoneFromPlane()) {
+                GameObject newPlane = findNewPlane(planeToControl.GetComponent<AiPlaneController>().getAlliance());
+                if (newPlane != null) {
+                    takeControlOfPlane(newPlane);
+                } else {
+                    planeToControl = null;
+                }
+            }
+        }
+        matchParentToPlane();
+    }
+
+    private void handleCam() {
+        Camera camera = gameObject.GetComponent<Camera>();
         if (transform.parent != null) {
             transform.position = transform.parent.position + offset;
         } else {
+            if (spectatedPlane != null) transform.position = spectatedPlane.transform.position + offset;
+
             Vector3 movementVec = new Vector3(0, 0, 0);
             if (Input.GetKey("w")) {
                 movementVec += new Vector3(0, 1, 0);
@@ -51,5 +118,100 @@ public class CamScript : MonoBehaviour {
         if (camera.fieldOfView < minP) { //makes cam size unable to go below min
             camera.fieldOfView = minP;
         }
+    }
+
+    private void scrollSpectatablePlanes() {
+        planeToControl = null;
+
+        GameObject[] planes = GameObject.FindGameObjectsWithTag("Plane");
+        if (spectatedPlane != null) {
+            for (int i = 0; i < planes.Length; i++) {
+                if (planes[i] == spectatedPlane) {
+                    spectatedPlane = planes[(i + 1) % planes.Length];
+                    break;
+                }
+            }
+        } else {
+            spectatedPlane = planes[0];
+        }
+    }
+
+    private void scrollCrewedPlanes() {
+        spectatedPlane = null;
+
+        GameObject[] planes = GameObject.FindGameObjectsWithTag("Plane");
+        List<GameObject> crewedPlanes = new List<GameObject>(); //Note: does not include planes with dead crew
+        for (int i = 0; i < planes.Length; i++) {
+            if (!planes[i].GetComponent<PlaneController>().allCrewGoneFromPlane()) {
+                crewedPlanes.Add(planes[i]);
+            }
+        }
+        if (crewedPlanes.Count == 0) {
+            planeToControl = null;
+            return;
+        }
+        if (planeToControl != null) {
+            if (!planeToControl.GetComponent<PlaneController>().allCrewGoneFromPlane()) {
+                for (int i = 0; i < crewedPlanes.Count; i++) {
+                    if (planeToControl == crewedPlanes[i]) {
+                        takeControlOfPlane(crewedPlanes[(i + 1) % crewedPlanes.Count]);
+                        break;
+                    }
+                }
+            } else {
+                takeControlOfPlane(crewedPlanes[0]);
+            }
+        } else {  
+            takeControlOfPlane(crewedPlanes[0]);
+        }
+    }
+
+    private void takeControlOfPlane(GameObject plane) {
+        if (plane != null && plane.GetComponent<AiPlaneController>().enabled) {
+            planeToControl = plane;
+            PlaneController[] controllers = plane.GetComponents<PlaneController>();
+            foreach (PlaneController controller in controllers) {
+                if (controller == plane.GetComponent<AiPlaneController>()) {
+                    controller.enabled = false;
+                } else {
+                    controller.enabled = true;
+                }
+            }
+        }
+    }
+
+    private GameObject findNewPlane(string alliance) {
+        foreach (GameObject plane in GameObject.FindGameObjectsWithTag("Plane")) {
+            if (plane == planeToControl) continue;
+
+            if (plane.GetComponent<AiPlaneController>().getAlliance() == alliance) {
+                if (!plane.GetComponent<PlaneController>().planeDead() &&plane.GetComponent<AiPlaneController>().enabled) {
+                    return plane;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private GameObject nearestEnemy() {
+        if (planeToControl == null) return null;
+        GameObject nearestEnemy = null;
+        foreach (GameObject plane in GameObject.FindGameObjectsWithTag("Plane")) {
+            if (plane == planeToControl) continue;
+
+            if (plane.GetComponent<AiPlaneController>().getAlliance() != planeToControl.GetComponent<AiPlaneController>().getAlliance()) {
+                if (!plane.GetComponent<PlaneController>().planeDead()) {
+                    if (nearestEnemy == null) {
+                        nearestEnemy = plane;
+                        continue;
+                    }
+                    if ((plane.transform.position - planeToControl.transform.position).magnitude < (nearestEnemy.transform.position - planeToControl.transform.position).magnitude) {
+                        nearestEnemy = plane;
+                    }
+                }
+            }
+        }
+        return nearestEnemy;
     }
 }

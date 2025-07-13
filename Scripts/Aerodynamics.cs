@@ -41,6 +41,7 @@ public class Aerodynamics : MonoBehaviour {
     }
 
     void setPlaneController() {
+        pc = null;
         foreach (PlaneController c in GetComponents<PlaneController>()) {
             if (c.enabled) {
                 pc = c;
@@ -83,20 +84,24 @@ public class Aerodynamics : MonoBehaviour {
     }
 
     private void handleTorque() {
-        int dirToTurn = pc.getDir();
-        if (GetComponent<Rigidbody2D>().velocity.magnitude < speedOfControlEffectiveness) {
-            return;
+        if (pc != null) {
+            int dirToTurn = pc.getDir();
+            if (GetComponent<Rigidbody2D>().velocity.magnitude < speedOfControlEffectiveness) {
+                return;
+            }
+            GetComponent<Rigidbody2D>().angularVelocity = dirToTurn * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude) * baseTorque;
+            bool positiveAoA = AoA() >= 0;
+            int correctionDir = positiveAoA ? -1 : 1;
+            if (AoA() > alignmentThresh || AoA() < -alignmentThresh) GetComponent<Rigidbody2D>().angularVelocity += correctionDir * Mathf.Abs(AoA()) * alignmentStrength * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude) * transform.localScale.y;
         }
-        GetComponent<Rigidbody2D>().angularVelocity = dirToTurn * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude) * baseTorque;
-        bool positiveAoA = AoA() >= 0;
-        int correctionDir = positiveAoA ? -1 : 1;
-        if (AoA() > alignmentThresh || AoA() < -alignmentThresh) GetComponent<Rigidbody2D>().angularVelocity += correctionDir * Mathf.Abs(AoA()) * alignmentStrength * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().velocity.magnitude) * transform.localScale.y;
     }
 
     private void handleThrust() {
-        if (transform.Find("Propeller") != null) {
-            if (pc.getEnginesOn()) {
-                GetComponent<Rigidbody2D>().AddForce(transform.right * (pc.getInWEP() ? WEP : Mathf.Min(idle + pc.getThrottle(), 1)) * maxThrust);
+        if (pc != null) {
+            if (transform.Find("Propeller") != null) {
+                if (pc.getEnginesOn()) {
+                    GetComponent<Rigidbody2D>().AddForce(transform.right * (pc.getInWEP() ? WEP : Mathf.Min(idle + pc.getThrottle(), 1)) * maxThrust);
+                }
             }
         }
     }
