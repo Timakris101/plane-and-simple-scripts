@@ -115,6 +115,7 @@ public class SquadronSpawner : MonoBehaviour {
                     selectorDropdown.GetComponent<TMP_Dropdown>().value = i;
                 }
             }
+            selectorDropdown.transform.Find("Label").GetComponent<TMP_Text>().text = curSelected.GetComponent<SquadronSpawner>().plane.name;
             curSelected.GetComponent<SpriteRenderer>().sprite = selected;
         } else {
             foreach (GameObject spawner in GameObject.FindGameObjectsWithTag("Spawner")) {
