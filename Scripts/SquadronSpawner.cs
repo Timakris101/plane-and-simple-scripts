@@ -41,7 +41,7 @@ public class SquadronSpawner : MonoBehaviour {
                     setCurrentSelectedObj(col.gameObject != curSelected ? col.gameObject : curSelected);
                 }
             }
-            if (Input.GetKey(KeyCode.Return)) setCurrentSelectedObj(null);
+            if (Input.GetKey(KeyCode.Escape)) setCurrentSelectedObj(null);
             if (Input.GetKey(KeyCode.Backspace)) Destroy(curSelected);
             if (curSelected != null) editSpawner();
             if (Input.GetMouseButtonDown(1) && curSelected == null) {
@@ -64,6 +64,7 @@ public class SquadronSpawner : MonoBehaviour {
         if (Input.GetMouseButton(0)) {
             if ((camera.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -camera.transform.position.z)) - curSelected.transform.position).magnitude < curSelected.GetComponent<CircleCollider2D>().radius * 2f) {
                 spawnerToEdit.transform.right = (camera.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -camera.transform.position.z)) - curSelected.transform.position).normalized;
+                spawnerToEdit.transform.localEulerAngles = new Vector3(0, 0, spawnerToEdit.transform.localEulerAngles.z);
             }
         }
         if (Input.GetMouseButton(1)) {
@@ -106,6 +107,9 @@ public class SquadronSpawner : MonoBehaviour {
     }
 
     public void setCurrentSelectedObj(GameObject obj) {
+        foreach (GameObject spawner in GameObject.FindGameObjectsWithTag("Spawner")) {
+            spawner.GetComponent<SpriteRenderer>().sprite = unselected;
+        }
         if (obj != null) {
             curSelected = obj;
             amountTextField.GetComponent<TMP_InputField>().text = curSelected.GetComponent<SquadronSpawner>().amt.ToString();
@@ -118,9 +122,6 @@ public class SquadronSpawner : MonoBehaviour {
             selectorDropdown.transform.Find("Label").GetComponent<TMP_Text>().text = selectorDropdown.GetComponent<TMP_Dropdown>().options[selectorDropdown.GetComponent<TMP_Dropdown>().value].text;
             curSelected.GetComponent<SpriteRenderer>().sprite = selected;
         } else {
-            foreach (GameObject spawner in GameObject.FindGameObjectsWithTag("Spawner")) {
-                spawner.GetComponent<SpriteRenderer>().sprite = unselected;
-            }
             curSelected = null;
         }
     }
