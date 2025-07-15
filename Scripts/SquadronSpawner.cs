@@ -62,9 +62,9 @@ public class SquadronSpawner : MonoBehaviour {
             }
         }
         if (Input.GetMouseButton(0)) {
-            if ((camera.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -camera.transform.position.z)) - curSelected.transform.position).magnitude < curSelected.GetComponent<CircleCollider2D>().radius * 2f) {
-                spawnerToEdit.transform.right = (camera.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -camera.transform.position.z)) - curSelected.transform.position).normalized;
-                spawnerToEdit.transform.localEulerAngles = new Vector3(0, 0, spawnerToEdit.transform.localEulerAngles.z);
+            Vector3 dir = camera.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -camera.transform.position.z)) - curSelected.transform.position;
+            if (dir.magnitude < curSelected.GetComponent<CircleCollider2D>().radius * 2f) {
+                spawnerToEdit.transform.localEulerAngles = new Vector3(0, 0, Mathf.Atan2(dir.normalized.y, dir.normalized.x) * 180f / 3.14f);
             }
         }
         if (Input.GetMouseButton(1)) {
