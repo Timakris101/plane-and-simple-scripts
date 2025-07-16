@@ -51,7 +51,7 @@ public class PropellerScript : MonoBehaviour {
         if (engineOn) {
             GetComponent<SpriteRenderer>().sortingOrder *= -1;
         } else {
-            GetComponent<SpriteRenderer>().sortingOrder = -1;
+            GetComponent<SpriteRenderer>().sortingOrder = 1;
         }
     }
 }
