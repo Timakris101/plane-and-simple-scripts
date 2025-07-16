@@ -30,6 +30,9 @@ public class SquadronSpawner : MonoBehaviour {
             for (int i = 0; i < planes.Length; i++) {
                 selectorDropdown.GetComponent<TMP_Dropdown>().options.Add(new TMP_Dropdown.OptionData(planes[i].name));
             }
+            selectorDropdown.transform.Find("Label").GetComponent<TMP_Text>().text = baseSpawner.GetComponent<SquadronSpawner>().plane.name;
+            amountTextField.GetComponent<TMP_InputField>().text = baseSpawner.GetComponent<SquadronSpawner>().amt.ToString();
+            containsPlayerToggle.GetComponent<Toggle>().isOn = baseSpawner.GetComponent<SquadronSpawner>().containsPlayer;
         }
         camera = GameObject.Find("Camera");
     }
