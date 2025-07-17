@@ -37,6 +37,7 @@ public class GForcesScript : MonoBehaviour {
             destroyed = true;
             Instantiate(explosion, transform.position, Quaternion.identity);
             Instantiate(fire, transform, false);
+            GetComponent<Aerodynamics>().setSpeedOfControlEff(Mathf.Infinity);
         }
         if (overGPlane()) {
             if (transform.Find("WingHitbox") != null) transform.Find("WingHitbox").GetComponent<DamageModel>().kill();
