@@ -46,13 +46,13 @@ public class AiPlaneController : PlaneController {
 
         if (targetedObj == null || targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude < 1f) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
 
-        if ((angleTo(targetedObj.transform.position) > 180f - sixAngle || angleTo(targetedObj.transform.position) < -(180f - sixAngle)) && targetedObj.transform.right.x / transform.right.x > 0) {
+        if ((angleTo(targetedObj.transform.position) > 180f - sixAngle || angleTo(targetedObj.transform.position) < -(180f - sixAngle)) && Vector3.Dot(targetedObj.transform.right, transform.right) > 0) {
             mode = "defensive";
         } else {
             mode = "pursuit";
         }
 
-        if (targetedObj.transform.right.x / transform.right.x < 0 && angleTo(targetedObj.transform.position) < angularThreshForGuns) {
+        if (Vector3.Dot(targetedObj.transform.right, transform.right) < 0 && angleTo(targetedObj.transform.position) < angularThreshForGuns) {
             mode = "headon";
         }
 

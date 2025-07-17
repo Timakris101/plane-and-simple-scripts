@@ -65,7 +65,7 @@ public class GForcesScript : MonoBehaviour {
             Vector3 currentForces = curVel - prevVel;
 
             if (currentForces.magnitude != 0) currentGs = transform.localScale.y * (currentForces + Vector3.up);
-            feltGs = Vector3.Project(currentGs, transform.up).y / transform.up.y;
+            feltGs = Vector3.Dot(Vector3.Project(currentGs, transform.up), transform.up);
         }
         prevVel = GetComponent<Rigidbody2D>().velocity;
     }
