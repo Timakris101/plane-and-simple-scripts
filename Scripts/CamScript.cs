@@ -5,6 +5,9 @@ using UnityEngine;
 public class CamScript : MonoBehaviour {
 
     private Vector3 offset;
+    [Header("Mode")]
+    [SerializeField] private bool missionEditor;
+
     [Header("CamStats")]
     [SerializeField] private int minP; //min for perspective
     [SerializeField] private int maxP; //max for perspective
@@ -52,7 +55,7 @@ public class CamScript : MonoBehaviour {
     }
 
     private void handlePlaneSwitching() {
-        if (Input.GetKeyDown("n")) {
+        if (Input.GetKeyDown("n") && missionEditor) {
             if (Input.GetKey(KeyCode.LeftShift)) {
                 if (planeToControl == null) {
                     scrollSpectatablePlanes();

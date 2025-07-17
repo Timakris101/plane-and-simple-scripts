@@ -95,7 +95,7 @@ public class AiPlaneController : PlaneController {
                 }
             }
         }
-        if (criticalSystemDestroyed) GetComponent<BailoutHandler>().callBailOut();
+        if (criticalSystemDestroyed || GetComponent<Rigidbody2D>().velocity.magnitude <= .1f) GetComponent<BailoutHandler>().callBailOut();
     }
 
     protected override void handleControls() {
