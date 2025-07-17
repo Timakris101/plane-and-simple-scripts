@@ -56,25 +56,27 @@ public class SquadronSpawner : MonoBehaviour {
     }
 
     public void editSpawner(GameObject spawnerToEdit) {
-        int ignore;
-        if (int.TryParse(amountTextField.GetComponent<TMP_InputField>().text, out ignore)) spawnerToEdit.GetComponent<SquadronSpawner>().amt = int.Parse(amountTextField.GetComponent<TMP_InputField>().text);
-        spawnerToEdit.GetComponent<SquadronSpawner>().containsPlayer = containsPlayerToggle.GetComponent<Toggle>().isOn;
-        foreach (GameObject spawner in GameObject.FindGameObjectsWithTag("Spawner")) {
-            if (spawner != spawnerToEdit && spawnerToEdit.GetComponent<SquadronSpawner>().containsPlayer) {
-                spawner.GetComponent<SquadronSpawner>().setContainsPlayer(false);
+        if (spawnerToEdit != null) {
+            int ignore;
+            if (int.TryParse(amountTextField.GetComponent<TMP_InputField>().text, out ignore)) spawnerToEdit.GetComponent<SquadronSpawner>().amt = int.Parse(amountTextField.GetComponent<TMP_InputField>().text);
+            spawnerToEdit.GetComponent<SquadronSpawner>().containsPlayer = containsPlayerToggle.GetComponent<Toggle>().isOn;
+            foreach (GameObject spawner in GameObject.FindGameObjectsWithTag("Spawner")) {
+                if (spawner != spawnerToEdit && spawnerToEdit.GetComponent<SquadronSpawner>().containsPlayer) {
+                    spawner.GetComponent<SquadronSpawner>().setContainsPlayer(false);
+                }
             }
-        }
-        if (Input.GetMouseButton(0)) {
-            Vector3 dir = camera.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -camera.transform.position.z)) - curSelected.transform.position;
-            if (dir.magnitude < curSelected.GetComponent<CircleCollider2D>().radius * 2f) {
-                spawnerToEdit.transform.localEulerAngles = new Vector3(0, 0, Mathf.Atan2(dir.normalized.y, dir.normalized.x) * 180f / 3.14f);
+            if (Input.GetMouseButton(0)) {
+                Vector3 dir = camera.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -camera.transform.position.z)) - curSelected.transform.position;
+                if (dir.magnitude < curSelected.GetComponent<CircleCollider2D>().radius * 2f) {
+                    spawnerToEdit.transform.localEulerAngles = new Vector3(0, 0, Mathf.Atan2(dir.normalized.y, dir.normalized.x) * 180f / 3.14f);
+                }
             }
-        }
-        if (Input.GetMouseButton(1)) {
-            spawnerToEdit.transform.position = camera.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -camera.transform.position.z));
-        }
+            if (Input.GetMouseButton(1)) {
+                spawnerToEdit.transform.position = camera.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -camera.transform.position.z));
+            }
 
-        spawnerToEdit.GetComponent<SquadronSpawner>().plane = planes[selectorDropdown.GetComponent<TMP_Dropdown>().value];
+            spawnerToEdit.GetComponent<SquadronSpawner>().plane = planes[selectorDropdown.GetComponent<TMP_Dropdown>().value];
+        }
     }
 
     public void editSpawner() {
