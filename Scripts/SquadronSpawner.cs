@@ -5,6 +5,10 @@ using TMPro;
 using UnityEngine.UI;
 
 public class SquadronSpawner : MonoBehaviour {  
+    [Header("Mode")]
+    [SerializeField] private bool arcade;
+    private bool on;
+
     [Header("SelectionSpawner")]
     [SerializeField] private bool selectionSpawner;
     [SerializeField] private GameObject curSelected;
@@ -53,6 +57,23 @@ public class SquadronSpawner : MonoBehaviour {
                 setCurrentSelectedObj(newSpawner);
             }
         }
+        if (arcade && on) {
+            if (!anyPlanesLeft(plane.GetComponent<AiPlaneController>().getAlliance())) {
+                spawnPlanes();
+                GameObject.Find("Score").GetComponent<TMP_Text>().text = (int.Parse(GameObject.Find("Score").GetComponent<TMP_Text>().text) + (containsPlayer ? -1 : 1)).ToString();
+            }
+        }
+    }
+
+    public bool anyPlanesLeft(string alliance) {
+        foreach (GameObject plane in GameObject.FindGameObjectsWithTag("Plane")) {
+            if (plane.GetComponent<AiPlaneController>().getAlliance() == alliance) {
+                if (!plane.GetComponent<PlaneController>().allCrewGoneFromPlane()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void editSpawner(GameObject spawnerToEdit) {
@@ -90,6 +111,7 @@ public class SquadronSpawner : MonoBehaviour {
     public static void activateSquadronSpawners() {
         foreach (GameObject spawner in GameObject.FindGameObjectsWithTag("Spawner")) {
             spawner.GetComponent<SquadronSpawner>().spawnPlanes();
+            spawner.GetComponent<SquadronSpawner>().on = true;
             spawner.GetComponent<SpriteRenderer>().enabled = false;
         }
     }

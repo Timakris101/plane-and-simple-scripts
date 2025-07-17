@@ -185,7 +185,7 @@ public class CamScript : MonoBehaviour {
             if (plane == planeToControl) continue;
 
             if (plane.GetComponent<AiPlaneController>().getAlliance() == alliance) {
-                if (!plane.GetComponent<PlaneController>().planeDead() &&plane.GetComponent<AiPlaneController>().enabled) {
+                if (!plane.GetComponent<PlaneController>().planeDead() && plane.GetComponent<AiPlaneController>().enabled) {
                     return plane;
                 }
             }
