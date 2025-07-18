@@ -119,7 +119,7 @@ public class DamageModel : MonoBehaviour {
         }
 
         if (effect == "Engine") {
-            aero.setMaxThrust(health <= 0 ? 0 : aero.getMaxThrust() - amt / maxHealth);
+            aero.setMaxThrust(health <= 0 ? 0 : aero.getMaxThrust() * (1 - amt / maxHealth));
         }
     }
 
