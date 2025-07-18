@@ -46,13 +46,13 @@ public class AiPlaneController : PlaneController {
 
         if (targetedObj == null || targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude < 1f) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
 
-        if ((angleTo(targetedObj.transform.position) > 180f - sixAngle || angleTo(targetedObj.transform.position) < -(180f - sixAngle)) && Vector3.Dot(targetedObj.transform.right, transform.right) > 0) {
+        if (Mathf.Abs(angleTo(targetedObj.transform.position)) > 180f - sixAngle && Mathf.Abs(Vector2.SignedAngle(targetedObj.transform.right, transform.right)) < 90f) {
             mode = "defensive";
         } else {
             mode = "pursuit";
         }
 
-        if (Vector3.Dot(targetedObj.transform.right, transform.right) < 0 && angleTo(targetedObj.transform.position) < angularThreshForGuns) {
+        if (Mathf.Abs(Vector2.SignedAngle(targetedObj.transform.right, transform.right)) > 135f && Mathf.Abs(angleTo(targetedObj.transform.position)) < sixAngle) {
             mode = "headon";
         }
 
@@ -65,7 +65,7 @@ public class AiPlaneController : PlaneController {
         if (mode == "pursuit" || mode == "overshoot" || mode == "defensive" || mode == "headon") return pointTowards(positionToTarget(primaryBullet));
 
         if (mode == "hammerhead") {
-            if (GetComponent<Rigidbody2D>().velocity.magnitude < 1f) {
+            if (GetComponent<Rigidbody2D>().velocity.magnitude < 1f || Mathf.Abs(Vector2.SignedAngle(targetedObj.transform.right, transform.right)) > 45f) {
                 mode = "pursuit";
             } else {
                 return pointTowards(transform.position + Vector3.up);
