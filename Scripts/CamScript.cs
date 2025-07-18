@@ -31,18 +31,20 @@ public class CamScript : MonoBehaviour {
     }
 
     private void handleArrow() {
-        if (nearestEnemy() != null && !planeToControl.GetComponent<PlaneController>().allCrewGoneFromPlane()) {
-            Vector3 screenPos = GetComponent<Camera>().WorldToScreenPoint(nearestEnemy().transform.position);
-            screenPos = (new Vector3(screenPos.x / Screen.width, screenPos.y / Screen.height, 0));
-            if (screenPos.x > 0 && screenPos.x < 1 && screenPos.y > 0 && screenPos.y < 1) {
-                transform.Find("Canvas").Find("ArrowHolder").GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = false;
+        if (transform.Find("Canvas") != null) {
+            if (nearestEnemy() != null && !planeToControl.GetComponent<PlaneController>().allCrewGoneFromPlane()) {
+                Vector3 screenPos = GetComponent<Camera>().WorldToScreenPoint(nearestEnemy().transform.position);
+                screenPos = (new Vector3(screenPos.x / Screen.width, screenPos.y / Screen.height, 0));
+                if (screenPos.x > 0 && screenPos.x < 1 && screenPos.y > 0 && screenPos.y < 1) {
+                    transform.Find("Canvas").Find("ArrowHolder").GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = false;
+                } else {
+                    transform.Find("Canvas").Find("ArrowHolder").GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = true;
+                }
+                
+                transform.Find("Canvas").Find("ArrowHolder").right = (nearestEnemy().transform.position - planeToControl.transform.position).normalized;
             } else {
-                transform.Find("Canvas").Find("ArrowHolder").GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = true;
+                transform.Find("Canvas").Find("ArrowHolder").GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = false;
             }
-            
-            transform.Find("Canvas").Find("ArrowHolder").right = (nearestEnemy().transform.position - planeToControl.transform.position).normalized;
-        } else {
-            transform.Find("Canvas").Find("ArrowHolder").GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = false;
         }
     }
 
