@@ -28,6 +28,7 @@ public class CamScript : MonoBehaviour {
         handleArrow();
         handlePlaneSwitching();
         handleCam();
+        handleCrosshair();
     }
 
     private void handleArrow() {
@@ -44,6 +45,22 @@ public class CamScript : MonoBehaviour {
                 transform.Find("Canvas").Find("ArrowHolder").right = (nearestEnemy().transform.position - planeToControl.transform.position).normalized;
             } else {
                 transform.Find("Canvas").Find("ArrowHolder").GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = false;
+            }
+        }
+    }
+
+    private void handleCrosshair() {
+        if (transform.Find("Canvas") != null) {
+            if (planeToControl != null) {
+                transform.Find("Canvas").Find("CrosshairHolder").right = planeToControl.transform.right;
+                for (int i = 0; i < transform.Find("Canvas").Find("CrosshairHolder").childCount; i++) {
+                    transform.Find("Canvas").Find("CrosshairHolder").GetChild(i).GetComponent<UnityEngine.UI.Image>().enabled = true;
+                    transform.Find("Canvas").Find("CrosshairHolder").GetChild(i).eulerAngles = new Vector3(0, 0, 0);
+                }
+            } else {
+                for (int i = 0; i < transform.Find("Canvas").Find("CrosshairHolder").childCount; i++) {
+                    transform.Find("Canvas").Find("CrosshairHolder").GetChild(i).GetComponent<UnityEngine.UI.Image>().enabled = false;
+                }
             }
         }
     }
