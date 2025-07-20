@@ -62,15 +62,15 @@ public class AiPlaneController : PlaneController {
 
         if (transform.position.y < minAltitude) return pointTowards(transform.position + Vector3.up);
 
-        if (mode == "pursuit" || mode == "overshoot" || mode == "defensive" || mode == "headon") return pointTowards(positionToTarget(primaryBullet));
-
         if (mode == "hammerhead") {
-            if (GetComponent<Rigidbody2D>().velocity.magnitude < 1f || Mathf.Abs(Vector2.SignedAngle(targetedObj.transform.right, transform.right)) > 45f) {
+            if (targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude < 15f || Mathf.Abs(Vector2.SignedAngle(targetedObj.transform.right, transform.right)) > 45f) {
                 mode = "pursuit";
             } else {
                 return pointTowards(transform.position + Vector3.up);
             }
         }
+
+        if (mode == "pursuit" || mode == "overshoot" || mode == "defensive" || mode == "headon") return pointTowards(positionToTarget(primaryBullet));
 
         return 0;
     }
