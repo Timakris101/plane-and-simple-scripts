@@ -153,7 +153,7 @@ public class PlaneController : MonoBehaviour {
     private void toggleGunners() {
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<GunnerScript>() != null) {
-                transform.GetChild(i).GetComponent<GunnerScript>().setManualControl(!gunnersAreManual());
+                transform.GetChild(i).GetComponent<GunnerScript>().setManualControl(!transform.GetChild(i).GetComponent<GunnerScript>().getManualControl());
             }
         }
     }
@@ -164,7 +164,7 @@ public class PlaneController : MonoBehaviour {
         }
     }
 
-    private bool gunnersAreManual() {
+    public bool gunnersAreManual() {
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<GunnerScript>() != null) return transform.GetChild(i).GetComponent<GunnerScript>().getManualControl();
         }

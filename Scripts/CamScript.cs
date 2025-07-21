@@ -21,7 +21,11 @@ public class CamScript : MonoBehaviour {
     void Start() {
         offset = new Vector3(0, 0, transform.position.z);
 
-        if (planeToControl == null) takeControlOfPlane(findNewPlane(startingAlliance));
+        if (planeToControl == null) {
+            takeControlOfPlane(findNewPlane(startingAlliance));
+        } else {
+            takeControlOfPlane(planeToControl);
+        }
     }
 
     void Update() {
@@ -51,7 +55,7 @@ public class CamScript : MonoBehaviour {
 
     private void handleCrosshair() {
         if (transform.Find("Canvas") != null) {
-            if (planeToControl != null) {
+            if (planeToControl != null && !planeToControl.GetComponent<PlaneController>().gunnersAreManual()) {
                 transform.Find("Canvas").Find("CrosshairHolder").right = planeToControl.transform.right;
                 for (int i = 0; i < transform.Find("Canvas").Find("CrosshairHolder").childCount; i++) {
                     transform.Find("Canvas").Find("CrosshairHolder").GetChild(i).GetComponent<UnityEngine.UI.Image>().enabled = true;
