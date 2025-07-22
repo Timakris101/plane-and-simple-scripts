@@ -26,6 +26,7 @@ public class CamScript : MonoBehaviour {
         } else {
             takeControlOfPlane(planeToControl);
         }
+        matchParentToPlane();
     }
 
     void Update() {
@@ -193,15 +194,10 @@ public class CamScript : MonoBehaviour {
     }
 
     public void takeControlOfPlane(GameObject plane) {
-        if (plane != null && plane.GetComponent<AiPlaneController>().enabled) {
+        if (plane != null) {
             planeToControl = plane;
-            PlaneController[] controllers = plane.GetComponents<PlaneController>();
-            foreach (PlaneController controller in controllers) {
-                if (controller == plane.GetComponent<AiPlaneController>()) {
-                    controller.enabled = false;
-                } else {
-                    controller.enabled = true;
-                }
+            foreach (PlaneController controller in plane.GetComponents<PlaneController>()) {
+                controller.enabled = controller.GetType() != plane.GetComponent<AiPlaneController>().GetType();
             }
         }
     }

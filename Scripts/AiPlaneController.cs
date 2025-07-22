@@ -43,6 +43,8 @@ public class AiPlaneController : PlaneController {
                 primaryBullet = transform.GetChild(i).GetComponent<GunScript>().getBullet();
             }
         }
+        
+        if (transform.position.y < minAltitude) return pointTowards(transform.position + Vector3.up);
 
         if (targetedObj == null || targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude < 1f) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
 
@@ -59,8 +61,6 @@ public class AiPlaneController : PlaneController {
         if (mode == "defensive" && Vector3.Project(targetedObj.transform.position - transform.position, Vector3.up).y < 0 && GetComponent<Rigidbody2D>().velocity.magnitude > targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude) mode = "hammerhead";
 
         if ((mode == "defensive" || mode == "hammerhead") && GetComponent<Rigidbody2D>().velocity.magnitude < targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude) mode = "overshoot";
-
-        if (transform.position.y < minAltitude) return pointTowards(transform.position + Vector3.up);
 
         if (mode == "hammerhead") {
             if (targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude < 15f || Mathf.Abs(Vector2.SignedAngle(targetedObj.transform.right, transform.right)) > 45f) {
