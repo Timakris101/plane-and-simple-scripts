@@ -12,6 +12,7 @@ public class PropellerScript : MonoBehaviour {
     [SerializeField] private Quaternion[] valsOfPropAtAnimIndexNonWingless;
     [Tooltip("X: position x | Y: position y | Z: rotation z | W: order (0 means gone)")]
     [SerializeField] private Quaternion[] valsOfPropAtAnimIndexWingless;
+    [SerializeField] private float engineAmt = 0;
 
     private PlaneController pc;
 
@@ -22,6 +23,10 @@ public class PropellerScript : MonoBehaviour {
     void Start() {
         idleCoef = transform.parent.GetComponent<Aerodynamics>().getIdle();
         GetComponent<Animator>().speed = transform.parent.GetComponent<PlaneController>().getEnginesStartOn() ? 0 : 1;
+
+        for (int i = 0; i < transform.parent.childCount; i++) {
+            if (transform.parent.GetChild(i).GetComponent<PropellerScript>() != null) engineAmt++;
+        }
     }
 
     void setPlaneController() {
@@ -53,11 +58,13 @@ public class PropellerScript : MonoBehaviour {
             }
         }
 
-        Quaternion[] arrToUse = (transform.parent.GetComponent<Animator>().GetBool("Wingless") ? valsOfPropAtAnimIndexWingless : valsOfPropAtAnimIndexNonWingless);
-        int indexToUse = int.Parse(transform.parent.GetComponent<SpriteRenderer>().sprite.name.Substring(transform.parent.GetComponent<SpriteRenderer>().sprite.name.IndexOf("_") + 1));
-        transform.localPosition = new Vector3(arrToUse[indexToUse].x, arrToUse[indexToUse].y, 0f);
-        transform.localEulerAngles = new Vector3(0, 0, arrToUse[indexToUse].z);
-        GetComponent<SpriteRenderer>().sortingOrder = (int) arrToUse[indexToUse].w;
-        GetComponent<SpriteRenderer>().enabled = arrToUse[indexToUse].w != 0;
+        if (engineAmt != 1) {
+            Quaternion[] arrToUse = (transform.parent.GetComponent<Animator>().GetBool("Wingless") ? valsOfPropAtAnimIndexWingless : valsOfPropAtAnimIndexNonWingless);
+            int indexToUse = int.Parse(transform.parent.GetComponent<SpriteRenderer>().sprite.name.Substring(transform.parent.GetComponent<SpriteRenderer>().sprite.name.IndexOf("_") + 1));
+            transform.localPosition = new Vector3(arrToUse[indexToUse].x, arrToUse[indexToUse].y, 0f);
+            transform.localEulerAngles = new Vector3(0, 0, arrToUse[indexToUse].z);
+            GetComponent<SpriteRenderer>().sortingOrder = (int) arrToUse[indexToUse].w;
+            GetComponent<SpriteRenderer>().enabled = arrToUse[indexToUse].w != 0;
+        }
     }
 }
