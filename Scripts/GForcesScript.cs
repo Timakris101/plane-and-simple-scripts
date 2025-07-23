@@ -7,7 +7,6 @@ public class GForcesScript : MonoBehaviour {
     [SerializeField] private Vector3 currentGs;
     [SerializeField] private float feltGs;
     private Vector3 prevVel;
-    private Sprite origSprite;
     [SerializeField] private float sleepyGs;
     [SerializeField] private float killingGs;
     [SerializeField] private float planeStructDestroyingGs;
@@ -17,19 +16,12 @@ public class GForcesScript : MonoBehaviour {
     [SerializeField] private GameObject fire;
     [SerializeField] private GameObject explosion;
     private bool destroyed = false;
-    
-    void Start() {
-        origSprite = GetComponent<SpriteRenderer>().sprite;
-    }
 
-    void Update() {
-        if (GetComponent<SpriteRenderer>().sprite == origSprite) {
+    void FixedUpdate() {
+        if (GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Wait")) {
             if (transform.Find("Gear") != null) transform.Find("Gear").GetComponent<GearScript>().unhideGear();
             if (transform.Find("Flaps") != null) transform.Find("Flaps").GetComponent<FlapScript>().unhideFlaps();
         }
-    }
-
-    void FixedUpdate() {
         if (feltGs < rollOverThresh && GetComponent<Rigidbody2D>().velocity.magnitude > 1f) {
             rollover();
         }

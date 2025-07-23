@@ -48,10 +48,5 @@ public class PropellerScript : MonoBehaviour {
                 GetComponent<Animator>().speed /= engineAccelRate;
             }
         }
-        if (engineOn) {
-            GetComponent<SpriteRenderer>().sortingOrder *= -1;
-        } else {
-            GetComponent<SpriteRenderer>().sortingOrder = 1;
-        }
     }
 }
