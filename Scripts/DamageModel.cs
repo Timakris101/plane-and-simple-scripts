@@ -40,28 +40,32 @@ public class DamageModel : MonoBehaviour {
     void Update() {
         if (health > maxHealth) health = maxHealth;
         if (health <= 0) {
-            if (effect == "Wing") {
-                transform.parent.GetComponent<Animator>().speed = transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude / animatorSpeedFactor;
-                aero.setAlignmentThresh(0);
-                aero.setBaseTorque(0);
-            }
-            if (effect == "Tail") {
-                aero.setSpeedOfControlEff(Mathf.Infinity);
-                if (transform.parent.GetComponent<Rigidbody2D>().angularVelocity > 0) {
-                    transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(.25f, .5f) * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude, 2f);
-                } else {
-                    transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(-.25f, -.5f) * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude, 2f);
-                }
-            }
-            if (effect == "Engine") {
-                if (transform.childCount == 0) {
-                    Instantiate(destructiveEffect, transform, false);
-                }
-                for (int i = 0; i < transform.parent.childCount; i++) {
-                    if (transform.parent.GetChild(i).GetComponent<DamageModel>() != null) {
-                        transform.parent.GetChild(i).GetComponent<DamageModel>().damage(fireDamagePerSec * Time.deltaTime);
+            switch (effect) {
+                case "Wing":
+                    transform.parent.GetComponent<Animator>().speed = transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude / animatorSpeedFactor;
+                    aero.setAlignmentThresh(0);
+                    aero.setBaseTorque(0);
+                    break;
+
+                case "Tail":
+                    aero.setSpeedOfControlEff(Mathf.Infinity);
+                    if (transform.parent.GetComponent<Rigidbody2D>().angularVelocity > 0) {
+                        transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(.25f, .5f) * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude, 2f);
+                    } else {
+                        transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(-.25f, -.5f) * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude, 2f);
                     }
-                }
+                    break;
+
+                case "Engine":
+                    if (transform.childCount == 0) {
+                        Instantiate(destructiveEffect, transform, false);
+                    }
+                    for (int i = 0; i < transform.parent.childCount; i++) {
+                        if (transform.parent.GetChild(i).GetComponent<DamageModel>() != null) {
+                            transform.parent.GetChild(i).GetComponent<DamageModel>().damage(fireDamagePerSec * Time.deltaTime);
+                        }
+                    }
+                    break;
             }   
         }
         if (effect == "Wing") {
@@ -88,49 +92,63 @@ public class DamageModel : MonoBehaviour {
 
     public void damage(float amt) {
         health -= amt;
-        if (effect == "Tail") {
-            aero.setBaseTorque(health <= 0 ? 0 : aero.getBaseTorque() * (1 - amt / maxHealth));
-            if (health <= 0 && !transform.parent.GetComponent<Animator>().GetBool("Tailless")) {
-                GameObject obj = Instantiate(tail, transform.position, transform.rotation);
-                obj.GetComponent<Rigidbody2D>().velocity = transform.parent.GetComponent<Rigidbody2D>().velocity;
-                obj.transform.localScale = transform.parent.localScale;
-                transform.parent.GetComponent<Animator>().SetBool("Tailless", true);
+        switch(effect) {
+            case "Tail":
+                aero.setBaseTorque(health <= 0 ? 0 : aero.getBaseTorque() * (1 - amt / maxHealth));
+                if (health <= 0 && !transform.parent.GetComponent<Animator>().GetBool("Tailless")) {
+                    handleSpawningTail();
+                }
+                break;
 
-                transform.parent.GetComponent<BoxCollider2D>().size = new Vector2(transform.parent.GetComponent<BoxCollider2D>().size.x - obj.GetComponent<BoxCollider2D>().size.x, transform.parent.GetComponent<BoxCollider2D>().size.y);
-                transform.parent.GetComponent<BoxCollider2D>().offset = new Vector2(transform.parent.GetComponent<BoxCollider2D>().offset.x + obj.GetComponent<BoxCollider2D>().size.x / 2, transform.parent.GetComponent<BoxCollider2D>().offset.y);
-            }
+            case "Wing":
+                aero.setWingArea(health <= 0 ? 0 : aero.getWingArea() * (1 - amt / maxHealth));
+                if (health / maxHealth < Random.Range(0f, .5f)) {
+                    if (transform.parent.Find("Gear") != null) transform.parent.Find("Gear").GetComponent<GearScript>().breakGear();
+                }
+                if (health / maxHealth < Random.Range(0f, .75f)) {
+                    if (transform.parent.Find("Flaps") != null) transform.parent.Find("Flaps").GetComponent<FlapScript>().breakFlaps();
+                }
+                if (health <= 0 && !transform.parent.GetComponent<Animator>().GetBool("Wingless")) {
+                    handleSpawningWing();
+                }
+                break;
+
+            case "Engine":
+                aero.setMaxThrust(health <= 0 ? 0 : aero.getMaxThrust() * (1 - amt / maxHealth));
+                break;
         }
+    }
 
-        if (effect == "Wing") {
-            aero.setWingArea(health <= 0 ? 0 : aero.getWingArea() * (1 - amt / maxHealth));
-            if (health / maxHealth < Random.Range(0f, .5f)) {
-                if (transform.parent.Find("Gear") != null) transform.parent.Find("Gear").GetComponent<GearScript>().breakGear();
-            }
-            if (health / maxHealth < Random.Range(0f, .75f)) {
-                if (transform.parent.Find("Flaps") != null) transform.parent.Find("Flaps").GetComponent<FlapScript>().breakFlaps();
-            }
-            if (health <= 0 && !transform.parent.GetComponent<Animator>().GetBool("Wingless")) {
-                GameObject obj = Instantiate(wing, transform.position, transform.rotation);
-                obj.GetComponent<Rigidbody2D>().velocity = transform.parent.GetComponent<Rigidbody2D>().velocity;
-                obj.transform.localScale = transform.parent.localScale;
-                transform.parent.GetComponent<Animator>().SetBool("Wingless", true);
-                if (obj.transform.childCount != 0) {
-                    for (int i = 0; i < transform.parent.childCount; i++) {
-                        if (transform.parent.GetChild(i).GetComponent<PropellerScript>() != null) {
-                            if (transform.parent.GetChild(i).GetComponent<SpriteRenderer>().sortingOrder == 1) {
-                                transform.parent.GetChild(i).GetComponent<PropellerScript>().enabled = false;
-                                transform.parent.GetChild(i).GetComponent<Animator>().enabled = false;
-                                transform.parent.GetChild(i).position = obj.transform.GetChild(0).position;
-                                transform.parent.GetChild(i).parent = obj.transform.GetChild(0);
-                            }
-                        }
+    private void handleSpawningTail() {
+        GameObject obj = Instantiate(tail, transform.position, transform.rotation);
+        obj.GetComponent<Rigidbody2D>().velocity = transform.parent.GetComponent<Rigidbody2D>().velocity;
+        obj.transform.localScale = transform.parent.localScale;
+        transform.parent.GetComponent<Animator>().SetBool("Tailless", true);
+
+        transform.parent.GetComponent<BoxCollider2D>().size = new Vector2(transform.parent.GetComponent<BoxCollider2D>().size.x - obj.GetComponent<BoxCollider2D>().size.x, transform.parent.GetComponent<BoxCollider2D>().size.y);
+        transform.parent.GetComponent<BoxCollider2D>().offset = new Vector2(transform.parent.GetComponent<BoxCollider2D>().offset.x + obj.GetComponent<BoxCollider2D>().size.x / 2, transform.parent.GetComponent<BoxCollider2D>().offset.y);
+    }
+
+    private void handleSpawningWing() {
+        GameObject obj = Instantiate(wing, transform.position, transform.rotation);
+        obj.GetComponent<Rigidbody2D>().velocity = transform.parent.GetComponent<Rigidbody2D>().velocity;
+        obj.transform.localScale = transform.parent.localScale;
+        transform.parent.GetComponent<Animator>().SetBool("Wingless", true);
+        handlePropellerOn(obj);
+    }
+
+    private void handlePropellerOn(GameObject obj) {
+        if (obj.transform.childCount != 0) {
+            for (int i = 0; i < transform.parent.childCount; i++) {
+                if (transform.parent.GetChild(i).GetComponent<PropellerScript>() != null) {
+                    if (transform.parent.GetChild(i).GetComponent<SpriteRenderer>().sortingOrder == 1) {
+                        transform.parent.GetChild(i).GetComponent<PropellerScript>().enabled = false;
+                        transform.parent.GetChild(i).GetComponent<Animator>().enabled = false;
+                        transform.parent.GetChild(i).position = obj.transform.GetChild(0).position;
+                        transform.parent.GetChild(i).parent = obj.transform.GetChild(0);
                     }
                 }
             }
-        }
-
-        if (effect == "Engine") {
-            aero.setMaxThrust(health <= 0 ? 0 : aero.getMaxThrust() * (1 - amt / maxHealth));
         }
     }
 
