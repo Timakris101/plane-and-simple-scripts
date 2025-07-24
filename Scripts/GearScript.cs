@@ -57,6 +57,7 @@ public class GearScript : MonoBehaviour {
     }
 
     public void breakGear() {
+        gearDown();
         Vector3 vel = transform.parent.GetComponent<Rigidbody2D>().velocity;
         transform.parent.GetComponent<Aerodynamics>().setFrontArea(transform.parent.GetComponent<Aerodynamics>().getFrontArea() + gearlessArea);
         transform.SetParent(null, true);

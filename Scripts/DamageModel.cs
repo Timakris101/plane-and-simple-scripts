@@ -114,7 +114,18 @@ public class DamageModel : MonoBehaviour {
                 obj.GetComponent<Rigidbody2D>().velocity = transform.parent.GetComponent<Rigidbody2D>().velocity;
                 obj.transform.localScale = transform.parent.localScale;
                 transform.parent.GetComponent<Animator>().SetBool("Wingless", true);
-                if (transform.childCount != 0) transform.GetChild(0).parent = null;
+                if (obj.transform.childCount != 0) {
+                    for (int i = 0; i < transform.parent.childCount; i++) {
+                        if (transform.parent.GetChild(i).GetComponent<PropellerScript>() != null) {
+                            if (transform.parent.GetChild(i).GetComponent<SpriteRenderer>().sortingOrder == 1) {
+                                transform.parent.GetChild(i).GetComponent<PropellerScript>().enabled = false;
+                                transform.parent.GetChild(i).GetComponent<Animator>().enabled = false;
+                                transform.parent.GetChild(i).position = obj.transform.GetChild(0).position;
+                                transform.parent.GetChild(i).parent = obj.transform.GetChild(0);
+                            }
+                        }
+                    }
+                }
             }
         }
 
