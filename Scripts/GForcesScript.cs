@@ -33,6 +33,7 @@ public class GForcesScript : MonoBehaviour {
         }
         if (overGPlane()) {
             if (transform.Find("WingHitbox") != null) transform.Find("WingHitbox").GetComponent<DamageModel>().kill();
+            if (transform.Find("TailHitbox") != null) transform.Find("TailHitbox").GetComponent<DamageModel>().kill();
         }
         if (overGPersonToDeath()) {
             for (int i = 0; i < transform.childCount; i++) {
