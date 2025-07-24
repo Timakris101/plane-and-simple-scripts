@@ -95,7 +95,8 @@ public class AiPlaneController : PlaneController {
                 }
             }
         }
-        if (criticalSystemDestroyed || GetComponent<Rigidbody2D>().velocity.magnitude <= .1f) GetComponent<BailoutHandler>().callBailOut();
+        if (transform.Find("PilotHitbox") == null) return; //already bailed out
+        if (criticalSystemDestroyed || GetComponent<Rigidbody2D>().velocity.magnitude <= .1f || !transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive()) GetComponent<BailoutHandler>().callBailOut();
     }
 
     protected override void handleControls() {
@@ -126,6 +127,7 @@ public class AiPlaneController : PlaneController {
     }
 
     public GameObject getTargetedObj() {
+        findTarget();
         return targetedObj;
     }
 }
