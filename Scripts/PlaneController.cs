@@ -39,8 +39,8 @@ public class PlaneController : MonoBehaviour {
                 }
             }
         }
-
-        return criticalSystemDamage || allCrewGoneFromPlane();
+        if (allCrewGoneFromPlane()) return true;
+        return criticalSystemDamage || pilotDeadOrGone();
     }
 
     void Update() {
@@ -62,7 +62,7 @@ public class PlaneController : MonoBehaviour {
     }
 
     public void removeCam() {
-        if (transform.Find("Camera") != null) transform.Find("Camera").parent = null;
+        if (transform.Find("Camera") != null) transform.Find("Camera").GetComponent<CamScript>().uncoupleCam();
     }
 
     public bool allCrewGoneFromPlane() {
@@ -76,6 +76,13 @@ public class PlaneController : MonoBehaviour {
             }
         }
         return true;
+    }
+
+    public bool pilotDeadOrGone() {
+        if (transform.Find("PilotHitbox") == null) {
+            return true;
+        }
+        return !transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive();
     }
 
     public int getDir() {
@@ -113,11 +120,13 @@ public class PlaneController : MonoBehaviour {
         }
         if (pilotGone) setGuns(false);
 
+        if (pilotDeadOrGone()) {
+            removeCam();
+        }
+
         if (!allCrewGoneFromPlane()) {
             handleNonPilotControls();
             handleSwapping();
-        } else {
-            removeCam();
         }
     }
 

@@ -97,8 +97,7 @@ public class CamScript : MonoBehaviour {
             }
         }
         if (Input.GetKeyDown(KeyCode.Escape)) {
-            planeToControl = null;
-            spectatedPlane = null;
+            uncoupleCam();
         }
         if (planeToControl != null) {
             if (planeToControl.GetComponent<PlaneController>().allCrewGoneFromPlane()) {
@@ -111,6 +110,11 @@ public class CamScript : MonoBehaviour {
             }
         }
         matchParentToPlane();
+    }
+
+    public void uncoupleCam() {
+        planeToControl = null;
+        spectatedPlane = null;
     }
 
     private void handleCam() {
