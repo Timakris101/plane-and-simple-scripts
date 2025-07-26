@@ -18,6 +18,12 @@ public class CrewScript : MonoBehaviour {
         }
     }
 
+    void OnCollisionStay2D(Collision2D col) {
+        if (col.transform.tag == "Ground" && !GetComponent<Animator>().GetBool("Dead")) {
+            transform.up = col.contacts[0].normal;
+        }
+    }
+
     void Start() {
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;
@@ -28,9 +34,6 @@ public class CrewScript : MonoBehaviour {
     void Update() {
         if (GetComponent<Animator>().GetBool("Dead") && onGround && Mathf.Abs(transform.localEulerAngles.z) < 1f) {
             transform.localEulerAngles = new Vector3(0, 0, 90f);
-        }
-        if (!GetComponent<Animator>().GetBool("Dead") && onGround && transform.localEulerAngles.z != 0) {
-            transform.localEulerAngles = new Vector3(0, 0, 0);
         }
         handleHealth();
         if (!onGround) {
