@@ -119,11 +119,7 @@ public class PlaneController : MonoBehaviour {
             }
         }
         if (pilotGone) setGuns(false);
-
-        if (pilotDeadOrGone()) {
-            removeCam();
-        }
-
+        
         if (!allCrewGoneFromPlane()) {
             handleNonPilotControls();
             handleSwapping();
