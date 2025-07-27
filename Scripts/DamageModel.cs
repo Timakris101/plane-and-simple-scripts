@@ -49,10 +49,12 @@ public class DamageModel : MonoBehaviour {
 
                 case "Tail":
                     aero.setSpeedOfControlEff(Mathf.Infinity);
-                    if (transform.parent.GetComponent<Rigidbody2D>().angularVelocity > 0) {
-                        transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(.25f, .5f) * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude, 2f);
-                    } else {
-                        transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(-.25f, -.5f) * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude, 2f);
+                    if (transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude > 5f) {
+                        if (transform.parent.GetComponent<Rigidbody2D>().angularVelocity > 0) {
+                            transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(.25f, .5f) * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude, 2f);
+                        } else {
+                            transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(-.25f, -.5f) * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude, 2f);
+                        }
                     }
                     break;
 
