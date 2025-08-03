@@ -22,7 +22,7 @@ public class CrewScript : MonoBehaviour {
         if (col.transform.tag == "Ground" && !GetComponent<Animator>().GetBool("Dead")) {
             transform.up = col.contacts[0].normal;
         }
-        if (GetComponent<Animator>().GetBool("Dead") && onGround && Mathf.Abs(Vector3.Angle(col.contacts[0].normal, transform.up)) < 1f) {
+        if (GetComponent<Animator>().GetBool("Dead") && onGround && Mathf.Abs(Vector3.Angle(col.contacts[0].normal, transform.up)) < 45f) {
             transform.localEulerAngles = new Vector3(0, 0, 90f);
         }
     }
