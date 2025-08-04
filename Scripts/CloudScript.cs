@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class CloudScript : MonoBehaviour {
     private float timer;
-    [SerializeField] private float lifeTime;
+    [SerializeField] private float maxLifeTime;
+    private float lifeTime;
     [SerializeField] private float maxSpeed;
     private float speed;
 
     void Start() {
         speed = Random.Range(-maxSpeed, maxSpeed);
+        lifeTime = Random.Range(0f, maxLifeTime);
     }
 
     void Update() {
