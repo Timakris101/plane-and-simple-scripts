@@ -10,6 +10,7 @@ public class AiPlaneController : PlaneController {
     [SerializeField] private string mode;
     [SerializeField] private float minAltitude;
     [SerializeField] private float gunRange;
+    [SerializeField] private bool nonFighter;
     private GameObject primaryBullet;
 
     [Header("Alliance")]
@@ -43,6 +44,8 @@ public class AiPlaneController : PlaneController {
                 primaryBullet = transform.GetChild(i).GetComponent<GunScript>().getBullet();
             }
         }
+
+        if (nonFighter) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
         
         if (transform.position.y < minAltitude) return pointTowards(transform.position + Vector3.up);
 
@@ -70,7 +73,7 @@ public class AiPlaneController : PlaneController {
             }
         }
 
-        if (mode == "pursuit" || mode == "overshoot" || mode == "defensive" || mode == "headon") return pointTowards(positionToTarget(primaryBullet));
+        if (mode == "pursuit" || mode == "overshoot" || mode == "defensive" || mode == "headon") return pointTowards(positionToTarget(primaryBullet, transform.right));
 
         return 0;
     }
@@ -106,7 +109,7 @@ public class AiPlaneController : PlaneController {
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<GunScript>() != null) {
                 if (targetedObj != null) {
-                    if (targetInSights(transform.GetChild(i).GetComponent<GunScript>().getBullet()) && (transform.position - positionToTarget(transform.GetChild(i).GetComponent<GunScript>().getBullet())).magnitude < gunRange && mode != "headon") {
+                    if (targetInSights(transform.GetChild(i).GetComponent<GunScript>().getBullet()) && (transform.position - positionToTarget(transform.GetChild(i).GetComponent<GunScript>().getBullet(), transform.right)).magnitude < gunRange && mode != "headon") {
                         transform.GetChild(i).GetComponent<GunScript>().setShooting(true);
                     } else {
                         transform.GetChild(i).GetComponent<GunScript>().setShooting(false);
@@ -119,11 +122,11 @@ public class AiPlaneController : PlaneController {
     }
 
     private bool targetInSights(GameObject bullet) {
-        return Mathf.Abs(Vector3.SignedAngle((positionToTarget(bullet) - transform.position).normalized, transform.right, transform.forward)) < angularThreshForGuns;
+        return Mathf.Abs(Vector3.SignedAngle((positionToTarget(bullet, transform.right) - transform.position).normalized, transform.right, transform.forward)) < angularThreshForGuns;
     }
 
-    private Vector3 positionToTarget(GameObject bullet) {
-        return targetedObj.transform.position + (Vector3) (targetedObj.GetComponent<Rigidbody2D>().velocity - GetComponent<Rigidbody2D>().velocity) * (targetedObj.transform.position - transform.position).magnitude / (bullet.GetComponent<BulletScript>().getInitSpeed());
+    private Vector3 positionToTarget(GameObject bullet, Vector3 gunDir) {
+        return targetedObj.transform.position + (Vector3) (targetedObj.GetComponent<Rigidbody2D>().velocity) * (targetedObj.transform.position - transform.position).magnitude / (bullet.GetComponent<BulletScript>().getInitSpeed() * gunDir + (Vector3) GetComponent<Rigidbody2D>().velocity).magnitude;
     }
 
     public GameObject getTargetedObj() {
