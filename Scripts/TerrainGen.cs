@@ -19,5 +19,7 @@ public class TerrainGen : MonoBehaviour {
         terrainVecs[(int) terrainPointAmt - 1] = new Vector2(terrainLength / 2, 0f);
 
         GetComponent<PolygonCollider2D>().SetPath(0, terrainVecs);
+
+        GetComponent<SpriteShapeRenderer>().localBounds = new Bounds(Vector3.zero, new Vector3(terrainLength * transform.localScale.x, maxHeight * transform.localScale.y, 0)); 
     }
 }
