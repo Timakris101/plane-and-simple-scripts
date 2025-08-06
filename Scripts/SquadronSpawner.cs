@@ -37,7 +37,17 @@ public class SquadronSpawner : MonoBehaviour {
                 selectorDropdown.GetComponent<TMP_Dropdown>().options.Add(new TMP_Dropdown.OptionData(planes[i].name));
             }
             selectorDropdown.transform.Find("Label").GetComponent<TMP_Text>().text = baseSpawner.GetComponent<SquadronSpawner>().plane.name;
+            for (int i = 0; i < selectorDropdown.GetComponent<TMP_Dropdown>().options.Count; i++) {
+                if (selectorDropdown.GetComponent<TMP_Dropdown>().options[i].text == selectorDropdown.transform.Find("Label").GetComponent<TMP_Text>().text) {
+                    selectorDropdown.GetComponent<TMP_Dropdown>().value = i;
+                }
+            }
             allianceDropdown.transform.Find("Label").GetComponent<TMP_Text>().text = baseSpawner.GetComponent<SquadronSpawner>().plane.GetComponent<AiPlaneController>().getAlliance();
+            for (int i = 0; i < allianceDropdown.GetComponent<TMP_Dropdown>().options.Count; i++) {
+                if (allianceDropdown.GetComponent<TMP_Dropdown>().options[i].text == allianceDropdown.transform.Find("Label").GetComponent<TMP_Text>().text) {
+                    allianceDropdown.GetComponent<TMP_Dropdown>().value = i;
+                }
+            }
             amountTextField.GetComponent<TMP_InputField>().text = baseSpawner.GetComponent<SquadronSpawner>().amt.ToString();
             containsPlayerToggle.GetComponent<Toggle>().isOn = baseSpawner.GetComponent<SquadronSpawner>().containsPlayer;
         }
@@ -48,7 +58,7 @@ public class SquadronSpawner : MonoBehaviour {
         if (camera != null && selectionSpawner) {
             if (Input.GetMouseButtonDown(0)) {
                 foreach (Collider2D col in Physics2D.OverlapCircleAll(camera.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -camera.transform.position.z)), .1f)) {
-                    setCurrentSelectedObj(col.gameObject != curSelected ? col.gameObject : curSelected);
+                    if (col.transform.GetComponent<SquadronSpawner>() != null) setCurrentSelectedObj(col.gameObject != curSelected ? col.gameObject : curSelected);
                 }
             }
             if (Input.GetKey(KeyCode.Escape)) {
@@ -149,21 +159,23 @@ public class SquadronSpawner : MonoBehaviour {
             curSelected = obj;
             amountTextField.GetComponent<TMP_InputField>().text = curSelected.GetComponent<SquadronSpawner>().amt.ToString();
             containsPlayerToggle.GetComponent<Toggle>().isOn = curSelected.GetComponent<SquadronSpawner>().containsPlayer;
-            setDropdown(selectorDropdown);
-            setDropdown(allianceDropdown);
+            for (int i = 0; i < selectorDropdown.GetComponent<TMP_Dropdown>().options.Count; i++) {
+                if (selectorDropdown.GetComponent<TMP_Dropdown>().options[i].text == curSelected.GetComponent<SquadronSpawner>().plane.name) {
+                    selectorDropdown.GetComponent<TMP_Dropdown>().value = i;
+                }
+            }
+            selectorDropdown.transform.Find("Label").GetComponent<TMP_Text>().text = selectorDropdown.GetComponent<TMP_Dropdown>().options[selectorDropdown.GetComponent<TMP_Dropdown>().value].text;
+
+            for (int i = 0; i < allianceDropdown.GetComponent<TMP_Dropdown>().options.Count; i++) {
+                if (allianceDropdown.GetComponent<TMP_Dropdown>().options[i].text == curSelected.GetComponent<SquadronSpawner>().alliance) {
+                    allianceDropdown.GetComponent<TMP_Dropdown>().value = i;
+                }
+            }
+            allianceDropdown.transform.Find("Label").GetComponent<TMP_Text>().text = allianceDropdown.GetComponent<TMP_Dropdown>().options[allianceDropdown.GetComponent<TMP_Dropdown>().value].text;
 
             curSelected.GetComponent<SpriteRenderer>().sprite = selected;
         } else {
             curSelected = null;
         }
-    }
-
-    private void setDropdown(GameObject dropdown) {
-        for (int i = 0; i < dropdown.GetComponent<TMP_Dropdown>().options.Count; i++) {
-            if (dropdown.GetComponent<TMP_Dropdown>().options[i].text == curSelected.GetComponent<SquadronSpawner>().alliance) {
-                dropdown.GetComponent<TMP_Dropdown>().value = i;
-            }
-        }
-        dropdown.transform.Find("Label").GetComponent<TMP_Text>().text = dropdown.GetComponent<TMP_Dropdown>().options[dropdown.GetComponent<TMP_Dropdown>().value].text;
     }
 }
