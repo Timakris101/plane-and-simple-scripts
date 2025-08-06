@@ -20,6 +20,10 @@ public class PropellerScript : MonoBehaviour {
         if (col.transform.tag == "Ground") Destroy(gameObject);
     }
 
+    public bool isPropOfFallenWing() {
+        return valsOfPropAtAnimIndexWingless.Length == 0;
+    }
+
     void Start() {
         idleCoef = transform.parent.GetComponent<Aerodynamics>().getIdle();
         GetComponent<Animator>().speed = transform.parent.GetComponent<PlaneController>().getEnginesStartOn() ? 0 : 1;
