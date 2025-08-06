@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class SquadronSpawner : MonoBehaviour {  
     [Header("Mode")]
     [SerializeField] private bool arcade;
-    private bool on;
+    private bool arcadeOn;
 
     [Header("SelectionSpawner")]
     [SerializeField] private bool selectionSpawner;
@@ -24,6 +24,9 @@ public class SquadronSpawner : MonoBehaviour {
     [SerializeField] private string alliance;
     [SerializeField] private Vector2 offset;
     [SerializeField] private GameObject camera;
+    private Vector3 origCamPos;
+    private float origCamSize;
+    private HashSet<GameObject> objectsWhichExistedInEditor;
 
     [Header("InputAreas")]
     [SerializeField] private GameObject amountTextField;
@@ -73,7 +76,7 @@ public class SquadronSpawner : MonoBehaviour {
                 setCurrentSelectedObj(newSpawner);
             }
         }
-        if (arcade && on) {
+        if (arcade && arcadeOn) {
             if (!anyPlanesLeft(plane.GetComponent<AiPlaneController>().getAlliance())) {
                 spawnPlanes();
                 GameObject.Find("Score").GetComponent<TMP_Text>().text = (int.Parse(GameObject.Find("Score").GetComponent<TMP_Text>().text) + (containsPlayer ? -1 : 1)).ToString();
@@ -125,12 +128,42 @@ public class SquadronSpawner : MonoBehaviour {
         containsPlayer = b;
     }
 
-    public static void activateSquadronSpawners() {
+    public void activateSquadronSpawners() {
+        saveObjectsToNotClear();
+        origCamPos = camera.transform.position;
+        origCamSize = camera.GetComponent<Camera>().fieldOfView;
         foreach (GameObject spawner in GameObject.FindGameObjectsWithTag("Spawner")) {
             spawner.GetComponent<SquadronSpawner>().spawnPlanes();
-            spawner.GetComponent<SquadronSpawner>().on = true;
             spawner.GetComponent<SpriteRenderer>().enabled = false;
+            if (spawner.GetComponent<SquadronSpawner>().arcade) spawner.GetComponent<SquadronSpawner>().arcadeOn = true;
         }
+    }
+
+    private void saveObjectsToNotClear() {
+        objectsWhichExistedInEditor = new HashSet<GameObject>();
+        foreach (GameObject obj in Object.FindObjectsOfType(typeof(GameObject))) {
+            objectsWhichExistedInEditor.Add(obj);
+        }
+    }
+
+    public void goBackToEditor() {
+        camera.GetComponent<CamScript>().uncoupleCam();
+        camera.transform.parent = null;
+        camera.transform.position = origCamPos;
+        camera.GetComponent<Camera>().fieldOfView = origCamSize;
+
+        foreach (GameObject spawner in GameObject.FindGameObjectsWithTag("Spawner")) {
+            spawner.GetComponent<SpriteRenderer>().enabled = true;
+        }
+
+        clearUnsavedObjects();
+    }
+
+    private void clearUnsavedObjects() {
+        foreach (GameObject obj in Object.FindObjectsOfType(typeof(GameObject))) {
+            if (!objectsWhichExistedInEditor.Contains(obj)) Destroy(obj);
+        }
+        objectsWhichExistedInEditor.Clear();
     }
 
     public void spawnPlanes() {
