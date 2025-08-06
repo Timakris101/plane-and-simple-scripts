@@ -21,6 +21,7 @@ public class CrewScript : MonoBehaviour {
     void OnCollisionStay2D(Collision2D col) {
         if (col.transform.tag == "Ground" && !GetComponent<Animator>().GetBool("Dead")) {
             transform.up = col.contacts[0].normal;
+            GetComponent<Rigidbody2D>().drag = 100000f;
         }
         if (GetComponent<Animator>().GetBool("Dead") && onGround && Mathf.Abs(Vector3.Angle(col.contacts[0].normal, transform.up)) < 45f) {
             transform.localEulerAngles = new Vector3(0, 0, 90f);
