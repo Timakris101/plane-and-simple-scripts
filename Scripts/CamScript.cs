@@ -79,25 +79,27 @@ public class CamScript : MonoBehaviour {
     }
 
     private void handlePlaneSwitching() {
-        if (Input.GetKeyDown("n") && missionEditor) {
-            if (Input.GetKey(KeyCode.LeftShift)) {
-                if (planeToControl == null) {
-                    scrollSpectatablePlanes();
+        if (missionEditor) {
+            if (Input.GetKeyDown("n")) {
+                if (Input.GetKey(KeyCode.LeftShift)) {
+                    if (planeToControl == null) {
+                        scrollSpectatablePlanes();
+                    } else {
+                        spectatedPlane = planeToControl;
+                        planeToControl = null;
+                    }
                 } else {
-                    spectatedPlane = planeToControl;
-                    planeToControl = null;
-                }
-            } else {
-                if (spectatedPlane == null) {
-                    scrollCrewedPlanes();
-                } else {
-                    takeControlOfPlane(spectatedPlane);
-                    spectatedPlane = null;
+                    if (spectatedPlane == null) {
+                        scrollCrewedPlanes();
+                    } else {
+                        takeControlOfPlane(spectatedPlane);
+                        spectatedPlane = null;
+                    }
                 }
             }
-        }
-        if (Input.GetKeyDown(KeyCode.Escape)) {
-            uncoupleCam();
+            if (Input.GetKeyDown(KeyCode.Escape)) {
+                uncoupleCam();
+            }
         }
         if (planeToControl != null) {
             if (planeToControl.GetComponent<PlaneController>().allCrewGoneFromPlane()) {
