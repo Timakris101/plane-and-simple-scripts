@@ -142,12 +142,13 @@ public class DamageModel : MonoBehaviour {
     private void handlePropellerOn(GameObject obj) {
         if (obj.transform.childCount != 0) {
             for (int i = 0; i < transform.parent.childCount; i++) {
-                if (transform.parent.GetChild(i).GetComponent<PropellerScript>() != null) {
-                    if (transform.parent.GetChild(i).GetComponent<SpriteRenderer>().sortingOrder == 1) {
-                        transform.parent.GetChild(i).GetComponent<PropellerScript>().enabled = false;
-                        transform.parent.GetChild(i).GetComponent<Animator>().enabled = false;
-                        transform.parent.GetChild(i).position = obj.transform.GetChild(0).position;
-                        transform.parent.GetChild(i).parent = obj.transform.GetChild(0);
+                GameObject possibleProp = transform.parent.GetChild(i).gameObject;
+                if (possibleProp.GetComponent<PropellerScript>() != null) {
+                    if (possibleProp.GetComponent<SpriteRenderer>().sortingOrder == 1) {
+                        possibleProp.GetComponent<PropellerScript>().enabled = false;
+                        possibleProp.GetComponent<Animator>().enabled = false;
+                        possibleProp.transform.position = obj.transform.GetChild(0).position;
+                        possibleProp.transform.parent = obj.transform.GetChild(0);
                     }
                 }
             }
