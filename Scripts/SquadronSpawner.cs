@@ -21,6 +21,7 @@ public class SquadronSpawner : MonoBehaviour {
     [SerializeField] private GameObject plane;
     [SerializeField] private bool containsPlayer;
     [SerializeField] private int amt;
+    [SerializeField] private string alliance;
     [SerializeField] private Vector2 offset;
     [SerializeField] private GameObject camera;
 
@@ -28,6 +29,7 @@ public class SquadronSpawner : MonoBehaviour {
     [SerializeField] private GameObject amountTextField;
     [SerializeField] private GameObject selectorDropdown;
     [SerializeField] private GameObject containsPlayerToggle;
+    [SerializeField] private GameObject allianceDropdown;
 
     void Start() {
         if (selectionSpawner) {
@@ -35,6 +37,7 @@ public class SquadronSpawner : MonoBehaviour {
                 selectorDropdown.GetComponent<TMP_Dropdown>().options.Add(new TMP_Dropdown.OptionData(planes[i].name));
             }
             selectorDropdown.transform.Find("Label").GetComponent<TMP_Text>().text = baseSpawner.GetComponent<SquadronSpawner>().plane.name;
+            allianceDropdown.transform.Find("Label").GetComponent<TMP_Text>().text = baseSpawner.GetComponent<SquadronSpawner>().plane.GetComponent<AiPlaneController>().getAlliance();
             amountTextField.GetComponent<TMP_InputField>().text = baseSpawner.GetComponent<SquadronSpawner>().amt.ToString();
             containsPlayerToggle.GetComponent<Toggle>().isOn = baseSpawner.GetComponent<SquadronSpawner>().containsPlayer;
         }
@@ -48,7 +51,10 @@ public class SquadronSpawner : MonoBehaviour {
                     setCurrentSelectedObj(col.gameObject != curSelected ? col.gameObject : curSelected);
                 }
             }
-            if (Input.GetKey(KeyCode.Escape)) setCurrentSelectedObj(null);
+            if (Input.GetKey(KeyCode.Escape)) {
+                if (curSelected != null) containsPlayerToggle.GetComponent<Toggle>().isOn = false;
+                setCurrentSelectedObj(null);
+            }
             if (Input.GetKey(KeyCode.Backspace)) Destroy(curSelected);
             if (curSelected != null) editSpawner();
             if (Input.GetMouseButtonDown(1) && curSelected == null) {
@@ -97,6 +103,7 @@ public class SquadronSpawner : MonoBehaviour {
             }
 
             spawnerToEdit.GetComponent<SquadronSpawner>().plane = planes[selectorDropdown.GetComponent<TMP_Dropdown>().value];
+            spawnerToEdit.GetComponent<SquadronSpawner>().alliance = allianceDropdown.GetComponent<TMP_Dropdown>().options[allianceDropdown.GetComponent<TMP_Dropdown>().value].text;
         }
     }
 
@@ -119,6 +126,7 @@ public class SquadronSpawner : MonoBehaviour {
     public void spawnPlanes() {
         for (int i = 0; i < amt; i++) {
             GameObject newPlane = Instantiate(plane, transform.position + (Vector3) offset * i, transform.rotation);
+            newPlane.GetComponent<AiPlaneController>().setAlliance(alliance);
             if (containsPlayer && i == 0) {
                 camera.GetComponent<CamScript>().takeControlOfPlane(newPlane);
                 continue;
@@ -141,15 +149,21 @@ public class SquadronSpawner : MonoBehaviour {
             curSelected = obj;
             amountTextField.GetComponent<TMP_InputField>().text = curSelected.GetComponent<SquadronSpawner>().amt.ToString();
             containsPlayerToggle.GetComponent<Toggle>().isOn = curSelected.GetComponent<SquadronSpawner>().containsPlayer;
-            for (int i = 0; i < selectorDropdown.GetComponent<TMP_Dropdown>().options.Count; i++) {
-                if (selectorDropdown.GetComponent<TMP_Dropdown>().options[i].text == curSelected.GetComponent<SquadronSpawner>().plane.name) {
-                    selectorDropdown.GetComponent<TMP_Dropdown>().value = i;
-                }
-            }
-            selectorDropdown.transform.Find("Label").GetComponent<TMP_Text>().text = selectorDropdown.GetComponent<TMP_Dropdown>().options[selectorDropdown.GetComponent<TMP_Dropdown>().value].text;
+            setDropdown(selectorDropdown);
+            setDropdown(allianceDropdown);
+
             curSelected.GetComponent<SpriteRenderer>().sprite = selected;
         } else {
             curSelected = null;
         }
+    }
+
+    private void setDropdown(GameObject dropdown) {
+        for (int i = 0; i < dropdown.GetComponent<TMP_Dropdown>().options.Count; i++) {
+            if (dropdown.GetComponent<TMP_Dropdown>().options[i].text == curSelected.GetComponent<SquadronSpawner>().alliance) {
+                dropdown.GetComponent<TMP_Dropdown>().value = i;
+            }
+        }
+        dropdown.transform.Find("Label").GetComponent<TMP_Text>().text = dropdown.GetComponent<TMP_Dropdown>().options[dropdown.GetComponent<TMP_Dropdown>().value].text;
     }
 }

@@ -36,6 +36,10 @@ public class AiPlaneController : PlaneController {
         return alliance;
     }
 
+    public void setAlliance(string alliance) {
+        this.alliance = alliance;
+    }
+
     protected override int wantedDir() {
         findTarget();
         
