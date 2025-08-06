@@ -153,6 +153,7 @@ public class PlaneController : MonoBehaviour {
         if (Input.GetKey("s") && throttle - throttleChangeSpeed * Time.deltaTime < 0 && transform.Find("Gear")) transform.Find("Gear").GetComponent<GearScript>().brake();
 
         setGuns(Input.GetMouseButton(0));
+        setBombs(Input.GetKey(KeyCode.Space));
     }
 
     private void toggleGunners() {
@@ -178,7 +179,34 @@ public class PlaneController : MonoBehaviour {
 
     private void setGuns(bool shooting) {
         for (int i = 0; i < transform.childCount; i++) {
-            if (transform.GetChild(i).GetComponent<GunScript>() != null) transform.GetChild(i).GetComponent<GunScript>().setShooting(shooting);
+            if (transform.GetChild(i).GetComponent<GunScript>() != null && transform.GetChild(i).GetComponent<BombHolderScript>() == null) transform.GetChild(i).GetComponent<GunScript>().setShooting(shooting);
+        }
+    }
+
+    private void setBombs(bool bombing) {
+        for (int i = 0; i < transform.childCount; i++) {
+            if (transform.GetChild(i).GetComponent<BombHolderScript>() != null) {
+                transform.GetChild(i).GetComponent<BombHolderScript>().setShooting(false);
+            }
+        }
+        for (int i = 0; i < transform.childCount; i++) {
+            if (transform.GetChild(i).GetComponent<BombHolderScript>() != null && transform.GetChild(i).GetComponent<BombHolderScript>().getAmmo() != 0) {
+                transform.GetChild(i).GetComponent<BombHolderScript>().setShooting(bombing);
+
+                if (transform.GetChild(i).GetComponent<BombHolderScript>().getAmmo() == 1) {
+                    resetTimerOfBombholderAfterIndex(i);
+                }
+
+                break;
+            }
+        }
+    }
+
+    private void resetTimerOfBombholderAfterIndex(int i) {
+        for (int j = i + 1; j < transform.childCount; j++) {
+            if (transform.GetChild(j).GetComponent<BombHolderScript>() != null) {
+                transform.GetChild(j).GetComponent<BombHolderScript>().setTimer(0);
+            }
         }
     }
 

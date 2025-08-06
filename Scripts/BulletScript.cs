@@ -15,7 +15,7 @@ public class BulletScript : MonoBehaviour {
     void OnCollisionEnter2D(Collision2D col) {
         RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position, explosionRad == 0 ? transform.localScale.x : explosionRad, -col.relativeVelocity, penetrationVal);
         foreach (RaycastHit2D hit in hits) {
-            if (hit.transform.gameObject != col.gameObject) continue;
+            if (initSpeed != 0 && hit.transform.gameObject != col.gameObject) continue;
             if (hit.collider.transform.GetComponent<DamageModel>() != null) {
                 hit.collider.transform.GetComponent<DamageModel>().hit(Random.Range(damage / 2f, damage));
             }
@@ -27,12 +27,13 @@ public class BulletScript : MonoBehaviour {
         planeFired = plane;
     }
 
-    void Start() {
-        
-    }
-
     void Update() {
-        
+        Physics2D.IgnoreCollision(planeFired.GetComponent<Collider2D>(), GetComponent<Collider2D>());
+        for (int i = 0; i < planeFired.transform.childCount; i++) {
+            if (planeFired.transform.GetChild(i).GetComponent<Collider2D>() != null) Physics2D.IgnoreCollision(planeFired.transform.GetChild(i).GetComponent<Collider2D>(), GetComponent<Collider2D>(), true);
+        }
+
+        transform.right = GetComponent<Rigidbody2D>().velocity.normalized;
     }
 
     public float getInitSpeed() {

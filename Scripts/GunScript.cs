@@ -7,8 +7,8 @@ public class GunScript : MonoBehaviour {
     [SerializeField] protected GameObject bullet;
     [SerializeField] private float fireRate;
     private float timer;
-    [SerializeField] private float maxAmmunition;
-    [SerializeField] protected float ammunition;
+    [SerializeField] private int maxAmmunition;
+    [SerializeField] protected int ammunition;
     private bool shooting;
 
     protected void Start() {
@@ -37,5 +37,13 @@ public class GunScript : MonoBehaviour {
 
     public GameObject getBullet() {
         return bullet;
+    }
+
+    public int getAmmo() {
+        return ammunition;
+    }
+
+    public void setTimer(float val) {
+        timer = val;
     }
 }
