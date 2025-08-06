@@ -86,8 +86,8 @@ public class DamageModel : MonoBehaviour {
         if (health > val) health = val;
     }
 
-    public void hit(float amt) {
-        if (Random.Range(0f, 1f) < hitChance) {
+    public void hit(float amt, bool withChance) {
+        if (Random.Range(0f, 1f) < (withChance ? hitChance : 1f)) {
             damage(amt);
         }
     }

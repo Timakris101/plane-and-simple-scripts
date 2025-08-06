@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BulletScript : MonoBehaviour {
+    private static float explosiveRangeOfCertainHit = 5f;
+
     [Header("Base Stats")]
     [SerializeField] private float initSpeed;
     [SerializeField] private float damage;
@@ -17,7 +19,7 @@ public class BulletScript : MonoBehaviour {
         foreach (RaycastHit2D hit in hits) {
             if (initSpeed != 0 && hit.transform.gameObject != col.gameObject) continue;
             if (hit.collider.transform.GetComponent<DamageModel>() != null) {
-                hit.collider.transform.GetComponent<DamageModel>().hit(Random.Range(damage / 2f, damage));
+                hit.collider.transform.GetComponent<DamageModel>().hit(Random.Range(damage / 2f, damage), explosionRad < explosiveRangeOfCertainHit);
             }
         }
         Destroy(gameObject);
