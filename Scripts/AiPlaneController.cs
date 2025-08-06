@@ -70,7 +70,7 @@ public class AiPlaneController : PlaneController {
         if ((mode == "defensive" || mode == "hammerhead") && GetComponent<Rigidbody2D>().velocity.magnitude < targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude) mode = "overshoot";
 
         if (mode == "hammerhead") {
-            if (targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude < 15f || GetComponent<Rigidbody2D>().velocity.magnitude < 10f || Mathf.Abs(Vector2.SignedAngle(targetedObj.transform.right, transform.right)) > 45f) {
+            if (targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude < 15f || GetComponent<Rigidbody2D>().velocity.magnitude < 10f || Mathf.Abs(Vector2.SignedAngle(targetedObj.transform.right, transform.right)) > 45f || targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude > GetComponent<Rigidbody2D>().velocity.magnitude) {
                 mode = "pursuit";
             } else {
                 return pointTowards(transform.position + Vector3.up);
