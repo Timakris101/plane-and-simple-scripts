@@ -31,6 +31,12 @@ public class PropellerScript : MonoBehaviour {
         for (int i = 0; i < transform.parent.childCount; i++) {
             if (transform.parent.GetChild(i).GetComponent<PropellerScript>() != null) engineAmt++;
         }
+
+        if (valsOfPropAtAnimIndexWingless.Length != 0) {
+            for (int i = 0; i < valsOfPropAtAnimIndexNonWingless.Length; i++) {
+                valsOfPropAtAnimIndexWingless[i] = valsOfPropAtAnimIndexNonWingless[i];
+            }
+        }
     }
 
     void setPlaneController() {
