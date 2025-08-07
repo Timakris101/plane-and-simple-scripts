@@ -5,8 +5,8 @@ using UnityEngine;
 public class GunScript : MonoBehaviour {
 
     [SerializeField] protected GameObject bullet;
-    [SerializeField] private float fireRate;
-    private float timer;
+    [SerializeField] protected float fireRate;
+    protected float timer;
     [SerializeField] private int maxAmmunition;
     [SerializeField] protected int ammunition;
     private bool shooting;

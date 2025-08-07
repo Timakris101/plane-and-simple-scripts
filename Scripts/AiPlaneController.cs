@@ -44,7 +44,7 @@ public class AiPlaneController : PlaneController {
         findTarget();
         
         for (int i = 0; i < transform.childCount; i++) {
-            if (transform.GetChild(i).GetComponent<GunScript>() != null) {
+            if (transform.GetChild(i).GetComponent<GunScript>() != null && transform.GetChild(i).GetComponent<BombHolderScript>() == null) {
                 primaryBullet = transform.GetChild(i).GetComponent<GunScript>().getBullet();
             }
         }
@@ -110,18 +110,14 @@ public class AiPlaneController : PlaneController {
         findTarget();
         throttle = 1f;
         if (mode == "overshoot") throttle = 0f;
-        for (int i = 0; i < transform.childCount; i++) {
-            if (transform.GetChild(i).GetComponent<GunScript>() != null) {
-                if (targetedObj != null) {
-                    if (targetInSights(transform.GetChild(i).GetComponent<GunScript>().getBullet()) && (transform.position - positionToTarget(transform.GetChild(i).GetComponent<GunScript>().getBullet(), transform.right)).magnitude < gunRange && mode != "headon") {
-                        transform.GetChild(i).GetComponent<GunScript>().setShooting(true);
-                    } else {
-                        transform.GetChild(i).GetComponent<GunScript>().setShooting(false);
-                    }
-                } else {
-                    transform.GetChild(i).GetComponent<GunScript>().setShooting(false);
-                }
+        if (targetedObj != null) {
+            if (targetInSights(primaryBullet) && (transform.position - positionToTarget(primaryBullet, transform.right)).magnitude < gunRange && mode != "headon") {
+                setGuns(true);
+            } else {
+                setGuns(false);
             }
+        } else {
+            setGuns(false);
         }
     }
 

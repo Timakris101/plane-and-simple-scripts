@@ -177,13 +177,13 @@ public class PlaneController : MonoBehaviour {
         return false;
     }
 
-    private void setGuns(bool shooting) {
+    protected void setGuns(bool shooting) {
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<GunScript>() != null && transform.GetChild(i).GetComponent<BombHolderScript>() == null) transform.GetChild(i).GetComponent<GunScript>().setShooting(shooting);
         }
     }
 
-    private void setBombs(bool bombing) {
+    protected void setBombs(bool bombing) {
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<BombHolderScript>() != null) {
                 transform.GetChild(i).GetComponent<BombHolderScript>().setShooting(false);

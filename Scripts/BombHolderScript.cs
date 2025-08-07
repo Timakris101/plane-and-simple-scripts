@@ -7,6 +7,7 @@ public class BombHolderScript : GunScript {
     private Sprite origSprite;
 
     void Start() {
+        timer = fireRate;
         origSprite = transform.parent.GetComponent<SpriteRenderer>().sprite;
         base.Start();
         transform.parent.GetComponent<Rigidbody2D>().mass += bullet.GetComponent<Rigidbody2D>().mass * ammunition;
