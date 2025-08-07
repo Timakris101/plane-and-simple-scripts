@@ -9,6 +9,7 @@ public class GunnerScript : MonoBehaviour {
     [SerializeField] private float angularThreshForGuns;
     [SerializeField] private float minDeflection;
     [SerializeField] private float maxDeflection;
+    [SerializeField] private float maxRange;
 
     void Update() {
         if (transform.parent.gameObject.layer == LayerMask.NameToLayer("Vehicle") && transform.parent.Find("WingHitbox").GetComponent<DamageModel>().isAlive()) { //if in plane and plane is not spinning out
@@ -16,7 +17,11 @@ public class GunnerScript : MonoBehaviour {
                 setTargetedObj(transform.parent.GetComponent<AiPlaneController>().getTargetedObj());
 
                 if (!manualControl) {
+                    bool inRange = false;
                     if (targetedObj != null) {
+                        inRange = (transform.position - targetedObj.transform.position).magnitude < maxRange;
+                    }
+                    if (targetedObj != null && inRange) {
                         pointGunAt(positionToTarget());
                         attemptToShoot(positionToTarget(), targetInSights());
                     } else {
