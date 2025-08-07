@@ -18,7 +18,7 @@ public class GunnerScript : MonoBehaviour {
                 if (!manualControl) {
                     if (targetedObj != null) {
                         pointGunAt(positionToTarget());
-                        attemptToShoot(targetInSights());
+                        attemptToShoot(positionToTarget(), targetInSights());
                     } else {
                         attemptToShoot(false);
                     }
@@ -26,7 +26,7 @@ public class GunnerScript : MonoBehaviour {
                     if (transform.parent.Find("Camera") != null) {
                         Vector3 screenToWorld = transform.parent.Find("Camera").GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -transform.parent.Find("Camera").position.z));
                         pointGunAt(new Vector3(screenToWorld.x, screenToWorld.y, 0));
-                        attemptToShoot(Input.GetMouseButton(0));
+                        attemptToShoot(new Vector3(screenToWorld.x, screenToWorld.y, 0), Input.GetMouseButton(0));
                     }
                 }
             }
@@ -35,6 +35,19 @@ public class GunnerScript : MonoBehaviour {
                 Destroy(transform.GetChild(0).gameObject);
             }
         }
+    }
+
+    private void attemptToShoot(Vector3 posToShoot, bool b) {
+        bool tooFarFromSight = Mathf.Abs(Vector2.SignedAngle(posToShoot - transform.GetChild(0).position, transform.GetChild(0).right)) > angularThreshForGuns;
+        bool hitsOwnPlane = false;
+        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.GetChild(0).position, transform.GetChild(0).right);
+        foreach (RaycastHit2D hit in hits) {
+            if (hit.collider.transform == transform.parent) { //checks if the specific collider is of the parent and not of the children. Hit.transform would return parent transform
+                hitsOwnPlane = true;
+                break;
+            }
+        }
+        transform.GetChild(0).GetComponent<GunScript>().setShooting(b && !hitsOwnPlane && !tooFarFromSight);
     }
 
     private void attemptToShoot(bool b) {
@@ -50,8 +63,16 @@ public class GunnerScript : MonoBehaviour {
     }
 
     private void pointGunAt(Vector3 pos) {
-        transform.GetChild(0).right = (pos - transform.GetChild(0).position).normalized;
-        transform.GetChild(0).localEulerAngles = new Vector3(0, 0, Mathf.Clamp(transform.GetChild(0).localEulerAngles.z, minDeflection, maxDeflection));
+        transform.GetChild(0).localEulerAngles = new Vector3(0, 0, boundedGunAngle(Mathf.Atan2((pos - transform.GetChild(0).position).y, (pos - transform.GetChild(0).position).x) * Mathf.Rad2Deg));
+    }
+
+    private float boundedGunAngle(float unboundedAngle) {
+        if (minDeflection < maxDeflection) {
+            unboundedAngle += (unboundedAngle < 0f ? 360f : 0f);
+            return Mathf.Clamp(unboundedAngle, minDeflection, maxDeflection);
+        } else {
+            return Mathf.Clamp(unboundedAngle + 360f, minDeflection, maxDeflection + 360f) % 360f;
+        }
     }
 
     private bool targetInSights() {
