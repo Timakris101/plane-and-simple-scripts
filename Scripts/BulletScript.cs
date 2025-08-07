@@ -10,7 +10,7 @@ public class BulletScript : MonoBehaviour {
     [SerializeField] private float damage;
     [SerializeField] private float explosionRad;
     [SerializeField] private float penetrationVal;
-    [SerializeField] private float armingDelay;
+    [SerializeField] private float armingDist;
     private float timer;
     
     [Header("Plane")]
@@ -32,21 +32,19 @@ public class BulletScript : MonoBehaviour {
     }
 
     void Start() {
-        collisionToPlaneFired(true);
+        collisionToPlaneFired(false);
     }
 
-    void collisionToPlaneFired(bool ignore) {
-        Physics2D.IgnoreCollision(planeFired.GetComponent<Collider2D>(), GetComponent<Collider2D>(), ignore);
+    void collisionToPlaneFired(bool collide) {
+        Physics2D.IgnoreCollision(planeFired.GetComponent<Collider2D>(), GetComponent<Collider2D>(), !collide);
         for (int i = 0; i < planeFired.transform.childCount; i++) {
-            if (planeFired.transform.GetChild(i).GetComponent<Collider2D>() != null) Physics2D.IgnoreCollision(planeFired.transform.GetChild(i).GetComponent<Collider2D>(), GetComponent<Collider2D>(), ignore);
+            if (planeFired.transform.GetChild(i).GetComponent<Collider2D>() != null) Physics2D.IgnoreCollision(planeFired.transform.GetChild(i).GetComponent<Collider2D>(), GetComponent<Collider2D>(), !collide);
         }
     }
 
     void Update() {
-        timer += Time.deltaTime;
-
-        if (timer > armingDelay) {
-            collisionToPlaneFired(false);
+        if ((transform.position - planeFired.transform.position).magnitude > armingDist) {
+            collisionToPlaneFired(true);
         }
 
         transform.right = GetComponent<Rigidbody2D>().velocity.normalized;
