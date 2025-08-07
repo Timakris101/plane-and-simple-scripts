@@ -10,7 +10,6 @@ public class AiPlaneController : PlaneController {
     [SerializeField] private string mode;
     [SerializeField] private float minAltitude;
     [SerializeField] private float gunRange;
-    [SerializeField] private bool nonFighter;
     private GameObject primaryBullet;
 
     [Header("Alliance")]
@@ -43,13 +42,14 @@ public class AiPlaneController : PlaneController {
     protected override int wantedDir() {
         findTarget();
         
+        primaryBullet = null;
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<GunScript>() != null && transform.GetChild(i).GetComponent<BombHolderScript>() == null) {
                 primaryBullet = transform.GetChild(i).GetComponent<GunScript>().getBullet();
             }
         }
 
-        if (nonFighter) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
+        if (primaryBullet == null) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
         
         if (transform.position.y < minAltitude) return pointTowards(transform.position + Vector3.up);
 
@@ -110,7 +110,7 @@ public class AiPlaneController : PlaneController {
         findTarget();
         throttle = 1f;
         if (mode == "overshoot") throttle = 0f;
-        if (targetedObj != null) {
+        if (targetedObj != null && primaryBullet != null) {
             if (targetInSights(primaryBullet) && (transform.position - positionToTarget(primaryBullet, transform.right)).magnitude < gunRange && mode != "headon") {
                 setGuns(true);
             } else {
