@@ -20,7 +20,7 @@ public class BulletScript : MonoBehaviour {
     void OnCollisionEnter2D(Collision2D col) {
         RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position - (Vector3) col.relativeVelocity.normalized * Random.Range(0f, maxFlyPastDist), explosionRad == 0 ? transform.localScale.x : explosionRad, -col.relativeVelocity, penetrationVal);
         foreach (RaycastHit2D hit in hits) {
-            if (initSpeed != 0 && hit.transform.gameObject != col.gameObject) continue;
+            if (hit.transform.gameObject != col.gameObject) continue;
             if (hit.collider.transform.GetComponent<DamageModel>() != null) {
                 hit.collider.transform.GetComponent<DamageModel>().hit(Random.Range(damage / 2f, damage), explosionRad < explosiveRangeOfCertainHit);
             }
