@@ -10,6 +10,7 @@ public class BulletScript : MonoBehaviour {
     [SerializeField] private float damage;
     [SerializeField] private float explosionRad;
     [SerializeField] private float penetrationVal;
+    [SerializeField] private float maxFlyPastDist;
     [SerializeField] private float armingDist;
     private float timer;
     
@@ -17,7 +18,7 @@ public class BulletScript : MonoBehaviour {
     [SerializeField] private GameObject planeFired;
 
     void OnCollisionEnter2D(Collision2D col) {
-        RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position, explosionRad == 0 ? transform.localScale.x : explosionRad, -col.relativeVelocity, penetrationVal);
+        RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position - (Vector3) col.relativeVelocity.normalized * Random.Range(0f, maxFlyPastDist), explosionRad == 0 ? transform.localScale.x : explosionRad, -col.relativeVelocity, penetrationVal);
         foreach (RaycastHit2D hit in hits) {
             if (initSpeed != 0 && hit.transform.gameObject != col.gameObject) continue;
             if (hit.collider.transform.GetComponent<DamageModel>() != null) {
