@@ -15,13 +15,14 @@ public class CrewScript : MonoBehaviour {
                 transform.GetChild(i).GetComponent<Animator>().SetBool("OnGround", true);
             }
             onGround = true;
+
+            GetComponent<Rigidbody2D>().drag = 100000f;
         }
     }
 
     void OnCollisionStay2D(Collision2D col) {
         if (col.transform.tag == "Ground" && !GetComponent<Animator>().GetBool("Dead")) {
             transform.up = col.contacts[0].normal;
-            GetComponent<Rigidbody2D>().drag = 100000f;
         }
         if (GetComponent<Animator>().GetBool("Dead") && onGround && Mathf.Abs(Vector3.Angle(col.contacts[0].normal, transform.up)) < 45f) {
             transform.localEulerAngles = new Vector3(0, 0, 90f);
@@ -60,6 +61,7 @@ public class CrewScript : MonoBehaviour {
             
             if (!transform.GetChild(i).GetComponent<DamageModel>().isAlive()) {
                 GetComponent<Animator>().SetBool("Dead", true);
+                GetComponent<Rigidbody2D>().drag = 0f;
             }
         }
     }
