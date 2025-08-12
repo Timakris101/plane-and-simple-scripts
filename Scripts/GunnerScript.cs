@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class GunnerScript : MonoBehaviour {
 
-    [SerializeField] private bool manualControl;
-    [SerializeField] private GameObject targetedObj;
-    [SerializeField] private float angularThreshForGuns;
-    [SerializeField] private float minDeflection;
-    [SerializeField] private float maxDeflection;
-    [SerializeField] private float maxRange;
+    [SerializeField] protected bool manualControl;
+    [SerializeField] protected GameObject targetedObj;
+    [SerializeField] protected float angularThreshForGuns;
+    [SerializeField] protected float minDeflection;
+    [SerializeField] protected float maxDeflection;
+    [SerializeField] protected float maxRange;
 
-    void Update() {
+    protected virtual void Update() {
         if (transform.parent.gameObject.layer == LayerMask.NameToLayer("Vehicle") && transform.parent.Find("WingHitbox").GetComponent<DamageModel>().isAlive()) { //if in plane and plane is not spinning out
             if (GetComponent<DamageModel>().isAlive() && !transform.parent.GetComponent<GForcesScript>().overGPerson()) { //if concious and alive
                 setTargetedObj(transform.parent.GetComponent<AiPlaneController>().getTargetedObj());
@@ -42,7 +42,7 @@ public class GunnerScript : MonoBehaviour {
         }
     }
 
-    private void attemptToShoot(Vector3 posToShoot, bool b) {
+    protected void attemptToShoot(Vector3 posToShoot, bool b) {
         bool tooFarFromSight = Mathf.Abs(Vector2.SignedAngle(posToShoot - transform.GetChild(0).position, transform.GetChild(0).right)) > angularThreshForGuns;
         bool hitsOwnPlane = false;
         RaycastHit2D[] hits = Physics2D.RaycastAll(transform.GetChild(0).position, transform.GetChild(0).right);
@@ -55,7 +55,7 @@ public class GunnerScript : MonoBehaviour {
         transform.GetChild(0).GetComponent<GunScript>().setShooting(b && !hitsOwnPlane && !tooFarFromSight);
     }
 
-    private void attemptToShoot(bool b) {
+    protected void attemptToShoot(bool b) {
         bool hitsOwnPlane = false;
         RaycastHit2D[] hits = Physics2D.RaycastAll(transform.GetChild(0).position, transform.GetChild(0).right);
         foreach (RaycastHit2D hit in hits) {
@@ -67,25 +67,28 @@ public class GunnerScript : MonoBehaviour {
         transform.GetChild(0).GetComponent<GunScript>().setShooting(b && !hitsOwnPlane);
     }
 
-    private void pointGunAt(Vector3 pos) {
-        transform.GetChild(0).localEulerAngles = new Vector3(0, 0, boundedGunAngle(Mathf.Atan2((pos - transform.GetChild(0).position).y, (pos - transform.GetChild(0).position).x) * Mathf.Rad2Deg));
+    protected void pointGunAt(Vector3 pos) {
+        transform.GetChild(0).eulerAngles = new Vector3(0, 0, boundedGunAngle(Mathf.Atan2((pos - transform.GetChild(0).position).y, (pos - transform.GetChild(0).position).x) * Mathf.Rad2Deg));
     }
 
-    private float boundedGunAngle(float unboundedAngle) {
+    protected float boundedGunAngle(float unboundedAngle) {
         if (minDeflection < maxDeflection) {
-            unboundedAngle += (unboundedAngle < 0f ? 360f : 0f);
-            return Mathf.Clamp(unboundedAngle, minDeflection, maxDeflection);
+            return Mathf.Clamp(unboundedAngle + (unboundedAngle < 0f ? 360f : 0f), minDeflection + rotOfBase(), maxDeflection + rotOfBase());
         } else {
-            return Mathf.Clamp(unboundedAngle + 360f, minDeflection, maxDeflection + 360f) % 360f;
+            return Mathf.Clamp(unboundedAngle + 360f, minDeflection + rotOfBase(), maxDeflection + 360f + rotOfBase()) % 360f;
         }
     }
 
-    private bool targetInSights() {
+    private float rotOfBase() {
+        return transform.eulerAngles.z;
+    }
+
+    protected bool targetInSights() {
         GameObject bullet = transform.GetChild(0).GetComponent<GunScript>().getBullet();
         return Mathf.Abs(Vector3.SignedAngle((positionToTarget() - transform.GetChild(0).position).normalized, transform.GetChild(0).right, transform.GetChild(0).forward)) < angularThreshForGuns;
     }
 
-    private Vector3 positionToTarget() {
+    protected virtual Vector3 positionToTarget() {
         GameObject bullet = transform.GetChild(0).GetComponent<GunScript>().getBullet();
         return targetedObj.transform.position + (Vector3) (targetedObj.GetComponent<Rigidbody2D>().velocity - transform.parent.GetComponent<Rigidbody2D>().velocity) * (targetedObj.transform.position - transform.GetChild(0).position).magnitude / (bullet.GetComponent<BulletScript>().getInitSpeed());
     }
