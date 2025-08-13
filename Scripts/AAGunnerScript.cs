@@ -17,6 +17,7 @@ public class AAGunnerScript : GunnerScript {
                 if (targetedObj != null && inRange) {
                     pointGunAt(positionToTarget());
                     attemptToShoot(positionToTarget(), targetInSights());
+                    transform.GetChild(0).GetComponent<GunScript>().setFuseOfBullets(positionToTarget());
                 } else {
                     attemptToShoot(false);
                 }
@@ -25,6 +26,7 @@ public class AAGunnerScript : GunnerScript {
                     Vector3 screenToWorld = transform.parent.Find("Camera").GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -transform.parent.Find("Camera").position.z));
                     pointGunAt(new Vector3(screenToWorld.x, screenToWorld.y, 0));
                     attemptToShoot(new Vector3(screenToWorld.x, screenToWorld.y, 0), Input.GetMouseButton(0));
+                    transform.GetChild(0).GetComponent<GunScript>().setFuseOfBullets(new Vector3(screenToWorld.x, screenToWorld.y, 0));
                 }
             }
         }

@@ -9,6 +9,7 @@ public class GunScript : MonoBehaviour {
     protected float timer;
     [SerializeField] private int maxAmmunition;
     [SerializeField] protected int ammunition;
+    [SerializeField] private float bulletFuse;
     private bool shooting;
 
     protected void Start() {
@@ -21,6 +22,7 @@ public class GunScript : MonoBehaviour {
         Vector3 baseVel = transform.parent.GetComponent<Rigidbody2D>() == null ? transform.parent.parent.GetComponent<Rigidbody2D>().velocity : transform.parent.GetComponent<Rigidbody2D>().velocity; //looks up hierarchy by 2
         newBullet.GetComponent<Rigidbody2D>().velocity = newBullet.GetComponent<BulletScript>().getInitSpeed() * transform.right + baseVel;
         newBullet.GetComponent<BulletScript>().setPlaneFired(transform.parent.GetComponent<Aerodynamics>() == null ? transform.parent.parent.gameObject : transform.parent.gameObject);
+        newBullet.GetComponent<BulletScript>().setFuseTime(bulletFuse);
     }
 
     protected void Update() {
@@ -29,6 +31,14 @@ public class GunScript : MonoBehaviour {
             timer = 0;
             shoot();
         }
+    }
+
+    public void setFuseOfBullets(float sec) {
+        bulletFuse = sec;
+    }
+
+    public void setFuseOfBullets(Vector3 target) {
+        bulletFuse = (target - transform.position).magnitude / (bullet.GetComponent<BulletScript>().getInitSpeed());
     }
 
     public void setShooting(bool b) {

@@ -73,9 +73,9 @@ public class GunnerScript : MonoBehaviour {
 
     protected float boundedGunAngle(float unboundedAngle) {
         if (minDeflection < maxDeflection) {
-            return Mathf.Clamp(unboundedAngle + (unboundedAngle < 0f ? 360f : 0f), minDeflection + rotOfBase(), maxDeflection + rotOfBase());
+            return Mathf.Clamp(unboundedAngle + (unboundedAngle < 0f ? 360f : 0f) + rotOfBase(), minDeflection + rotOfBase(), maxDeflection + rotOfBase()) - rotOfBase();
         } else {
-            return Mathf.Clamp(unboundedAngle + 360f, minDeflection + rotOfBase(), maxDeflection + 360f + rotOfBase()) % 360f;
+            return (Mathf.Clamp(unboundedAngle + 360f + rotOfBase(), minDeflection + rotOfBase(), maxDeflection + 360f + rotOfBase()) - rotOfBase()) % 360f;
         }
     }
 
