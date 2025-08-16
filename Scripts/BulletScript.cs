@@ -13,6 +13,7 @@ public class BulletScript : MonoBehaviour {
     [SerializeField] private float maxFlyPastDist;
     [SerializeField] private float armingDist;
     [SerializeField] private float fuseTimeSec;
+    [SerializeField] private GameObject explosiveEffect;
     private float timer;
     
     [Header("Plane")]
@@ -30,7 +31,7 @@ public class BulletScript : MonoBehaviour {
                 hit.collider.transform.GetComponent<DamageModel>().hit(Random.Range(damage / 2f, damage), explosionRad < explosiveRangeOfCertainHit);
             }
         }
-        Destroy(gameObject);
+        makeEffectAndDestroyObj();
     }
 
     void dealDamage() {
@@ -40,6 +41,13 @@ public class BulletScript : MonoBehaviour {
                 hit.collider.transform.GetComponent<DamageModel>().hit(Random.Range(damage / 2f, damage), explosionRad < explosiveRangeOfCertainHit);
             }
         }
+        makeEffectAndDestroyObj();
+    }
+
+    private void makeEffectAndDestroyObj() {
+        GameObject effect = Instantiate(explosiveEffect, transform.position, transform.rotation);
+        var mainModule = effect.GetComponent<ParticleSystem>().main;
+        if (mainModule.startSpeed.constantMax == 0) mainModule.startSpeed = new ParticleSystem.MinMaxCurve(0, explosionRad / mainModule.startLifetime.constant);
         Destroy(gameObject);
     }
 
