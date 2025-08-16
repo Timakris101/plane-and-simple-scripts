@@ -48,6 +48,7 @@ public class BulletScript : MonoBehaviour {
         GameObject effect = Instantiate(explosiveEffect, transform.position, transform.rotation);
         var mainModule = effect.GetComponent<ParticleSystem>().main;
         if (mainModule.startSpeed.constantMax == 0) mainModule.startSpeed = new ParticleSystem.MinMaxCurve(0, explosionRad / mainModule.startLifetime.constant);
+        Destroy(effect, 10f);
         Destroy(gameObject);
     }
 
