@@ -40,6 +40,8 @@ public class DamageModelDisplay : MonoBehaviour {
 
     void Start() {
         coupledModules = new List<CoupledModule>();
+        transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().sprite = null;
+        transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = false;
     }
 
     public void displayPlane(GameObject plane) {

@@ -22,8 +22,11 @@ public class PlaneController : MonoBehaviour {
         onGround = false;
     }
 
-    void Start() {
+    void Awake() {
         origSprite = GetComponent<SpriteRenderer>().sprite;
+    }
+
+    void Start() {
         enginesOn = enginesStartOn;
         throttle = enginesStartOn ? 1 : 0;
         setGunnersToManual(false);
