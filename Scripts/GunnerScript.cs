@@ -68,19 +68,20 @@ public class GunnerScript : MonoBehaviour {
     }
 
     protected void pointGunAt(Vector3 pos) {
-        transform.GetChild(0).eulerAngles = new Vector3(0, 0, boundedGunAngle(Mathf.Atan2((pos - transform.GetChild(0).position).y, (pos - transform.GetChild(0).position).x) * Mathf.Rad2Deg));
+        transform.GetChild(0).eulerAngles = new Vector3(0, 0, Mathf.Atan2((pos - transform.GetChild(0).position).y, (pos - transform.GetChild(0).position).x) * Mathf.Rad2Deg);
+        transform.GetChild(0).localEulerAngles = new Vector3(0, 0, boundedGunAngle(transform.GetChild(0).localEulerAngles.z, minDeflection, maxDeflection));
     }
 
-    protected float boundedGunAngle(float unboundedAngle) {
+    protected float boundedGunAngle(float unboundedAngle, float minDeflection, float maxDeflection) {
         if (minDeflection < maxDeflection) {
             return Mathf.Clamp(unboundedAngle + (unboundedAngle < 0f ? 360f : 0f) + rotOfBase(), minDeflection + rotOfBase(), maxDeflection + rotOfBase()) - rotOfBase();
         } else {
-            return (Mathf.Clamp(unboundedAngle + 360f + rotOfBase(), minDeflection + rotOfBase(), maxDeflection + 360f + rotOfBase()) - rotOfBase()) % 360f;
+            return (Mathf.Clamp(unboundedAngle + (unboundedAngle < maxDeflection ? 360f : 0f) + rotOfBase(), minDeflection + rotOfBase(), maxDeflection + 360f + rotOfBase()) - rotOfBase()) - 360f;
         }
     }
 
     private float rotOfBase() {
-        return transform.eulerAngles.z;
+        return transform.eulerAngles.z - transform.localEulerAngles.z;
     }
 
     protected bool targetInSights() {
