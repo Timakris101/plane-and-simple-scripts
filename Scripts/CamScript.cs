@@ -89,7 +89,7 @@ public class CamScript : MonoBehaviour {
                         planeToControl = null;
                     }
                 } else {
-                    if (spectatedPlane == null) {
+                    if (spectatedPlane == null || spectatedPlane.GetComponent<PlaneController>().allCrewGoneFromPlane()) {
                         scrollCrewedPlanes();
                     } else {
                         takeControlOfPlane(spectatedPlane);
