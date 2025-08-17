@@ -14,6 +14,7 @@ public class BulletScript : MonoBehaviour {
     [SerializeField] private float armingDist;
     [SerializeField] private float fuseTimeSec;
     [SerializeField] private GameObject effect;
+    [SerializeField] private float lifeTime;
     private float timer;
     
     [Header("Plane")]
@@ -60,6 +61,7 @@ public class BulletScript : MonoBehaviour {
 
     void Start() {
         collisionToPlaneFired(false);
+        Destroy(gameObject, lifeTime);
     }
 
     public void setFuseTime(float sec) {
