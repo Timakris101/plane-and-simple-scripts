@@ -17,7 +17,14 @@ public class PropellerScript : MonoBehaviour {
     private PlaneController pc;
 
     void OnTriggerEnter2D(Collider2D col) {
-        if (col.transform.tag == "Ground") Destroy(gameObject);
+        if (col.transform.tag == "Ground") {
+            for (int i = 0; i < transform.parent.childCount; i++) {
+                GameObject potentialProp = transform.parent.GetChild(i).gameObject;
+                if (potentialProp.GetComponent<PropellerScript>() != null) {
+                    Destroy(potentialProp);
+                }
+            }
+        }
     }
 
     public bool isPropOfFallenWing() {
@@ -70,7 +77,7 @@ public class PropellerScript : MonoBehaviour {
 
         if (engineAmt != 1) {
             Quaternion[] arrToUse = (transform.parent.GetComponent<Animator>().GetBool("Wingless") ? valsOfPropAtAnimIndexWingless : valsOfPropAtAnimIndexNonWingless);
-            int indexToUse = int.Parse(transform.parent.GetComponent<SpriteRenderer>().sprite.name.Substring(transform.parent.GetComponent<SpriteRenderer>().sprite.name.IndexOf("_") + 1));
+            int indexToUse = int.Parse(transform.parent.GetComponent<SpriteRenderer>().sprite.name.Substring(transform.parent.GetComponent<SpriteRenderer>().sprite.name.Length - 1));
             transform.localPosition = new Vector3(arrToUse[indexToUse].x, arrToUse[indexToUse].y, 0f);
             transform.localEulerAngles = new Vector3(0, 0, arrToUse[indexToUse].z);
             GetComponent<SpriteRenderer>().sortingOrder = (int) arrToUse[indexToUse].w;

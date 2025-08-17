@@ -98,10 +98,16 @@ public class Aerodynamics : MonoBehaviour {
 
     private void handleThrust() {
         if (pc != null) {
-            if (transform.Find("Propeller") != null) {
-                if (pc.getEnginesOn()) {
-                    GetComponent<Rigidbody2D>().AddForce(transform.right * (pc.getInWEP() ? WEP : Mathf.Min(idle + pc.getThrottle(), 1)) * maxThrust);
+            bool anyPropellers = false;
+            for (int i = 0; i < transform.childCount; i++) {
+                if (transform.GetChild(i).GetComponent<PropellerScript>() != null) {
+                    anyPropellers = true;
+                    break;
                 }
+            }
+            if (!anyPropellers) return;
+            if (pc.getEnginesOn()) {
+                GetComponent<Rigidbody2D>().AddForce(transform.right * (pc.getInWEP() ? WEP : Mathf.Min(idle + pc.getThrottle(), 1)) * maxThrust);
             }
         }
     }
