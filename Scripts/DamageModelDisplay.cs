@@ -57,7 +57,7 @@ public class DamageModelDisplay : MonoBehaviour {
         }
         transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = true;
         transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().sprite = plane.GetComponent<PlaneController>().getOrigSprite();
-        float sizeMultiplier = GetComponent<RectTransform>().sizeDelta.x / plane.GetComponent<SpriteRenderer>().bounds.size.x;
+        float sizeMultiplier = GetComponent<RectTransform>().sizeDelta.x / plane.GetComponent<PlaneController>().getOrigSprite().bounds.size.x;
         for (int i = 0; i < plane.transform.childCount; i++) {
             if (plane.transform.GetChild(i).GetComponent<DamageModel>() != null) {
                 GameObject newModuleDisp = Instantiate(moduleImage, transform);
