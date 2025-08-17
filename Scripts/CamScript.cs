@@ -102,7 +102,7 @@ public class CamScript : MonoBehaviour {
             }
         }
         if (planeToControl != null) {
-            if (planeToControl.GetComponent<PlaneController>().allCrewGoneFromPlane()) {
+            if (planeToControl.GetComponent<PlaneController>().pilotDeadOrGone()) {
                 GameObject newPlane = findNewPlane(planeToControl.GetComponent<AiPlaneController>().getAlliance());
                 if (newPlane != null) {
                     takeControlOfPlane(newPlane);
@@ -241,5 +241,19 @@ public class CamScript : MonoBehaviour {
             }
         }
         return nearestEnemy;
+    }
+
+    public GameObject getControlledPlane() {
+        return planeToControl;
+    }
+
+    public GameObject getControlledOrSpectatedPlane() {
+        if (planeToControl != null && spectatedPlane == null) {
+            return planeToControl;
+        }
+        if (planeToControl == null && spectatedPlane != null) {
+            return spectatedPlane;
+        } 
+        return null;
     }
 }

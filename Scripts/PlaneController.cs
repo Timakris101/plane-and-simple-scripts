@@ -9,6 +9,7 @@ public class PlaneController : MonoBehaviour {
     private bool enginesOn;
     private bool unconcious;
     private bool pilotGone;
+    private Sprite origSprite;
     [SerializeField] private bool enginesStartOn;
 
     private bool onGround;
@@ -22,9 +23,14 @@ public class PlaneController : MonoBehaviour {
     }
 
     void Start() {
+        origSprite = GetComponent<SpriteRenderer>().sprite;
         enginesOn = enginesStartOn;
         throttle = enginesStartOn ? 1 : 0;
         setGunnersToManual(false);
+    }
+
+    public Sprite getOrigSprite() {
+        return origSprite;
     }
 
     public bool planeDead() {

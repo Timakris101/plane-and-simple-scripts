@@ -162,4 +162,12 @@ public class DamageModel : MonoBehaviour {
     public bool isAlive() {
         return health > 0;
     }
+
+    public float getHealth() {
+        return health;
+    }
+
+    public float getMaxHealth() {
+        return maxHealth;
+    }
 }

@@ -13,7 +13,7 @@ public class BulletScript : MonoBehaviour {
     [SerializeField] private float maxFlyPastDist;
     [SerializeField] private float armingDist;
     [SerializeField] private float fuseTimeSec;
-    [SerializeField] private GameObject explosiveEffect;
+    [SerializeField] private GameObject effect;
     private float timer;
     
     [Header("Plane")]
@@ -24,6 +24,7 @@ public class BulletScript : MonoBehaviour {
     }
 
     void dealDamage(Collision2D col) {
+        Vector3 beginningHitPos = transform.position - (Vector3) col.relativeVelocity.normalized * Random.Range(0f, maxFlyPastDist);
         RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position - (Vector3) col.relativeVelocity.normalized * Random.Range(0f, maxFlyPastDist), explosionRad == 0 ? transform.localScale.x : explosionRad, -col.relativeVelocity, penetrationVal);
         foreach (RaycastHit2D hit in hits) {
             if (initSpeed != 0 && hit.transform.gameObject != col.gameObject) continue;
@@ -31,24 +32,25 @@ public class BulletScript : MonoBehaviour {
                 hit.collider.transform.GetComponent<DamageModel>().hit(Random.Range(damage / 2f, damage), explosionRad < explosiveRangeOfCertainHit);
             }
         }
-        makeEffectAndDestroyObj();
+        makeEffectAndDestroyObj(beginningHitPos);
     }
 
     void dealDamage() {
-        RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position + (Vector3) GetComponent<Rigidbody2D>().velocity.normalized * Random.Range(0f, maxFlyPastDist), explosionRad == 0 ? transform.localScale.x : explosionRad, GetComponent<Rigidbody2D>().velocity.normalized, penetrationVal);
+        Vector3 beginningHitPos = transform.position + (Vector3) GetComponent<Rigidbody2D>().velocity.normalized * Random.Range(0f, maxFlyPastDist);
+        RaycastHit2D[] hits = Physics2D.CircleCastAll(beginningHitPos, explosionRad == 0 ? transform.localScale.x : explosionRad, GetComponent<Rigidbody2D>().velocity.normalized, penetrationVal);
         foreach (RaycastHit2D hit in hits) {
             if (hit.collider.transform.GetComponent<DamageModel>() != null) {
                 hit.collider.transform.GetComponent<DamageModel>().hit(Random.Range(damage / 2f, damage), explosionRad < explosiveRangeOfCertainHit);
             }
         }
-        makeEffectAndDestroyObj();
+        makeEffectAndDestroyObj(beginningHitPos);
     }
 
-    private void makeEffectAndDestroyObj() {
-        GameObject effect = Instantiate(explosiveEffect, transform.position, Quaternion.identity);
-        var mainModule = effect.GetComponent<ParticleSystem>().main;
+    private void makeEffectAndDestroyObj(Vector3 effectPos) {
+        GameObject newEffect = Instantiate(effect, effectPos, Quaternion.identity);
+        var mainModule = newEffect.GetComponent<ParticleSystem>().main;
         if (mainModule.startSpeed.constantMax == 0) mainModule.startSpeed = new ParticleSystem.MinMaxCurve(0, explosionRad / mainModule.startLifetime.constant);
-        Destroy(effect, 10f);
+        Destroy(newEffect, 10f);
         Destroy(gameObject);
     }
 
