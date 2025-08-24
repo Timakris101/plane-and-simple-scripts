@@ -8,6 +8,7 @@ public class TerrainGen : MonoBehaviour {
     [SerializeField] private float terrainLength;
     [SerializeField] private float maxHeight;
     [SerializeField] private AnimationCurve baseTerrHeight;
+    [SerializeField] private float waterLvl;
     void Start() {
         Vector2[] terrainVecs = new Vector2[(int) terrainPointAmt];
         GetComponent<SpriteShapeController>().spline.Clear();
@@ -22,5 +23,7 @@ public class TerrainGen : MonoBehaviour {
         GetComponent<PolygonCollider2D>().SetPath(0, terrainVecs);
 
         GetComponent<SpriteShapeRenderer>().localBounds = new Bounds(Vector3.zero, new Vector3(terrainLength * transform.localScale.x, maxHeight * transform.localScale.y, 0)); 
+
+        if (waterLvl != 0) transform.GetChild(0).localScale = new Vector3(terrainLength, waterLvl * 2f, 1f);
     }
 }
