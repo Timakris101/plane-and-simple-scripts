@@ -7,11 +7,12 @@ public class TerrainGen : MonoBehaviour {
     [SerializeField] private float terrainPointAmt;
     [SerializeField] private float terrainLength;
     [SerializeField] private float maxHeight;
+    [SerializeField] private AnimationCurve baseTerrHeight;
     void Start() {
         Vector2[] terrainVecs = new Vector2[(int) terrainPointAmt];
         GetComponent<SpriteShapeController>().spline.Clear();
         for (int i = 0; i < terrainPointAmt; i++) {
-            terrainVecs[i] = new Vector2(-(terrainLength / 2) + i * (terrainLength / terrainPointAmt), Random.Range(maxHeight / 2f, maxHeight));
+            terrainVecs[i] = new Vector2(-(terrainLength / 2) + i * (terrainLength / terrainPointAmt), Random.Range(maxHeight / 2f, maxHeight) + baseTerrHeight.Evaluate(i / terrainPointAmt));
             GetComponent<SpriteShapeController>().spline.InsertPointAt(i, new Vector2(terrainVecs[i].x, i == 0 || i == terrainPointAmt - 1 ? 0f : terrainVecs[i].y));
         }
         terrainVecs[0] = new Vector2(-terrainLength / 2, 0f);
