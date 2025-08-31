@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.U2D;
 
+[ExecuteInEditMode]
 public class TerrainGen : MonoBehaviour {
     [SerializeField] private float terrainPointAmt;
     [SerializeField] private float terrainLength;
@@ -24,7 +25,10 @@ public class TerrainGen : MonoBehaviour {
 
         GetComponent<SpriteShapeRenderer>().localBounds = new Bounds(Vector3.zero, new Vector3(terrainLength * transform.localScale.x, maxHeight * transform.localScale.y + maxBaseTerrHeight(0.01f), 0)); 
 
-        if (waterLvl != 0) transform.GetChild(0).localScale = new Vector3(terrainLength, waterLvl * 2f, 1f);
+        if (waterLvl != 0) {
+            transform.GetChild(0).GetComponent<SpriteRenderer>().size = new Vector2(terrainLength, waterLvl * 2f);
+            transform.GetChild(0).GetComponent<BoxCollider2D>().size = new Vector2(terrainLength, waterLvl * 2f);
+        }
     }
 
     public float maxBaseTerrHeight(float precision) {
