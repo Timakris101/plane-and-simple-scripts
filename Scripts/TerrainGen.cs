@@ -38,4 +38,8 @@ public class TerrainGen : MonoBehaviour {
         }
         return max;
     }
+
+    public float getWaterLvl() {
+        return waterLvl;
+    }
 }

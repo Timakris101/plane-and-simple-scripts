@@ -13,9 +13,15 @@ public class GForcesScript : MonoBehaviour {
     [SerializeField] private float planeDestroyingGs;
 
     [Header("DestructiveEffects")]
+    private GameObject terrain;
     [SerializeField] private GameObject fire;
     [SerializeField] private GameObject explosion;
+    private bool extinguished = false;
     private bool destroyed = false;
+
+    void Start() {
+        terrain = GameObject.Find("Terrain");
+    }
 
     void FixedUpdate() {
         if (GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Wait")) {
@@ -27,9 +33,13 @@ public class GForcesScript : MonoBehaviour {
         }
         if (overGPlaneToDeath() && !destroyed) {
             destroyed = true;
-            Instantiate(explosion, transform.position, Quaternion.identity);
+            if (!waterLogged()) Instantiate(explosion, transform.position, Quaternion.identity);
             Instantiate(fire, transform, false);
             GetComponent<Aerodynamics>().setSpeedOfControlEff(Mathf.Infinity);
+        }
+        if (waterLogged() && destroyed && !extinguished) {
+            extinguished = true;
+            Destroy(transform.Find(fire.name + "(Clone)").gameObject);
         }
         if (overGPlane()) {
             if (transform.Find("WingHitbox") != null) transform.Find("WingHitbox").GetComponent<DamageModel>().kill();
@@ -44,6 +54,10 @@ public class GForcesScript : MonoBehaviour {
             }
         }
         calculateGs();
+    }
+
+    private bool waterLogged() {
+        return terrain.GetComponent<TerrainGen>().getWaterLvl() > transform.position.y - 1f;
     }
 
     private void rollover() {
