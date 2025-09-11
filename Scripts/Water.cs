@@ -8,7 +8,7 @@ public class Water : MonoBehaviour {
     [SerializeField] private float splashCoef;
 
     void OnTriggerEnter2D(Collider2D other) {
-        if (other.transform.tag != "Plane" && other.transform.parent == null) {
+        if (other.transform.tag != "Plane" && other.transform.tag != "Crew" && other.transform.parent == null) {
             Destroy(other.transform.gameObject);
         }
         if (other.transform.parent == null) {

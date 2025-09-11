@@ -6,18 +6,23 @@ public class CrewScript : MonoBehaviour {
 
     [SerializeField] private float chuteSpeed;
     [SerializeField] private float chuteEff;
+    private float seaLevel = 60f;
     private bool onGround;
 
     void OnCollisionEnter2D(Collision2D col) {
         if (col.transform.tag == "Ground") {
-            for (int i = 0; i < transform.childCount; i++) {
-                if (transform.GetChild(i).GetComponent<Animator>() == null) continue;
-                transform.GetChild(i).GetComponent<Animator>().SetBool("OnGround", true);
-            }
-            onGround = true;
-
-            GetComponent<Rigidbody2D>().drag = 100000f;
+            toDoWhenOnGround();
         }
+    }
+
+    void toDoWhenOnGround() {
+        for (int i = 0; i < transform.childCount; i++) {
+            if (transform.GetChild(i).GetComponent<Animator>() == null) continue;
+            transform.GetChild(i).GetComponent<Animator>().SetBool("OnGround", true);
+        }
+        onGround = true;
+
+        GetComponent<Rigidbody2D>().drag = 100000f;
     }
 
     void OnCollisionStay2D(Collision2D col) {
@@ -41,6 +46,9 @@ public class CrewScript : MonoBehaviour {
         if (!onGround) {
             handleSpeed();
             handleDir();
+        }
+        if (transform.position.y < seaLevel) {
+            toDoWhenOnGround();
         }
     }
 
