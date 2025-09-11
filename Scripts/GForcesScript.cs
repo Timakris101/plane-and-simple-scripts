@@ -25,7 +25,11 @@ public class GForcesScript : MonoBehaviour {
 
     void FixedUpdate() {
         if (GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Wait")) {
-            if (transform.Find("Gear") != null) transform.Find("Gear").GetComponent<GearScript>().unhideGear();
+            for (int i = 0; i < transform.childCount; i++) {
+                if (transform.GetChild(i).GetComponent<GearScript>() != null) {
+                    transform.GetChild(i).GetComponent<GearScript>().unhideGear();
+                }
+            }
             if (transform.Find("Flaps") != null) transform.Find("Flaps").GetComponent<FlapScript>().unhideFlaps();
         }
         if (feltGs < rollOverThresh && GetComponent<Rigidbody2D>().velocity.magnitude > 1f) {
@@ -63,7 +67,11 @@ public class GForcesScript : MonoBehaviour {
     private void rollover() {
         transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y * -1, transform.localScale.z);
         GetComponent<Animator>().SetTrigger("Rollover");
-        if (transform.Find("Gear") != null) transform.Find("Gear").GetComponent<GearScript>().hideGear();
+        for (int i = 0; i < transform.childCount; i++) {
+            if (transform.GetChild(i).GetComponent<GearScript>() != null) {
+                transform.GetChild(i).GetComponent<GearScript>().unhideGear();
+            }
+        }
         if (transform.Find("Flaps") != null) transform.Find("Flaps").GetComponent<FlapScript>().hideFlaps();
     }
 

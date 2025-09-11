@@ -158,7 +158,13 @@ public class PlaneController : MonoBehaviour {
 
         if (Input.GetKeyDown("f") && transform.Find("Flaps") != null) transform.Find("Flaps").GetComponent<FlapScript>().toggleFlaps();
 
-        if (Input.GetKeyDown("g") && transform.Find("Gear") && !onGround) transform.Find("Gear").GetComponent<GearScript>().toggleGear();
+        if (Input.GetKeyDown("g") && transform.Find("Gear") && !onGround) {
+            for (int i = 0; i < transform.childCount; i++) {
+                if (transform.GetChild(i).GetComponent<GearScript>() != null) {
+                    transform.GetChild(i).GetComponent<GearScript>().toggleGear();
+                }
+            }
+        }
         if (Input.GetKey("s") && throttle - throttleChangeSpeed * Time.deltaTime < 0 && transform.Find("Gear")) transform.Find("Gear").GetComponent<GearScript>().brake();
 
         setGuns(Input.GetMouseButton(0));
