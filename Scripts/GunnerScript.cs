@@ -12,8 +12,8 @@ public class GunnerScript : MonoBehaviour {
     [SerializeField] protected float maxRange;
 
     protected virtual void Update() {
-        if (transform.parent.gameObject.layer == LayerMask.NameToLayer("Vehicle") && transform.parent.Find("WingHitbox").GetComponent<DamageModel>().isAlive()) { //if in plane and plane is not spinning out
-            if (GetComponent<DamageModel>().isAlive() && !transform.parent.GetComponent<GForcesScript>().overGPerson()) { //if concious and alive
+        if (transform.parent.gameObject.layer == LayerMask.NameToLayer("Vehicle")) { //if in plane
+            if (GetComponent<DamageModel>().isAlive() && !transform.parent.GetComponent<GForcesScript>().overGPerson() && transform.parent.Find("WingHitbox").GetComponent<DamageModel>().isAlive()) { //if concious and alive and plane is not spinning out
                 setTargetedObj(transform.parent.GetComponent<AiPlaneController>().getTargetedObj());
 
                 if (!manualControl) {
@@ -34,6 +34,8 @@ public class GunnerScript : MonoBehaviour {
                         attemptToShoot(new Vector3(screenToWorld.x, screenToWorld.y, 0), Input.GetMouseButton(0));
                     }
                 }
+            } else {
+                attemptToShoot(false);
             }
         } else {
             if (transform.childCount != 0) {
@@ -56,15 +58,7 @@ public class GunnerScript : MonoBehaviour {
     }
 
     protected void attemptToShoot(bool b) {
-        bool hitsOwnPlane = false;
-        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.GetChild(0).position, transform.GetChild(0).right);
-        foreach (RaycastHit2D hit in hits) {
-            if (hit.collider.transform == transform.parent) { //checks if the specific collider is of the parent and not of the children. Hit.transform would return parent transform
-                hitsOwnPlane = true;
-                break;
-            }
-        }
-        transform.GetChild(0).GetComponent<GunScript>().setShooting(b && !hitsOwnPlane);
+        transform.GetChild(0).GetComponent<GunScript>().setShooting(b);
     }
 
     protected void pointGunAt(Vector3 pos) {

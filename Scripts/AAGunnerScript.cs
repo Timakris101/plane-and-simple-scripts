@@ -29,6 +29,8 @@ public class AAGunnerScript : GunnerScript {
                     transform.GetChild(0).GetComponent<GunScript>().setFuseOfBullets(new Vector3(screenToWorld.x, screenToWorld.y, 0));
                 }
             }
+        } else {
+            attemptToShoot(false);
         }
     }
 
