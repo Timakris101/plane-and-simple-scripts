@@ -43,7 +43,7 @@ public class DamageModel : MonoBehaviour {
         if (health <= 0) {
             if (destructiveEffect != null && !effectApplied) {
                 effectApplied = true;
-                Instantiate(destructiveEffect, transform, false);
+                Instantiate(destructiveEffect, transform.position + (Vector3) GetComponent<BoxCollider2D>().offset, Quaternion.identity, transform);
             }
             switch (effect) {
                 case "Wing":
