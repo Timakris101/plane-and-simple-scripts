@@ -30,7 +30,7 @@ public class BulletScript : MonoBehaviour {
         foreach (RaycastHit2D hit in hits) {
             if (initSpeed != 0 && hit.transform.gameObject != col.gameObject) continue;
             if (hit.collider.transform.GetComponent<DamageModel>() != null) {
-                hit.collider.transform.GetComponent<DamageModel>().hit(Random.Range(damage / 2f, damage), explosionRad < explosiveRangeOfCertainHit);
+                hit.collider.transform.GetComponent<DamageModel>().hit(damage, explosionRad < explosiveRangeOfCertainHit);
             }
         }
         makeEffectAndDestroyObj(beginningHitPos);
@@ -41,7 +41,7 @@ public class BulletScript : MonoBehaviour {
         RaycastHit2D[] hits = Physics2D.CircleCastAll(beginningHitPos, explosionRad == 0 ? transform.localScale.x : explosionRad, GetComponent<Rigidbody2D>().velocity.normalized, penetrationVal);
         foreach (RaycastHit2D hit in hits) {
             if (hit.collider.transform.GetComponent<DamageModel>() != null) {
-                hit.collider.transform.GetComponent<DamageModel>().hit(Random.Range(damage / 2f, damage), explosionRad < explosiveRangeOfCertainHit);
+                hit.collider.transform.GetComponent<DamageModel>().hit(damage, explosionRad < explosiveRangeOfCertainHit);
             }
         }
         makeEffectAndDestroyObj(beginningHitPos);

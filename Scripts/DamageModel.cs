@@ -9,9 +9,9 @@ public class DamageModel : MonoBehaviour {
     [SerializeField] private float maxHealth;
     [SerializeField] private float health;
     [SerializeField] private bool crewRole;
+    [SerializeField] private GameObject destructiveEffect;
 
     [Header("Engine")]
-    [SerializeField] private GameObject destructiveEffect;
     [SerializeField] private float fireDamagePerSec;
 
     [Header("Tail")]
@@ -23,6 +23,7 @@ public class DamageModel : MonoBehaviour {
     [SerializeField] private float animatorSpeedFactor;
 
     private Aerodynamics aero;
+    private bool effectApplied;
 
     public bool isCrewRole() {
         return crewRole;
@@ -40,6 +41,10 @@ public class DamageModel : MonoBehaviour {
     void Update() {
         if (health > maxHealth) health = maxHealth;
         if (health <= 0) {
+            if (destructiveEffect != null && !effectApplied) {
+                effectApplied = true;
+                Instantiate(destructiveEffect, transform, false);
+            }
             switch (effect) {
                 case "Wing":
                     transform.parent.GetComponent<Animator>().speed = transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude / animatorSpeedFactor;
@@ -59,9 +64,6 @@ public class DamageModel : MonoBehaviour {
                     break;
 
                 case "Engine":
-                    if (transform.childCount == 0) {
-                        Instantiate(destructiveEffect, transform, false);
-                    }
                     for (int i = 0; i < transform.parent.childCount; i++) {
                         if (transform.parent.GetChild(i).GetComponent<DamageModel>() != null) {
                             transform.parent.GetChild(i).GetComponent<DamageModel>().damage(fireDamagePerSec * Time.deltaTime);
