@@ -17,8 +17,7 @@ public class Aerodynamics : MonoBehaviour {
 
     [Header("Drag")]
     [SerializeField] private AnimationCurve cD;
-    private float frontArea;
-    private float planeThickness = .5f;
+    [SerializeField] private float frontArea;
 
     [Header("Torque")]
     [SerializeField] private AnimationCurve torqueStrength;
@@ -34,7 +33,6 @@ public class Aerodynamics : MonoBehaviour {
     private PlaneController pc;
 
     void Start() {
-        frontArea = GetComponent<BoxCollider2D>().size.y * planeThickness;
         setPlaneController();         
     }
 
