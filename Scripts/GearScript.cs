@@ -21,6 +21,8 @@ public class GearScript : MonoBehaviour {
     private float timeBraking;
     private float time;
 
+    private Sprite origSpriteOfPlane;
+
     void OnCollisionEnter2D(Collision2D col) {
         if (transform.parent != null) {
             if (Vector3.Project(col.contacts[0].relativeVelocity, -col.contacts[0].normal).magnitude > crushSpeed) breakGear();
@@ -36,10 +38,12 @@ public class GearScript : MonoBehaviour {
         }
         GetComponent<Animator>().SetBool("gearDownAtStart", gearDownAtStart);
         GetComponent<Animator>().SetBool("gearDeployed", gearDownAtStart);
+
+        origSpriteOfPlane = transform.parent.GetComponent<SpriteRenderer>().sprite;
     }
 
     public float getGearDrag() {
-        return gearDrag;
+        return isGearDown() ? gearDrag : 0f;
     }
 
     public void gearDown() {
@@ -102,6 +106,15 @@ public class GearScript : MonoBehaviour {
         GetComponent<BoxCollider2D>().enabled = GetComponent<SpriteRenderer>().sprite == gearDownSprite;
         if (transform.parent != null) {
             if (isGearDown() && transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude > breakSpeed) breakGear();
+        }
+        if (transform.parent != null) {
+            if (transform.parent.GetComponent<SpriteRenderer>().sprite == origSpriteOfPlane) {
+                unhideGear();
+            } else {
+                hideGear();
+            }
+        } else {
+            unhideGear();
         }
     }
 }

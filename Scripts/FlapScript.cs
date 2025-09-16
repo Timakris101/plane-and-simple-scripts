@@ -10,10 +10,25 @@ public class FlapScript : MonoBehaviour {
     [SerializeField] private float flapDrag;
     [SerializeField] private float breakSpeed;
 
+    private Sprite origSpriteOfPlane;
+
+    void Start() {
+        origSpriteOfPlane = transform.parent.GetComponent<SpriteRenderer>().sprite;
+    }
+
     void Update() {
         handleFlaps();
         if (transform.parent != null) {
             if (deflection() >= maxDeflection && transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude > breakSpeed) breakFlaps();
+        }
+        if (transform.parent != null) {
+            if (transform.parent.GetComponent<SpriteRenderer>().sprite == origSpriteOfPlane) {
+                unhideFlaps();
+            } else {
+                hideFlaps();
+            }
+        } else {
+            unhideFlaps();
         }
     }
 

@@ -11,9 +11,15 @@ public class GunnerScript : MonoBehaviour {
     [SerializeField] protected float maxDeflection;
     [SerializeField] protected float maxRange;
 
+    private Sprite origSpriteOfPlane;
+
+    void Start() {
+        origSpriteOfPlane = transform.parent.GetComponent<SpriteRenderer>().sprite;
+    }
+
     protected virtual void Update() {
         if (transform.parent.gameObject.layer == LayerMask.NameToLayer("Vehicle")) { //if in plane
-            if (GetComponent<DamageModel>().isAlive() && !transform.parent.GetComponent<GForcesScript>().overGPerson() && transform.parent.Find("WingHitbox").GetComponent<DamageModel>().isAlive()) { //if concious and alive and plane is not spinning out
+            if (GetComponent<DamageModel>().isAlive() && !transform.parent.GetComponent<GForcesScript>().overGPerson() && transform.parent.GetComponent<SpriteRenderer>().sprite == origSpriteOfPlane) { //if concious and alive and plane is not spinning out
                 setTargetedObj(transform.parent.GetComponent<AiPlaneController>().getTargetedObj());
 
                 if (!manualControl) {
