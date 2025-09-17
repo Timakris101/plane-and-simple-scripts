@@ -142,8 +142,10 @@ public class CamScript : MonoBehaviour {
             transform.position += movementVec * freeCamSpeedScaler * Mathf.Tan(camera.fieldOfView / 2f / 180f * 3.14f) * Time.deltaTime;
         }
         transform.eulerAngles = new Vector3(0, 0, 0);
+
+        Vector3 prevMousePos = gameObject.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -transform.position.z));
         
-        camera.fieldOfView -= 2 * Mathf.Atan(Input.mouseScrollDelta.y); //adds mouse scroll to cam fov, tangent for smooth cam movement
+        camera.fieldOfView -= Input.mouseScrollDelta.y;
 
         if (camera.fieldOfView > maxP) { //makes cam size unable to go above max
             camera.fieldOfView = maxP;
@@ -151,6 +153,10 @@ public class CamScript : MonoBehaviour {
         if (camera.fieldOfView < minP) { //makes cam size unable to go below min
             camera.fieldOfView = minP;
         }
+
+        Vector3 newMousePos = gameObject.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -transform.position.z));
+
+        transform.position += prevMousePos - newMousePos;
     }
 
     private void scrollSpectatablePlanes() {
