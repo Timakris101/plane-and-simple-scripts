@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AiPlaneController : PlaneController {
 
-    private GameObject targetedObj;
+    [SerializeField] private GameObject targetedObj;
     [SerializeField] private float angularThreshForGuns;
     [SerializeField] private float sixAngle;
     [SerializeField] private string mode;
