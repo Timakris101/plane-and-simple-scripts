@@ -121,27 +121,6 @@ public class CamScript : MonoBehaviour {
 
     private void handleCam() {
         Camera camera = gameObject.GetComponent<Camera>();
-        if (transform.parent != null) {
-            transform.position = transform.parent.position + offset;
-        } else {
-            if (spectatedPlane != null) transform.position = spectatedPlane.transform.position + offset;
-
-            Vector3 movementVec = new Vector3(0, 0, 0);
-            if (Input.GetKey("w")) {
-                movementVec += new Vector3(0, 1, 0);
-            }
-            if (Input.GetKey("a")) {
-                movementVec += new Vector3(-1, 0, 0);
-            }
-            if (Input.GetKey("s")) {
-                movementVec += new Vector3(0, -1, 0);
-            }
-            if (Input.GetKey("d")) {
-                movementVec += new Vector3(1, 0, 0);
-            }
-            transform.position += movementVec * freeCamSpeedScaler * Mathf.Tan(camera.fieldOfView / 2f / 180f * 3.14f) * Time.deltaTime;
-        }
-        transform.eulerAngles = new Vector3(0, 0, 0);
 
         Vector3 prevMousePos = gameObject.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -transform.position.z));
         
@@ -157,6 +136,23 @@ public class CamScript : MonoBehaviour {
         Vector3 newMousePos = gameObject.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -transform.position.z));
 
         transform.position += prevMousePos - newMousePos;
+
+        if (transform.parent != null) {
+            transform.position = transform.parent.position + offset;
+        } else {
+            if (spectatedPlane != null) {
+                transform.position = spectatedPlane.transform.position + offset;
+            } else {
+                Vector3 movementVec = new Vector3(0, 0, 0);
+                if (Input.GetKey("w")) movementVec += new Vector3(0, 1, 0);
+                if (Input.GetKey("a")) movementVec += new Vector3(-1, 0, 0);
+                if (Input.GetKey("s")) movementVec += new Vector3(0, -1, 0);
+                if (Input.GetKey("d")) movementVec += new Vector3(1, 0, 0);
+
+                transform.position += movementVec.normalized * freeCamSpeedScaler * Mathf.Tan(camera.fieldOfView / 2f / 180f * 3.14f) * Time.deltaTime;
+            }
+        }
+        transform.eulerAngles = new Vector3(0, 0, 0);
     }
 
     private void scrollSpectatablePlanes() {
