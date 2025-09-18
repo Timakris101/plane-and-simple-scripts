@@ -127,7 +127,7 @@ public class PlaneController : MonoBehaviour {
                 handleControls();
             }
         }
-        if (pilotGone) setGuns(false);
+        if (pilotGone || unconcious) setGuns(false);
         
         if (!allCrewGoneFromPlane()) {
             handleNonPilotControls();
