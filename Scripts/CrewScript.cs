@@ -48,8 +48,10 @@ public class CrewScript : MonoBehaviour {
             handleDir();
         }
         if (transform.position.y < seaLevel) {
-            toDoWhenOnGround();
+            if (!onGround) toDoWhenOnGround();
             transform.position += new Vector3(0, Time.deltaTime, 0);
+            transform.rotation = Quaternion.identity;
+            GetComponent<Rigidbody2D>().drag = 100000f;
         }
     }
 
