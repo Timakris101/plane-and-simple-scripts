@@ -67,12 +67,12 @@ public class DamageModelDisplay : MonoBehaviour {
                 coupledModules.Add(new CoupledModule(newModuleDisp, plane.transform.GetChild(i).gameObject));
             }
         }
-    }
-
-    void Update() {
         foreach (CoupledModule c in coupledModules) {
             c.getDisp().GetComponent<UnityEngine.UI.Image>().color = healthDispGradient.Evaluate(Mathf.Max(c.getCoupledModule().GetComponent<DamageModel>().getHealth(), 0f) / c.getCoupledModule().GetComponent<DamageModel>().getMaxHealth());
         }
-        if (camera.GetComponent<CamScript>().getControlledOrSpectatedPlane() != plane) displayPlane(camera.GetComponent<CamScript>().getControlledOrSpectatedPlane());
+    }
+
+    void Update() {
+        displayPlane(camera.GetComponent<CamScript>().getControlledOrSpectatedPlane());
     }
 }

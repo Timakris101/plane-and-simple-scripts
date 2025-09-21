@@ -65,6 +65,8 @@ public class FlapScript : MonoBehaviour {
         GetComponent<Rigidbody2D>().drag = 1;
         GetComponent<Rigidbody2D>().velocity = vel;
         GetComponent<Rigidbody2D>().angularVelocity = Random.Range(-GetComponent<Rigidbody2D>().velocity.magnitude, GetComponent<Rigidbody2D>().velocity.magnitude);
+        
+        Destroy(gameObject, 10f);
     }
 
     public void toggleFlaps() {

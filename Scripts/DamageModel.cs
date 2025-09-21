@@ -131,6 +131,8 @@ public class DamageModel : MonoBehaviour {
 
         transform.parent.GetComponent<BoxCollider2D>().size = new Vector2(transform.parent.GetComponent<BoxCollider2D>().size.x - obj.GetComponent<BoxCollider2D>().size.x, transform.parent.GetComponent<BoxCollider2D>().size.y);
         transform.parent.GetComponent<BoxCollider2D>().offset = new Vector2(transform.parent.GetComponent<BoxCollider2D>().offset.x + obj.GetComponent<BoxCollider2D>().size.x / 2, transform.parent.GetComponent<BoxCollider2D>().offset.y);
+
+        Destroy(obj, 10f);
     }
 
     private void handleSpawningWing() {
@@ -139,6 +141,8 @@ public class DamageModel : MonoBehaviour {
         obj.transform.localScale = transform.parent.localScale;
         transform.parent.GetComponent<Animator>().SetBool("Wingless", true);
         handlePropellerOn(obj);
+        
+        Destroy(obj, 10f);
     }
 
     private void handlePropellerOn(GameObject obj) {

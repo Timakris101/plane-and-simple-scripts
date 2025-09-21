@@ -32,6 +32,7 @@ public class GForcesScript : MonoBehaviour {
             if (!waterLogged()) Instantiate(explosion, transform.position, Quaternion.identity);
             Instantiate(fire, transform, false);
             GetComponent<Aerodynamics>().setSpeedOfControlEff(Mathf.Infinity);
+            Destroy(gameObject, 10f);
         }
         if (waterLogged() && destroyed && !extinguished) {
             extinguished = true;
