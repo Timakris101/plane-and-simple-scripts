@@ -11,7 +11,6 @@ public class Water : MonoBehaviour {
     void OnTriggerEnter2D(Collider2D other) {
         if (other.transform.tag != "Plane" && other.transform.tag != "Crew" && other.transform.parent == null) {
             Destroy(other.transform.gameObject);
-            return;
         }
         if (other.transform.parent == null) {
             GameObject newSplash = Instantiate(splashEffect, other.transform.position, Quaternion.identity);
