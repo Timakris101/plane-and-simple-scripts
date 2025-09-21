@@ -49,6 +49,7 @@ public class CrewScript : MonoBehaviour {
         }
         if (transform.position.y < seaLevel) {
             toDoWhenOnGround();
+            transform.position += new Vector3(0, Time.deltaTime, 0);
         }
     }
 
