@@ -17,6 +17,7 @@ public class Water : MonoBehaviour {
             GameObject newSplash = Instantiate(splashEffect, other.transform.position, Quaternion.identity);
             var mainModule = newSplash.GetComponent<ParticleSystem>().main;
             mainModule.startSpeed = new ParticleSystem.MinMaxCurve(splashSize(other.transform.gameObject) / 2f, splashSize(other.transform.gameObject));
+            Destroy(newSplash, 20f);
         }
     }
 
