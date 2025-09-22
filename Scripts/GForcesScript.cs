@@ -13,7 +13,7 @@ public class GForcesScript : MonoBehaviour {
     [SerializeField] private float planeDestroyingGs;
     private bool sleepy;
     private float inGlocTimer;
-    private float timeToGloc = 5f;
+    private float timeToGloc = 4f;
     private float inSleepTimer;
     private float timeToUnsleep = 1f;
 
@@ -60,9 +60,9 @@ public class GForcesScript : MonoBehaviour {
 
     private void updateSleepy() {
         if (overGPerson()) {
-            inGlocTimer += Time.fixedDeltaTime;
+            inGlocTimer += (feltGs - sleepyGs + 1f) * Time.fixedDeltaTime;
         } else {
-            if (inGlocTimer > 0f && !sleepy) inGlocTimer -= (sleepyGs - feltGs) * Time.fixedDeltaTime;
+            if (inGlocTimer > 0f && !sleepy) inGlocTimer -= (sleepyGs - feltGs + 1f) * Time.fixedDeltaTime;
         }
         if (!sleepy && inGlocTimer > timeToGloc) {
             sleepy = true;
