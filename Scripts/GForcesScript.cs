@@ -11,6 +11,11 @@ public class GForcesScript : MonoBehaviour {
     [SerializeField] private float killingGs;
     [SerializeField] private float planeStructDestroyingGs;
     [SerializeField] private float planeDestroyingGs;
+    private bool sleepy;
+    private float inGlocTimer;
+    [SerializeField] private float timeToGloc = 3f;
+    private float inSleepTimer;
+    [SerializeField] private float timeToUnsleep = 3f;
 
     [Header("DestructiveEffects")]
     private GameObject terrain;
@@ -49,7 +54,26 @@ public class GForcesScript : MonoBehaviour {
                 transform.GetChild(i).GetComponent<DamageModel>().kill();
             }
         }
+        updateSleepy();
         calculateGs();
+    }
+
+    private void updateSleepy() {
+        if (overGPerson()) {
+            inGlocTimer += Time.fixedDeltaTime;
+        } else {
+            if (inGlocTimer > 0f && !sleepy) inGlocTimer -= Time.fixedDeltaTime;
+        }
+        if (!sleepy && inGlocTimer > timeToGloc) {
+            sleepy = true;
+            inSleepTimer = 0;
+        }
+        if (sleepy) {
+            inSleepTimer += Time.fixedDeltaTime;
+        }
+        if (inSleepTimer > timeToUnsleep) {
+            sleepy = false;
+        }
     }
 
     private bool waterLogged() {
@@ -64,7 +88,7 @@ public class GForcesScript : MonoBehaviour {
     private void calculateGs() {
         if (prevVel.magnitude != 0) {
             Vector3 curVel = GetComponent<Rigidbody2D>().velocity;
-            Vector3 currentForces = curVel - prevVel;
+            Vector3 currentForces = (curVel - prevVel) / Time.fixedDeltaTime / 9.8f;
 
             if (currentForces.magnitude != 0) currentGs = transform.localScale.y * (currentForces + Vector3.up);
             feltGs = Vector3.Dot(Vector3.Project(currentGs, transform.up), transform.up);
@@ -86,5 +110,14 @@ public class GForcesScript : MonoBehaviour {
 
     public bool overGPerson() {
         return Mathf.Abs(feltGs) > Mathf.Abs(sleepyGs);
+    }
+
+    public bool isPersonSleepy() {
+        return sleepy;
+    }
+
+    public float howSleepyIsPerson() {
+        if (sleepy) return 1f;
+        return inGlocTimer / timeToGloc;
     }
 }

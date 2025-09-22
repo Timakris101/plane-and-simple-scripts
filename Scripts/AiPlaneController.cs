@@ -39,7 +39,7 @@ public class AiPlaneController : PlaneController {
         this.alliance = alliance;
     }
 
-    protected override int wantedDir() {
+    protected override float wantedDir() {
         findTarget();
         
         primaryBullet = null;
@@ -82,8 +82,8 @@ public class AiPlaneController : PlaneController {
         return 0;
     }
 
-    private int pointTowards(Vector3 pos) {
-        return  angleTo(pos) > 0 ? -1 : 1;
+    private float pointTowards(Vector3 pos) {
+        return Mathf.Clamp(-angleTo(pos), -1, 1);
     }
 
     private float angleTo(Vector3 pos) {

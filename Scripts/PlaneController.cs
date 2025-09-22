@@ -58,7 +58,7 @@ public class PlaneController : MonoBehaviour {
             pilotGone = true;
             return;
         }
-        unconcious = !transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive() || GetComponent<GForcesScript>().overGPerson();
+        unconcious = !transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive() || GetComponent<GForcesScript>().isPersonSleepy();
         if (transform.Find("Camera") == null) {
             foreach (PlaneController controller in GetComponents<PlaneController>()) {
                 if (controller == GetComponent<AiPlaneController>()) {
@@ -94,7 +94,7 @@ public class PlaneController : MonoBehaviour {
         return !transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive();
     }
 
-    public int getDir() {
+    public float getDir() {
         if (!unconcious && !pilotGone) {
             if (gunnersAreManual()) {
                 return GetComponent<AiPlaneController>().wantedDir();
@@ -105,7 +105,7 @@ public class PlaneController : MonoBehaviour {
         return 0;
     }
 
-    protected virtual int wantedDir() {
+    protected virtual float wantedDir() {
         int val = 0;
         if (Input.GetKey("d")) {
             val = -1;
