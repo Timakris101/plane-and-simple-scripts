@@ -6,6 +6,8 @@ public class AAGunnerScript : GunnerScript {
 
     [SerializeField] private string alliance;
 
+    protected override void Start() {}
+
     protected override void Update() {
         if (GetComponent<DamageModel>().isAlive()) {
             findTarget();

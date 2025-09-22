@@ -13,7 +13,7 @@ public class GunnerScript : MonoBehaviour {
 
     private Sprite origSpriteOfPlane;
 
-    void Start() {
+    protected virtual void Start() {
         origSpriteOfPlane = transform.parent.GetComponent<SpriteRenderer>().sprite;
     }
 
