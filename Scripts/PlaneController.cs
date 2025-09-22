@@ -8,6 +8,8 @@ public class PlaneController : MonoBehaviour {
     private float throttleChangeSpeed = 1f;
     private bool enginesOn;
     private bool unconcious;
+    private float unconciousPilotEffectiveness = .5f;
+    private bool pilotDead;
     private bool pilotGone;
     private Sprite origSprite;
     [SerializeField] private bool enginesStartOn;
@@ -58,7 +60,8 @@ public class PlaneController : MonoBehaviour {
             pilotGone = true;
             return;
         }
-        unconcious = !transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive() || GetComponent<GForcesScript>().isPersonSleepy();
+        pilotDead = !transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive();
+        unconcious = GetComponent<GForcesScript>().isPersonSleepy();
         if (transform.Find("Camera") == null) {
             foreach (PlaneController controller in GetComponents<PlaneController>()) {
                 if (controller == GetComponent<AiPlaneController>()) {
@@ -95,11 +98,11 @@ public class PlaneController : MonoBehaviour {
     }
 
     public float getDir() {
-        if (!unconcious && !pilotGone) {
+        if (!pilotDead && !pilotGone) {
             if (gunnersAreManual()) {
-                return GetComponent<AiPlaneController>().wantedDir();
+                return GetComponent<AiPlaneController>().wantedDir() * (unconcious ? unconciousPilotEffectiveness : 1f);
             } else {
-                return wantedDir();
+                return wantedDir() * (unconcious ? unconciousPilotEffectiveness : 1f);
             }
         }
         return 0;
@@ -127,7 +130,7 @@ public class PlaneController : MonoBehaviour {
                 handleControls();
             }
         }
-        if (pilotGone || unconcious) setGuns(false);
+        if (pilotGone || pilotDead) setGuns(false);
         
         if (!allCrewGoneFromPlane()) {
             handleNonPilotControls();

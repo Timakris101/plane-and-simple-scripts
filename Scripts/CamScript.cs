@@ -18,6 +18,8 @@ public class CamScript : MonoBehaviour {
     [SerializeField] private GameObject spectatedPlane;
     [SerializeField] private string startingAlliance;
 
+    private float GlocDarkness = .9f;
+
     void Start() {
         offset = new Vector3(0, 0, transform.position.z);
 
@@ -75,7 +77,7 @@ public class CamScript : MonoBehaviour {
         transform.Find("Canvas").Find("GForceDisp").GetComponent<UnityEngine.UI.Image>().color = new Color(0f, 0f, 0f, Mathf.Max(0f, transform.Find("Canvas").Find("GForceDisp").GetComponent<UnityEngine.UI.Image>().color.a - Time.deltaTime));
         transform.Find("Canvas").Find("GForceDisp").GetComponent<RectTransform>().sizeDelta = transform.Find("Canvas").GetComponent<RectTransform>().sizeDelta;
         if (planeToControl == null) return;
-        transform.Find("Canvas").Find("GForceDisp").GetComponent<UnityEngine.UI.Image>().color = new Color(0f, 0f, 0f, planeToControl.GetComponent<GForcesScript>().howSleepyIsPerson());
+        transform.Find("Canvas").Find("GForceDisp").GetComponent<UnityEngine.UI.Image>().color = new Color(0f, 0f, 0f, planeToControl.GetComponent<GForcesScript>().howSleepyIsPerson() * GlocDarkness);
     }
 
     private void matchParentToPlane() {

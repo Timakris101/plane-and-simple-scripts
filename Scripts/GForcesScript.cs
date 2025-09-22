@@ -59,11 +59,8 @@ public class GForcesScript : MonoBehaviour {
     }
 
     private void updateSleepy() {
-        if (overGPerson()) {
-            inGlocTimer += Time.fixedDeltaTime;
-        } else {
-            if (inGlocTimer > 0f && !sleepy) inGlocTimer -= (sleepyGs - feltGs + 1f) * Time.fixedDeltaTime;
-        }
+        if (!sleepy) inGlocTimer = Mathf.Max(inGlocTimer + (feltGs - sleepyGs) * Time.fixedDeltaTime, 0f);
+
         if (!sleepy && inGlocTimer > timeToGloc) {
             sleepy = true;
             inSleepTimer = 0;
