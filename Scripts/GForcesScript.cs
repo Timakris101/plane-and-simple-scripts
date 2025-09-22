@@ -60,7 +60,7 @@ public class GForcesScript : MonoBehaviour {
 
     private void updateSleepy() {
         if (overGPerson()) {
-            inGlocTimer += (feltGs - sleepyGs + 1f) * Time.fixedDeltaTime;
+            inGlocTimer += Time.fixedDeltaTime;
         } else {
             if (inGlocTimer > 0f && !sleepy) inGlocTimer -= (sleepyGs - feltGs + 1f) * Time.fixedDeltaTime;
         }
