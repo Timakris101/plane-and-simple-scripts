@@ -13,9 +13,9 @@ public class GForcesScript : MonoBehaviour {
     [SerializeField] private float planeDestroyingGs;
     private bool sleepy;
     private float inGlocTimer;
-    [SerializeField] private float timeToGloc = 3f;
+    private float timeToGloc = 5f;
     private float inSleepTimer;
-    [SerializeField] private float timeToUnsleep = 3f;
+    private float timeToUnsleep = 1f;
 
     [Header("DestructiveEffects")]
     private GameObject terrain;
@@ -62,7 +62,7 @@ public class GForcesScript : MonoBehaviour {
         if (overGPerson()) {
             inGlocTimer += Time.fixedDeltaTime;
         } else {
-            if (inGlocTimer > 0f && !sleepy) inGlocTimer -= Time.fixedDeltaTime;
+            if (inGlocTimer > 0f && !sleepy) inGlocTimer -= (sleepyGs - feltGs) * Time.fixedDeltaTime;
         }
         if (!sleepy && inGlocTimer > timeToGloc) {
             sleepy = true;
