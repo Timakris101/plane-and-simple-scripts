@@ -8,7 +8,6 @@ public class PlaneController : MonoBehaviour {
     private float throttleChangeSpeed = 1f;
     private bool enginesOn;
     private bool unconcious;
-    private float unconciousPilotEffectiveness = 0f;
     private bool pilotDead;
     private bool pilotGone;
     private Sprite origSprite;
@@ -100,9 +99,9 @@ public class PlaneController : MonoBehaviour {
     public float getDir() {
         if (!pilotDead && !pilotGone) {
             if (gunnersAreManual()) {
-                return GetComponent<AiPlaneController>().wantedDir() * (unconcious ? unconciousPilotEffectiveness : 1f);
+                return GetComponent<AiPlaneController>().wantedDir() * (unconcious ? Constants.GForceEffectConstants.unconciousPilotEffectiveness : 1f);
             } else {
-                return wantedDir() * (unconcious ? unconciousPilotEffectiveness : 1f);
+                return wantedDir() * (unconcious ? Constants.GForceEffectConstants.unconciousPilotEffectiveness : 1f);
             }
         }
         return 0;
