@@ -18,7 +18,7 @@ public class CamScript : MonoBehaviour {
     [SerializeField] private GameObject spectatedPlane;
     [SerializeField] private string startingAlliance;
 
-    private float GlocDarkness = .9f;
+    private float GlocDarkness = 1f;
 
     void Start() {
         offset = new Vector3(0, 0, transform.position.z);

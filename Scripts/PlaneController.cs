@@ -8,7 +8,7 @@ public class PlaneController : MonoBehaviour {
     private float throttleChangeSpeed = 1f;
     private bool enginesOn;
     private bool unconcious;
-    private float unconciousPilotEffectiveness = .5f;
+    private float unconciousPilotEffectiveness = 0f;
     private bool pilotDead;
     private bool pilotGone;
     private Sprite origSprite;
