@@ -34,7 +34,10 @@ public class SquadronSpawner : MonoBehaviour {
     [SerializeField] private GameObject containsPlayerToggle;
     [SerializeField] private GameObject allianceDropdown;
 
+    private bool inEditor;
+
     void Start() {
+        inEditor = true;
         if (selectionSpawner) {
             for (int i = 0; i < planes.Length; i++) {
                 selectorDropdown.GetComponent<TMP_Dropdown>().options.Add(new TMP_Dropdown.OptionData(planes[i].name));
@@ -69,12 +72,11 @@ public class SquadronSpawner : MonoBehaviour {
                 setCurrentSelectedObj(null);
             }
             if (Input.GetKey(KeyCode.Backspace)) Destroy(curSelected);
-            if (curSelected != null) editSpawner();
             if (Input.GetMouseButtonDown(1) && curSelected == null) {
                 GameObject newSpawner = Instantiate(baseSpawner, camera.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -camera.transform.position.z)), Quaternion.identity);
-                editSpawner(newSpawner);
                 setCurrentSelectedObj(newSpawner);
             }
+            editSpawner(curSelected);
         }
         if (arcade && arcadeOn) {
             if (!anyPlanesLeft(plane.GetComponent<AiPlaneController>().getAlliance())) {
@@ -96,7 +98,7 @@ public class SquadronSpawner : MonoBehaviour {
     }
 
     public void editSpawner(GameObject spawnerToEdit) {
-        if (spawnerToEdit != null) {
+        if (spawnerToEdit != null && inEditor) {
             int ignore;
             if (int.TryParse(amountTextField.GetComponent<TMP_InputField>().text, out ignore)) spawnerToEdit.GetComponent<SquadronSpawner>().amt = int.Parse(amountTextField.GetComponent<TMP_InputField>().text);
             spawnerToEdit.GetComponent<SquadronSpawner>().containsPlayer = containsPlayerToggle.GetComponent<Toggle>().isOn;
@@ -120,10 +122,6 @@ public class SquadronSpawner : MonoBehaviour {
         }
     }
 
-    public void editSpawner() {
-        editSpawner(curSelected);      
-    }
-
     public void setContainsPlayer(bool b) {
         containsPlayer = b;
     }
@@ -137,6 +135,8 @@ public class SquadronSpawner : MonoBehaviour {
             spawner.GetComponent<SpriteRenderer>().enabled = false;
             if (spawner.GetComponent<SquadronSpawner>().arcade) spawner.GetComponent<SquadronSpawner>().arcadeOn = true;
         }
+
+        inEditor = false;
     }
 
     private void saveObjectsToNotClear() {
@@ -157,6 +157,8 @@ public class SquadronSpawner : MonoBehaviour {
         }
 
         clearUnsavedObjects();
+
+        inEditor = true;
     }
 
     private void clearUnsavedObjects() {
