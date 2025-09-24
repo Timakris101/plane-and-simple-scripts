@@ -15,6 +15,7 @@ public class BulletScript : MonoBehaviour {
     [SerializeField] private float fuseTimeSec;
     [SerializeField] private GameObject effect;
     [SerializeField] private float lifeTime;
+    [SerializeField] private float damageVariation;
     private float timer;
     
     [Header("Plane")]
@@ -30,7 +31,7 @@ public class BulletScript : MonoBehaviour {
         foreach (RaycastHit2D hit in hits) {
             if (initSpeed != 0 && hit.transform.gameObject != col.gameObject) continue;
             if (hit.collider.transform.GetComponent<DamageModel>() != null) {
-                hit.collider.transform.GetComponent<DamageModel>().hit(damage, explosionRad < explosiveRangeOfCertainHit);
+                hit.collider.transform.GetComponent<DamageModel>().hit(Random.Range((1f - damageVariation) * damage, (1f + damageVariation) * damage), explosionRad < explosiveRangeOfCertainHit);
             }
         }
         makeEffectAndDestroyObj(beginningHitPos);
@@ -41,7 +42,7 @@ public class BulletScript : MonoBehaviour {
         RaycastHit2D[] hits = Physics2D.CircleCastAll(beginningHitPos, explosionRad == 0 ? transform.localScale.x : explosionRad, GetComponent<Rigidbody2D>().velocity.normalized, penetrationVal);
         foreach (RaycastHit2D hit in hits) {
             if (hit.collider.transform.GetComponent<DamageModel>() != null) {
-                hit.collider.transform.GetComponent<DamageModel>().hit(damage, explosionRad < explosiveRangeOfCertainHit);
+                hit.collider.transform.GetComponent<DamageModel>().hit(Random.Range((1f - damageVariation) * damage, (1f + damageVariation) * damage), explosionRad < explosiveRangeOfCertainHit);
             }
         }
         makeEffectAndDestroyObj(beginningHitPos);
