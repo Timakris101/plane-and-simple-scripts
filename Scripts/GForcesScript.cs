@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GForcesScript : MonoBehaviour {
     [SerializeField] private float rollOverThresh;
@@ -37,6 +38,7 @@ public class GForcesScript : MonoBehaviour {
             if (!waterLogged()) Instantiate(explosion, transform.position, Quaternion.identity);
             Instantiate(fire, transform, false);
             GetComponent<Aerodynamics>().setSpeedOfControlEff(Mathf.Infinity);
+            if (SceneManager.GetActiveScene().name == "Arcade") Destroy(gameObject, 10f);
         }
         if (waterLogged() && destroyed && !extinguished) {
             extinguished = true;

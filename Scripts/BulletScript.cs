@@ -77,6 +77,11 @@ public class BulletScript : MonoBehaviour {
     }
 
     void Update() {
+        if (planeFired == null) {
+            Destroy(gameObject);
+            return;
+        }
+
         if ((transform.position - planeFired.transform.position).magnitude > armingDist) {
             collisionToPlaneFired(true);
         }
