@@ -232,7 +232,7 @@ public class PlaneController : MonoBehaviour {
     }
 
     public float getThrottle() {
-        return throttle;
+        return (inWEP ? GetComponent<Aerodynamics>().getWEP() : throttle);
     }
 
     public bool getEnginesOn() {

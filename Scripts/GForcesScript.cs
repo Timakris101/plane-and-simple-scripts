@@ -85,7 +85,7 @@ public class GForcesScript : MonoBehaviour {
     }
 
     private void calculateGs() {
-        if (prevVel.magnitude != 0) {
+        if (prevVel.magnitude > GetComponent<Aerodynamics>().getSpeedOfControlEff() + 1f) {
             Vector3 curVel = GetComponent<Rigidbody2D>().velocity;
             Vector3 currentForces = (curVel - prevVel) / Time.fixedDeltaTime / 9.8f;
 

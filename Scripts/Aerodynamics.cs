@@ -126,6 +126,10 @@ public class Aerodynamics : MonoBehaviour {
         return idle;
     }
 
+    public float getWEP() {
+        return WEP;
+    }
+
     public void setBaseTorque(float val) {
         baseTorque = val;
     }
@@ -144,6 +148,10 @@ public class Aerodynamics : MonoBehaviour {
 
     public void setSpeedOfControlEff(float val) {
         speedOfControlEffectiveness = val;
+    }
+
+    public float getSpeedOfControlEff() {
+        return speedOfControlEffectiveness;
     }
 
     public void setWingArea(float val) {
