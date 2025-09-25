@@ -74,6 +74,7 @@ public class SquadronSpawner : MonoBehaviour {
             if (Input.GetKey(KeyCode.Backspace)) Destroy(curSelected);
             if (Input.GetMouseButtonDown(1) && curSelected == null) {
                 GameObject newSpawner = Instantiate(baseSpawner, camera.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -camera.transform.position.z)), Quaternion.identity);
+                setSpawnerToPanelStats(newSpawner);
                 setCurrentSelectedObj(newSpawner);
             }
             editSpawner(curSelected);
@@ -99,9 +100,7 @@ public class SquadronSpawner : MonoBehaviour {
 
     public void editSpawner(GameObject spawnerToEdit) {
         if (spawnerToEdit != null && inEditor) {
-            int ignore;
-            if (int.TryParse(amountTextField.GetComponent<TMP_InputField>().text, out ignore)) spawnerToEdit.GetComponent<SquadronSpawner>().amt = int.Parse(amountTextField.GetComponent<TMP_InputField>().text);
-            spawnerToEdit.GetComponent<SquadronSpawner>().containsPlayer = containsPlayerToggle.GetComponent<Toggle>().isOn;
+            setSpawnerToPanelStats(spawnerToEdit);
             foreach (GameObject spawner in GameObject.FindGameObjectsWithTag("Spawner")) {
                 if (spawner != spawnerToEdit && spawnerToEdit.GetComponent<SquadronSpawner>().containsPlayer) {
                     spawner.GetComponent<SquadronSpawner>().setContainsPlayer(false);
@@ -116,10 +115,15 @@ public class SquadronSpawner : MonoBehaviour {
             if (Input.GetMouseButton(1)) {
                 spawnerToEdit.transform.position = camera.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -camera.transform.position.z));
             }
-
-            spawnerToEdit.GetComponent<SquadronSpawner>().plane = planes[selectorDropdown.GetComponent<TMP_Dropdown>().value];
-            spawnerToEdit.GetComponent<SquadronSpawner>().alliance = allianceDropdown.GetComponent<TMP_Dropdown>().options[allianceDropdown.GetComponent<TMP_Dropdown>().value].text;
         }
+    }
+
+    private void setSpawnerToPanelStats(GameObject spawnerToEdit) {
+        int ignore;
+        if (int.TryParse(amountTextField.GetComponent<TMP_InputField>().text, out ignore)) spawnerToEdit.GetComponent<SquadronSpawner>().amt = int.Parse(amountTextField.GetComponent<TMP_InputField>().text);
+        spawnerToEdit.GetComponent<SquadronSpawner>().containsPlayer = containsPlayerToggle.GetComponent<Toggle>().isOn;
+        spawnerToEdit.GetComponent<SquadronSpawner>().plane = planes[selectorDropdown.GetComponent<TMP_Dropdown>().value];
+        spawnerToEdit.GetComponent<SquadronSpawner>().alliance = allianceDropdown.GetComponent<TMP_Dropdown>().options[allianceDropdown.GetComponent<TMP_Dropdown>().value].text;
     }
 
     public void setContainsPlayer(bool b) {
