@@ -12,6 +12,7 @@ public class GForcesScript : MonoBehaviour {
     [SerializeField] private float killingGs;
     [SerializeField] private float planeStructDestroyingGs;
     [SerializeField] private float planeDestroyingGs;
+    private float minCalcSpeed = 4f;
     private bool sleepy;
     private float inGlocTimer;
     private float timeToGloc = 4f;
@@ -85,7 +86,7 @@ public class GForcesScript : MonoBehaviour {
     }
 
     private void calculateGs() {
-        if (prevVel.magnitude > (GetComponent<Aerodynamics>() != null ? GetComponent<Aerodynamics>().getSpeedOfControlEff() : 0f) + 1f) {
+        if (prevVel.magnitude > minCalcSpeed) {
             Vector3 curVel = GetComponent<Rigidbody2D>().velocity;
             Vector3 currentForces = (curVel - prevVel) / Time.fixedDeltaTime / 9.8f;
 
