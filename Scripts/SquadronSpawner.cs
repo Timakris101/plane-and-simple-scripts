@@ -61,7 +61,7 @@ public class SquadronSpawner : MonoBehaviour {
     }
 
     void Update() {
-        if (camera != null && selectionSpawner) {
+        if (camera != null && selectionSpawner && inEditor) {
             if (Input.GetMouseButtonDown(0)) {
                 foreach (Collider2D col in Physics2D.OverlapCircleAll(camera.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -camera.transform.position.z)), .1f)) {
                     if (col.transform.GetComponent<SquadronSpawner>() != null) setCurrentSelectedObj(col.gameObject != curSelected ? col.gameObject : curSelected);
