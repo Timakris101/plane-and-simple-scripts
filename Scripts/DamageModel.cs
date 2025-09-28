@@ -124,7 +124,7 @@ public class DamageModel : MonoBehaviour {
     }
 
     private void handleSpawningTail() {
-        GameObject obj = Instantiate(tail, transform.position, transform.rotation);
+        GameObject obj = Instantiate(tail, transform.position + (Vector3) GetComponent<BoxCollider2D>().offset, transform.rotation);
         obj.GetComponent<Rigidbody2D>().velocity = transform.parent.GetComponent<Rigidbody2D>().velocity;
         obj.transform.localScale = transform.parent.localScale;
         transform.parent.GetComponent<Animator>().SetBool("Tailless", true);
@@ -136,7 +136,7 @@ public class DamageModel : MonoBehaviour {
     }
 
     private void handleSpawningWing() {
-        GameObject obj = Instantiate(wing, transform.position, transform.rotation);
+        GameObject obj = Instantiate(wing, transform.position + (Vector3) GetComponent<BoxCollider2D>().offset, transform.rotation);
         obj.GetComponent<Rigidbody2D>().velocity = transform.parent.GetComponent<Rigidbody2D>().velocity;
         obj.transform.localScale = transform.parent.localScale;
         transform.parent.GetComponent<Animator>().SetBool("Wingless", true);
