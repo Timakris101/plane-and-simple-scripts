@@ -1,0 +1,30 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class FireScript : MonoBehaviour {
+
+    private GameObject terrain;
+
+    void Start() {
+        terrain = GameObject.Find("Terrain");
+    }
+
+    void Update() {
+        if (waterLogged()) {
+            if (GetComponent<ParticleSystem>() == null) {
+                Destroy(gameObject);
+            } else {
+                var emissionModule = GetComponent<ParticleSystem>().emission;
+                emissionModule.rate = 0f;
+                if (GetComponent<ParticleSystem>().particleCount == 0 && emissionModule.rate.constant == 0f) {
+                    Destroy(gameObject);
+                }
+            }
+        }
+    }
+
+    private bool waterLogged() {
+        return terrain.GetComponent<TerrainGen>().getWaterLvl() > transform.position.y - 1f;
+    }
+}

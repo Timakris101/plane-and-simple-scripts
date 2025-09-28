@@ -20,15 +20,10 @@ public class GForcesScript : MonoBehaviour {
     private float timeToUnsleep = 1f;
 
     [Header("DestructiveEffects")]
-    private GameObject terrain;
     [SerializeField] private GameObject fire;
     [SerializeField] private GameObject explosion;
     private bool extinguished = false;
     private bool destroyed = false;
-
-    void Start() {
-        terrain = GameObject.Find("Terrain");
-    }
 
     void FixedUpdate() {
         if (feltGs < rollOverThresh && GetComponent<Rigidbody2D>().velocity.magnitude > 1f && !GetComponent<PlaneController>().pilotDeadOrGone() && !sleepy) {
@@ -36,14 +31,10 @@ public class GForcesScript : MonoBehaviour {
         }
         if (overGPlaneToDeath() && !destroyed) {
             destroyed = true;
-            if (!waterLogged()) Instantiate(explosion, transform.position, Quaternion.identity);
+            Instantiate(explosion, transform.position, Quaternion.identity);
             Instantiate(fire, transform, false);
             GetComponent<Aerodynamics>().setSpeedOfControlEff(Mathf.Infinity);
             if (SceneManager.GetActiveScene().name == "Arcade") Destroy(gameObject, 10f);
-        }
-        if (waterLogged() && destroyed && !extinguished) {
-            extinguished = true;
-            Destroy(transform.Find(fire.name + "(Clone)").gameObject);
         }
         if (overGPlane()) {
             if (transform.Find("WingHitbox") != null) transform.Find("WingHitbox").GetComponent<DamageModel>().kill();
@@ -74,10 +65,6 @@ public class GForcesScript : MonoBehaviour {
         if (inSleepTimer > timeToUnsleep) {
             sleepy = false;
         }
-    }
-
-    private bool waterLogged() {
-        return terrain.GetComponent<TerrainGen>().getWaterLvl() > transform.position.y - 1f;
     }
 
     private void rollover() {
