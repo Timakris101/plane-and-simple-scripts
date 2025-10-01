@@ -42,7 +42,7 @@ public class PlaneController : MonoBehaviour {
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;
             
-            if (!transform.GetChild(i).GetComponent<DamageModel>().isCrewRole()) {
+            if (!transform.GetChild(i).GetComponent<DamageModel>().isCrewRole() && transform.GetChild(i).GetComponent<DamageModel>().isCritical()) {
                 if (!transform.GetChild(i).GetComponent<DamageModel>().isAlive()) {
                     criticalSystemDamage = true;
                     break;

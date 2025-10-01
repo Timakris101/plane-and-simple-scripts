@@ -9,6 +9,7 @@ public class DamageModel : MonoBehaviour {
     [SerializeField] private float maxHealth;
     [SerializeField] private float health;
     [SerializeField] private bool crewRole;
+    [SerializeField] private bool criticalSystem;
     [SerializeField] private GameObject destructiveEffect;
 
     [Header("Engine")]
@@ -27,6 +28,10 @@ public class DamageModel : MonoBehaviour {
 
     public bool isCrewRole() {
         return crewRole;
+    }
+
+    public bool isCritical() {
+        return criticalSystem;
     }
 
     void Awake() {
