@@ -93,20 +93,6 @@ public class DamageModel : MonoBehaviour {
             }   
         }
 
-        switch(effect) {
-            case "Tail":
-                aero.setBaseTorque(health <= 0 ? 0 : startingValOfEffect * (1 - ((maxHealth - health) * effectivenessFalloffRate / maxHealth)));
-                break;
-
-            case "Wing":
-                aero.setWingArea(health <= 0 ? 0 : startingValOfEffect * (1 - ((maxHealth - health) * effectivenessFalloffRate / maxHealth)));
-                break;
-
-            case "Engine":
-                aero.setMaxThrust(health <= 0 ? 0 : startingValOfEffect * (1 - ((maxHealth - health) * effectivenessFalloffRate / maxHealth)));
-                break;
-        }
-
         if (effect == "Wing") {
             if (transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude > ripSpeed) {
                 kill();
@@ -151,6 +137,20 @@ public class DamageModel : MonoBehaviour {
                 break;
 
             case "Engine":
+                break;
+        }
+
+        switch(effect) {
+            case "Tail":
+                aero.setBaseTorque(health <= 0 ? 0 : startingValOfEffect * (1 - ((maxHealth - health) * effectivenessFalloffRate / maxHealth)));
+                break;
+
+            case "Wing":
+                aero.setWingArea(health <= 0 ? 0 : startingValOfEffect * (1 - ((maxHealth - health) * effectivenessFalloffRate / maxHealth)));
+                break;
+
+            case "Engine":
+                aero.setMaxThrust(health <= 0 ? 0 : startingValOfEffect * (1 - ((maxHealth - health) * effectivenessFalloffRate / maxHealth)));
                 break;
         }
     }
