@@ -11,6 +11,8 @@ public class DamageModel : MonoBehaviour {
     [SerializeField] private bool crewRole;
     [SerializeField] private bool criticalSystem;
     [SerializeField] private GameObject destructiveEffect;
+    private float startingValOfEffect;
+    private float effectivenessFalloffRate = .8f;
 
     [Header("Engine")]
     [SerializeField] private float fireDamagePerSec;
@@ -41,6 +43,19 @@ public class DamageModel : MonoBehaviour {
     void Start() {
         aero = transform.parent.GetComponent<Aerodynamics>();
         effect = gameObject.name.Replace("Hitbox", "");
+        switch(effect) {
+            case "Tail":
+                startingValOfEffect = aero.getBaseTorque();
+                break;
+
+            case "Wing":
+                startingValOfEffect = aero.getWingArea();
+                break;
+
+            case "Engine":
+                startingValOfEffect = aero.getMaxThrust();
+                break;
+        }
     }
 
     void Update() {
@@ -77,6 +92,21 @@ public class DamageModel : MonoBehaviour {
                     break;
             }   
         }
+
+        switch(effect) {
+            case "Tail":
+                aero.setBaseTorque(health <= 0 ? 0 : startingValOfEffect * (1 - ((maxHealth - health) * effectivenessFalloffRate / maxHealth)));
+                break;
+
+            case "Wing":
+                aero.setWingArea(health <= 0 ? 0 : startingValOfEffect * (1 - ((maxHealth - health) * effectivenessFalloffRate / maxHealth)));
+                break;
+
+            case "Engine":
+                aero.setMaxThrust(health <= 0 ? 0 : startingValOfEffect * (1 - ((maxHealth - health) * effectivenessFalloffRate / maxHealth)));
+                break;
+        }
+
         if (effect == "Wing") {
             if (transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude > ripSpeed) {
                 kill();
@@ -103,14 +133,12 @@ public class DamageModel : MonoBehaviour {
         health -= amt;
         switch(effect) {
             case "Tail":
-                aero.setBaseTorque(health <= 0 ? 0 : aero.getBaseTorque() * (1 - amt / maxHealth));
                 if (health <= 0 && !transform.parent.GetComponent<Animator>().GetBool("Tailless")) {
                     handleSpawningTail();
                 }
                 break;
 
             case "Wing":
-                aero.setWingArea(health <= 0 ? 0 : aero.getWingArea() * (1 - amt / maxHealth));
                 if (health / maxHealth < Random.Range(0f, .5f)) {
                     if (transform.parent.Find("Gear") != null) transform.parent.Find("Gear").GetComponent<GearScript>().breakGear();
                 }
@@ -123,7 +151,6 @@ public class DamageModel : MonoBehaviour {
                 break;
 
             case "Engine":
-                aero.setMaxThrust(health <= 0 ? 0 : aero.getMaxThrust() * (1 - amt / maxHealth));
                 break;
         }
     }
