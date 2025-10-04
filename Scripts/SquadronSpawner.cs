@@ -68,6 +68,7 @@ public class SquadronSpawner : MonoBehaviour {
                 }
             }
             if (Input.GetKey(KeyCode.Escape)) {
+                setCurrentSelectedObj(curSelected);
                 if (curSelected != null) containsPlayerToggle.GetComponent<Toggle>().isOn = false;
                 setCurrentSelectedObj(null);
             }
