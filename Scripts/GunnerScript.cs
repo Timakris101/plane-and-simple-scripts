@@ -91,7 +91,7 @@ public class GunnerScript : MonoBehaviour {
 
     protected virtual Vector3 positionToTarget() {
         GameObject bullet = transform.GetChild(0).GetComponent<GunScript>().getBullet();
-        return targetedObj.transform.position + (Vector3) (targetedObj.GetComponent<Rigidbody2D>().velocity - transform.parent.GetComponent<Rigidbody2D>().velocity) * (targetedObj.transform.position - transform.GetChild(0).position).magnitude / (bullet.GetComponent<BulletScript>().getInitSpeed());
+        return targetedObj.transform.position + (Vector3) (targetedObj.GetComponent<Rigidbody2D>().linearVelocity - transform.parent.GetComponent<Rigidbody2D>().linearVelocity) * (targetedObj.transform.position - transform.GetChild(0).position).magnitude / (bullet.GetComponent<BulletScript>().getInitSpeed());
     }
 
     public void setManualControl(bool b) {

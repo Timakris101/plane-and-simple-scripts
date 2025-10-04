@@ -67,18 +67,18 @@ public class DamageModel : MonoBehaviour {
             }
             switch (effect) {
                 case "Wing":
-                    transform.parent.GetComponent<Animator>().speed = transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude / animatorSpeedFactor;
+                    transform.parent.GetComponent<Animator>().speed = transform.parent.GetComponent<Rigidbody2D>().linearVelocity.magnitude / animatorSpeedFactor;
                     aero.setAlignmentThresh(0);
                     aero.setBaseTorque(0);
                     break;
 
                 case "Tail":
                     aero.setSpeedOfControlEff(Mathf.Infinity);
-                    if (transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude > 5f) {
+                    if (transform.parent.GetComponent<Rigidbody2D>().linearVelocity.magnitude > 5f) {
                         if (transform.parent.GetComponent<Rigidbody2D>().angularVelocity > 0) {
-                            transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(.25f, .5f) * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude, 2f);
+                            transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(.25f, .5f) * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().linearVelocity.magnitude, 2f);
                         } else {
-                            transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(-.25f, -.5f) * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude, 2f);
+                            transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(-.25f, -.5f) * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().linearVelocity.magnitude, 2f);
                         }
                     }
                     break;
@@ -94,7 +94,7 @@ public class DamageModel : MonoBehaviour {
         }
 
         if (effect == "Wing") {
-            if (transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude > ripSpeed) {
+            if (transform.parent.GetComponent<Rigidbody2D>().linearVelocity.magnitude > ripSpeed) {
                 kill();
             }
         }
@@ -157,7 +157,7 @@ public class DamageModel : MonoBehaviour {
 
     private void handleSpawningTail() {
         GameObject obj = Instantiate(tail, transform.position, transform.rotation);
-        obj.GetComponent<Rigidbody2D>().velocity = transform.parent.GetComponent<Rigidbody2D>().velocity;
+        obj.GetComponent<Rigidbody2D>().linearVelocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
         obj.transform.localScale = transform.parent.localScale;
         transform.parent.GetComponent<Animator>().SetBool("Tailless", true);
 
@@ -169,7 +169,7 @@ public class DamageModel : MonoBehaviour {
 
     private void handleSpawningWing() {
         GameObject obj = Instantiate(wing, transform.position, transform.rotation);
-        obj.GetComponent<Rigidbody2D>().velocity = transform.parent.GetComponent<Rigidbody2D>().velocity;
+        obj.GetComponent<Rigidbody2D>().linearVelocity = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
         obj.transform.localScale = transform.parent.localScale;
         transform.parent.GetComponent<Animator>().SetBool("Wingless", true);
         handlePropellerOn(obj);

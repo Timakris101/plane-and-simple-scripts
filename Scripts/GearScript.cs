@@ -62,13 +62,13 @@ public class GearScript : MonoBehaviour {
 
     public void breakGear() {
         gearDown();
-        Vector3 vel = transform.parent.GetComponent<Rigidbody2D>().velocity;
+        Vector3 vel = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
         transform.parent.GetComponent<Aerodynamics>().setFrontArea(transform.parent.GetComponent<Aerodynamics>().getFrontArea() + gearlessArea);
         transform.SetParent(null, true);
         gameObject.AddComponent<Rigidbody2D>();
-        GetComponent<Rigidbody2D>().drag = 1;
-        GetComponent<Rigidbody2D>().velocity = vel;
-        GetComponent<Rigidbody2D>().angularVelocity = Random.Range(-GetComponent<Rigidbody2D>().velocity.magnitude, GetComponent<Rigidbody2D>().velocity.magnitude);
+        GetComponent<Rigidbody2D>().linearDamping = 1;
+        GetComponent<Rigidbody2D>().linearVelocity = vel;
+        GetComponent<Rigidbody2D>().angularVelocity = Random.Range(-GetComponent<Rigidbody2D>().linearVelocity.magnitude, GetComponent<Rigidbody2D>().linearVelocity.magnitude);
         
         Destroy(gameObject, 10f);
     }
@@ -107,7 +107,7 @@ public class GearScript : MonoBehaviour {
         unbrakeIfNoBrake();
         GetComponent<BoxCollider2D>().enabled = GetComponent<SpriteRenderer>().sprite == gearDownSprite;
         if (transform.parent != null) {
-            if (isGearDown() && transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude > breakSpeed) breakGear();
+            if (isGearDown() && transform.parent.GetComponent<Rigidbody2D>().linearVelocity.magnitude > breakSpeed) breakGear();
         }
         if (transform.parent != null) {
             if (transform.parent.GetComponent<SpriteRenderer>().sprite == origSpriteOfPlane) {

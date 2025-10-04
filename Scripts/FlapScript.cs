@@ -19,7 +19,7 @@ public class FlapScript : MonoBehaviour {
     void Update() {
         handleFlaps();
         if (transform.parent != null) {
-            if (deflection() >= maxDeflection && transform.parent.GetComponent<Rigidbody2D>().velocity.magnitude > breakSpeed) breakFlaps();
+            if (deflection() >= maxDeflection && transform.parent.GetComponent<Rigidbody2D>().linearVelocity.magnitude > breakSpeed) breakFlaps();
         }
         if (transform.parent != null) {
             if (transform.parent.GetComponent<SpriteRenderer>().sprite == origSpriteOfPlane) {
@@ -59,12 +59,12 @@ public class FlapScript : MonoBehaviour {
     }
 
     public void breakFlaps() {
-        Vector3 vel = transform.parent.GetComponent<Rigidbody2D>().velocity;
+        Vector3 vel = transform.parent.GetComponent<Rigidbody2D>().linearVelocity;
         transform.SetParent(null, true);
         gameObject.AddComponent<Rigidbody2D>();
-        GetComponent<Rigidbody2D>().drag = 1;
-        GetComponent<Rigidbody2D>().velocity = vel;
-        GetComponent<Rigidbody2D>().angularVelocity = Random.Range(-GetComponent<Rigidbody2D>().velocity.magnitude, GetComponent<Rigidbody2D>().velocity.magnitude);
+        GetComponent<Rigidbody2D>().linearDamping = 1;
+        GetComponent<Rigidbody2D>().linearVelocity = vel;
+        GetComponent<Rigidbody2D>().angularVelocity = Random.Range(-GetComponent<Rigidbody2D>().linearVelocity.magnitude, GetComponent<Rigidbody2D>().linearVelocity.magnitude);
         
         Destroy(gameObject, 10f);
     }

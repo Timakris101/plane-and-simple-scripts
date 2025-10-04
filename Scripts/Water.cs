@@ -21,14 +21,14 @@ public class Water : MonoBehaviour {
     }
 
     private float splashSize(GameObject objEntering) {
-        return Mathf.Min(objEntering.GetComponent<Rigidbody2D>().mass * Mathf.Pow(objEntering.GetComponent<Rigidbody2D>().velocity.y, 2) * splashCoef, maxSplashSize);
+        return Mathf.Min(objEntering.GetComponent<Rigidbody2D>().mass * Mathf.Pow(objEntering.GetComponent<Rigidbody2D>().linearVelocity.y, 2) * splashCoef, maxSplashSize);
     }
 
     void OnTriggerStay2D(Collider2D other) {
         if (other.transform.tag == "Plane") {
-            float dragForce = dragForceCoef * Mathf.Pow(other.transform.GetComponent<Rigidbody2D>().velocity.magnitude, 2);
+            float dragForce = dragForceCoef * Mathf.Pow(other.transform.GetComponent<Rigidbody2D>().linearVelocity.magnitude, 2);
 
-            other.transform.GetComponent<Rigidbody2D>().AddForce(-other.transform.GetComponent<Rigidbody2D>().velocity.normalized * dragForce);
+            other.transform.GetComponent<Rigidbody2D>().AddForce(-other.transform.GetComponent<Rigidbody2D>().linearVelocity.normalized * dragForce);
         }
     }
 }

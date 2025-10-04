@@ -38,8 +38,8 @@ public class BulletScript : MonoBehaviour {
     }
 
     void dealDamage() {
-        Vector3 beginningHitPos = transform.position + (Vector3) GetComponent<Rigidbody2D>().velocity.normalized * Random.Range(0f, maxFlyPastDist);
-        RaycastHit2D[] hits = Physics2D.CircleCastAll(beginningHitPos, explosionRad == 0 ? transform.localScale.x : explosionRad, GetComponent<Rigidbody2D>().velocity.normalized, penetrationVal);
+        Vector3 beginningHitPos = transform.position + (Vector3) GetComponent<Rigidbody2D>().linearVelocity.normalized * Random.Range(0f, maxFlyPastDist);
+        RaycastHit2D[] hits = Physics2D.CircleCastAll(beginningHitPos, explosionRad == 0 ? transform.localScale.x : explosionRad, GetComponent<Rigidbody2D>().linearVelocity.normalized, penetrationVal);
         foreach (RaycastHit2D hit in hits) {
             if (hit.collider.transform.GetComponent<DamageModel>() != null) {
                 hit.collider.transform.GetComponent<DamageModel>().hit(Random.Range((1f - damageVariation) * damage, (1f + damageVariation) * damage), explosionRad < explosiveRangeOfCertainHit);
@@ -89,7 +89,7 @@ public class BulletScript : MonoBehaviour {
         timer += Time.deltaTime;
         if (fuseTimeSec > 0 && timer > fuseTimeSec) dealDamage();
 
-        transform.right = GetComponent<Rigidbody2D>().velocity.normalized;
+        transform.right = GetComponent<Rigidbody2D>().linearVelocity.normalized;
     }
 
     public float getInitSpeed() {

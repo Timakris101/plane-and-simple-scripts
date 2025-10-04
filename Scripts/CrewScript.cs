@@ -22,7 +22,7 @@ public class CrewScript : MonoBehaviour {
         }
         onGround = true;
 
-        GetComponent<Rigidbody2D>().drag = 100000f;
+        GetComponent<Rigidbody2D>().linearDamping = 100000f;
     }
 
     void OnCollisionStay2D(Collision2D col) {
@@ -51,19 +51,19 @@ public class CrewScript : MonoBehaviour {
             if (!onGround) toDoWhenOnGround();
             transform.position += new Vector3(0, Time.deltaTime, 0);
             transform.rotation = Quaternion.identity;
-            GetComponent<Rigidbody2D>().drag = 100000f;
+            GetComponent<Rigidbody2D>().linearDamping = 100000f;
         }
     }
 
     void handleSpeed() {
-        if (GetComponent<Rigidbody2D>().velocity.magnitude > chuteSpeed) {
-            GetComponent<Rigidbody2D>().velocity -= GetComponent<Rigidbody2D>().velocity.normalized * (Time.deltaTime * chuteEff * GetComponent<Rigidbody2D>().velocity.magnitude);
+        if (GetComponent<Rigidbody2D>().linearVelocity.magnitude > chuteSpeed) {
+            GetComponent<Rigidbody2D>().linearVelocity -= GetComponent<Rigidbody2D>().linearVelocity.normalized * (Time.deltaTime * chuteEff * GetComponent<Rigidbody2D>().linearVelocity.magnitude);
         }
     }
 
     void handleDir() {
         GetComponent<Rigidbody2D>().angularVelocity = 0f;
-        if (GetComponent<Rigidbody2D>().velocity.magnitude > 1f) transform.up = -GetComponent<Rigidbody2D>().velocity.normalized;
+        if (GetComponent<Rigidbody2D>().linearVelocity.magnitude > 1f) transform.up = -GetComponent<Rigidbody2D>().linearVelocity.normalized;
     }
 
     void handleHealth() {
@@ -72,7 +72,7 @@ public class CrewScript : MonoBehaviour {
             
             if (!transform.GetChild(i).GetComponent<DamageModel>().isAlive()) {
                 GetComponent<Animator>().SetBool("Dead", true);
-                GetComponent<Rigidbody2D>().drag = 0f;
+                GetComponent<Rigidbody2D>().linearDamping = 0f;
             }
         }
     }

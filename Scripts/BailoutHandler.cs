@@ -38,7 +38,7 @@ public class BailoutHandler : MonoBehaviour {
             GameObject hitbox = transform.GetChild(i).gameObject;
 
             GameObject newCrew = Instantiate(crew, hitbox.transform.position, Quaternion.identity);
-            newCrew.GetComponent<Rigidbody2D>().velocity = GetComponent<Rigidbody2D>().velocity;
+            newCrew.GetComponent<Rigidbody2D>().linearVelocity = GetComponent<Rigidbody2D>().linearVelocity;
 
             if (transform.Find("Camera") != null) transform.Find("Camera").parent = null;
 

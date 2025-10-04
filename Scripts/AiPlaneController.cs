@@ -53,7 +53,7 @@ public class AiPlaneController : PlaneController {
         
         if (transform.position.y < minAltitude) return pointTowards(transform.position + Vector3.up);
 
-        if (targetedObj == null || targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude < 1f) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
+        if (targetedObj == null || targetedObj.GetComponent<Rigidbody2D>().linearVelocity.magnitude < 1f) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
 
         if (Mathf.Abs(angleTo(targetedObj.transform.position)) > 180f - sixAngle && Mathf.Abs(Vector2.SignedAngle(targetedObj.transform.right, transform.right)) < 90f) {
             mode = "defensive";
@@ -65,12 +65,12 @@ public class AiPlaneController : PlaneController {
             mode = "headon";
         }
 
-        if (mode == "defensive" && Vector3.Project(targetedObj.transform.position - transform.position, Vector3.up).y < 0 && GetComponent<Rigidbody2D>().velocity.magnitude > targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude) mode = "hammerhead";
+        if (mode == "defensive" && Vector3.Project(targetedObj.transform.position - transform.position, Vector3.up).y < 0 && GetComponent<Rigidbody2D>().linearVelocity.magnitude > targetedObj.GetComponent<Rigidbody2D>().linearVelocity.magnitude) mode = "hammerhead";
 
-        if ((mode == "defensive" || mode == "hammerhead") && GetComponent<Rigidbody2D>().velocity.magnitude < targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude) mode = "overshoot";
+        if ((mode == "defensive" || mode == "hammerhead") && GetComponent<Rigidbody2D>().linearVelocity.magnitude < targetedObj.GetComponent<Rigidbody2D>().linearVelocity.magnitude) mode = "overshoot";
 
         if (mode == "hammerhead") {
-            if (targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude < 15f || GetComponent<Rigidbody2D>().velocity.magnitude < 10f || Mathf.Abs(Vector2.SignedAngle(targetedObj.transform.right, transform.right)) > 45f || targetedObj.GetComponent<Rigidbody2D>().velocity.magnitude > GetComponent<Rigidbody2D>().velocity.magnitude) {
+            if (targetedObj.GetComponent<Rigidbody2D>().linearVelocity.magnitude < 15f || GetComponent<Rigidbody2D>().linearVelocity.magnitude < 10f || Mathf.Abs(Vector2.SignedAngle(targetedObj.transform.right, transform.right)) > 45f || targetedObj.GetComponent<Rigidbody2D>().linearVelocity.magnitude > GetComponent<Rigidbody2D>().linearVelocity.magnitude) {
                 mode = "pursuit";
             } else {
                 return pointTowards(transform.position + Vector3.up);
@@ -103,7 +103,7 @@ public class AiPlaneController : PlaneController {
             }
         }
         if (transform.Find("PilotHitbox") == null) return; //already bailed out
-        if (criticalSystemDestroyed || GetComponent<Rigidbody2D>().velocity.magnitude <= .1f || !transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive()) GetComponent<BailoutHandler>().callBailOut();
+        if (criticalSystemDestroyed || GetComponent<Rigidbody2D>().linearVelocity.magnitude <= .1f || !transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive()) GetComponent<BailoutHandler>().callBailOut();
     }
 
     protected override void handleControls() {
@@ -126,7 +126,7 @@ public class AiPlaneController : PlaneController {
     }
 
     private Vector3 positionToTarget(GameObject bullet, Vector3 gunDir) {
-        return targetedObj.transform.position + (Vector3) (targetedObj.GetComponent<Rigidbody2D>().velocity) * (targetedObj.transform.position - transform.position).magnitude / (bullet.GetComponent<BulletScript>().getInitSpeed() * gunDir + (Vector3) GetComponent<Rigidbody2D>().velocity).magnitude;
+        return targetedObj.transform.position + (Vector3) (targetedObj.GetComponent<Rigidbody2D>().linearVelocity) * (targetedObj.transform.position - transform.position).magnitude / (bullet.GetComponent<BulletScript>().getInitSpeed() * gunDir + (Vector3) GetComponent<Rigidbody2D>().linearVelocity).magnitude;
     }
 
     public GameObject getTargetedObj() {

@@ -26,7 +26,7 @@ public class GForcesScript : MonoBehaviour {
     private bool destroyed = false;
 
     void FixedUpdate() {
-        if (feltGs < rollOverThresh && GetComponent<Rigidbody2D>().velocity.magnitude > minRolloverSpeed && !GetComponent<PlaneController>().pilotDeadOrGone() && !sleepy) {
+        if (feltGs < rollOverThresh && GetComponent<Rigidbody2D>().linearVelocity.magnitude > minRolloverSpeed && !GetComponent<PlaneController>().pilotDeadOrGone() && !sleepy) {
             rollover();
         }
         if (overGPlaneToDeath() && !destroyed) {
@@ -74,14 +74,14 @@ public class GForcesScript : MonoBehaviour {
 
     private void calculateGs() {
         if (prevVel.magnitude != 0f) {
-            Vector3 curVel = GetComponent<Rigidbody2D>().velocity;
+            Vector3 curVel = GetComponent<Rigidbody2D>().linearVelocity;
             Vector3 currentForces = (curVel - prevVel) / Time.fixedDeltaTime / 9.8f;
 
             if (currentForces.magnitude != 0) currentGs = transform.localScale.y * (currentForces + Vector3.up);
             feltGs = (transform.up.x != 0 ? Vector3.Project(currentGs, transform.up).x / transform.up.x : Vector3.Project(currentGs, transform.up).y / transform.up.y);
         }
         
-        prevVel = GetComponent<Rigidbody2D>().velocity;
+        prevVel = GetComponent<Rigidbody2D>().linearVelocity;
     }
 
     public bool overGPlaneToDeath() {

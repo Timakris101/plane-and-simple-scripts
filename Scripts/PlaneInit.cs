@@ -7,7 +7,7 @@ public class PlaneInit : MonoBehaviour {
     [SerializeField] private float speed;
 
     void Start() {
-        GetComponent<Rigidbody2D>().velocity = transform.right * speed;
+        GetComponent<Rigidbody2D>().linearVelocity = transform.right * speed;
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<Collider2D>() != null && transform.GetChild(i).localPosition.magnitude == 0) {
                 if (transform.GetChild(i).GetComponent<BoxCollider2D>() != null) {
