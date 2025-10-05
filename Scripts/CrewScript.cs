@@ -22,7 +22,7 @@ public class CrewScript : MonoBehaviour {
         }
         onGround = true;
 
-        GetComponent<Rigidbody2D>().linearDamping = 100000f;
+        GetComponent<Rigidbody2D>().linearDamping = 1f;
     }
 
     void OnCollisionStay2D(Collision2D col) {
@@ -43,15 +43,19 @@ public class CrewScript : MonoBehaviour {
 
     void Update() {
         handleHealth();
+        if (transform.position.y < seaLevel) {
+            if (!onGround) toDoWhenOnGround();
+            GetComponent<Rigidbody2D>().linearVelocity = new Vector2(GetComponent<Rigidbody2D>().linearVelocity.x , 1f);
+            transform.rotation = Quaternion.identity;
+            GetComponent<Rigidbody2D>().linearDamping = 10f;
+            if (GetComponent<Animator>().GetBool("Dead") && onGround) {
+                transform.localEulerAngles = new Vector3(0, 0, 90f);
+            }
+            GetComponent<Rigidbody2D>().linearDamping = 1f;
+        }
         if (!onGround) {
             handleSpeed();
             handleDir();
-        }
-        if (transform.position.y < seaLevel) {
-            if (!onGround) toDoWhenOnGround();
-            transform.position += new Vector3(0, Time.deltaTime, 0);
-            transform.rotation = Quaternion.identity;
-            GetComponent<Rigidbody2D>().linearDamping = 100000f;
         }
     }
 
@@ -72,7 +76,7 @@ public class CrewScript : MonoBehaviour {
             
             if (!transform.GetChild(i).GetComponent<DamageModel>().isAlive()) {
                 GetComponent<Animator>().SetBool("Dead", true);
-                GetComponent<Rigidbody2D>().linearDamping = 0f;
+                GetComponent<Rigidbody2D>().linearDamping = 1f;
             }
         }
     }
