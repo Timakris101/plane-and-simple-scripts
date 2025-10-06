@@ -5,9 +5,7 @@ using UnityEngine;
 public class Aerodynamics : MonoBehaviour {
 
     [Header("Thrust")]
-    [SerializeField] private float maxThrust;
-    [SerializeField] private float idle;
-    [SerializeField] private float WEP;
+    [SerializeField] private EngineScript es;
 
     [Header("Lift / Induced Drag")]
     [SerializeField] private AnimationCurve cL;
@@ -33,7 +31,8 @@ public class Aerodynamics : MonoBehaviour {
     private PlaneController pc;
 
     void Start() {
-        setPlaneController();         
+        setPlaneController(); 
+        es = transform.Find("EngineHitbox").GetComponent<EngineScript>();        
     }
 
     void Update() {
@@ -98,16 +97,8 @@ public class Aerodynamics : MonoBehaviour {
 
     private void handleThrust() {
         if (pc != null) {
-            bool anyPropellers = false;
-            for (int i = 0; i < transform.childCount; i++) {
-                if (transform.GetChild(i).GetComponent<PropellerScript>() != null) {
-                    anyPropellers = true;
-                    break;
-                }
-            }
-            if (!anyPropellers) return;
             if (pc.getEnginesOn()) {
-                GetComponent<Rigidbody2D>().AddForce(transform.right * (pc.getInWEP() ? WEP : Mathf.Min(idle + pc.getThrottle(), 1)) * maxThrust);
+                GetComponent<Rigidbody2D>().AddForce(transform.right * pc.getThrottle() * es.getThrustNewtons(GetComponent<Rigidbody2D>().linearVelocity.magnitude));
             }
         }
     }
@@ -120,14 +111,6 @@ public class Aerodynamics : MonoBehaviour {
 
     private float wingAspectRatio() {
         return (Mathf.Pow(wingSpan, 2)) / wingArea;
-    }
-
-    public float getIdle() {
-        return idle;
-    }
-
-    public float getWEP() {
-        return WEP;
     }
 
     public void setBaseTorque(float val) {
@@ -168,14 +151,6 @@ public class Aerodynamics : MonoBehaviour {
 
     public float getWingEfficiency() {
         return wingEfficiency;
-    }
-
-    public void setMaxThrust(float val) {
-        maxThrust = val;
-    }
-
-    public float getMaxThrust() {
-        return maxThrust;
     }
 
     public float getFrontArea() {

@@ -53,7 +53,7 @@ public class DamageModel : MonoBehaviour {
                 break;
 
             case "Engine":
-                startingValOfEffect = aero.getMaxThrust();
+                startingValOfEffect = GetComponent<EngineScript>().getVal();
                 break;
         }
     }
@@ -150,7 +150,7 @@ public class DamageModel : MonoBehaviour {
                 break;
 
             case "Engine":
-                aero.setMaxThrust(health <= 0 ? 0 : startingValOfEffect * (1 - ((maxHealth - health) * effectivenessFalloffRate / maxHealth)));
+                GetComponent<EngineScript>().setVal(health <= 0 ? 0 : startingValOfEffect * (1 - ((maxHealth - health) * effectivenessFalloffRate / maxHealth)));
                 break;
         }
     }
