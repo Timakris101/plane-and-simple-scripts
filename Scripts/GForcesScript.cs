@@ -24,9 +24,14 @@ public class GForcesScript : MonoBehaviour {
     [SerializeField] private GameObject explosion;
     private bool extinguished = false;
     private bool destroyed = false;
+    private Sprite origSprite;
+
+    void Start() {
+        origSprite = GetComponent<SpriteRenderer>().sprite;
+    }
 
     void FixedUpdate() {
-        if (feltGs < rollOverThresh && GetComponent<Rigidbody2D>().linearVelocity.magnitude > minRolloverSpeed && !GetComponent<PlaneController>().pilotDeadOrGone() && !sleepy) {
+        if (feltGs < rollOverThresh && GetComponent<Rigidbody2D>().linearVelocity.magnitude > minRolloverSpeed && !GetComponent<PlaneController>().pilotDeadOrGone() && !sleepy && GetComponent<SpriteRenderer>().sprite == origSprite) {
             rollover();
         }
         if (overGPlaneToDeath() && !destroyed) {

@@ -37,6 +37,10 @@ public class CamScript : MonoBehaviour {
         handleGForceDisp();
     }
 
+    void FixedUpdate() {
+        transform.eulerAngles = new Vector3(0, 0, 0);
+    }
+
     private void handleArrow() {
         if (transform.Find("Canvas") != null) {
             if (nearestEnemy() != null && !planeToControl.GetComponent<PlaneController>().allCrewGoneFromPlane()) {

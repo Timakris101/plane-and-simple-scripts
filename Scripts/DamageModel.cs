@@ -12,7 +12,7 @@ public class DamageModel : MonoBehaviour {
     [SerializeField] private bool criticalSystem;
     [SerializeField] private GameObject destructiveEffect;
     private float startingValOfEffect;
-    private float effectivenessFalloffRate = .8f;
+    [SerializeField] private float effectivenessFalloffRate;
 
     [Header("Engine")]
     [SerializeField] private float fireDamagePerSec;
@@ -68,7 +68,6 @@ public class DamageModel : MonoBehaviour {
             switch (effect) {
                 case "Wing":
                     transform.parent.GetComponent<Animator>().speed = transform.parent.GetComponent<Rigidbody2D>().linearVelocity.magnitude / animatorSpeedFactor;
-                    aero.setAlignmentThresh(0);
                     aero.setBaseTorque(0);
                     break;
 

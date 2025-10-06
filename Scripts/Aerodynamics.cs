@@ -10,6 +10,7 @@ public class Aerodynamics : MonoBehaviour {
     [Header("Lift / Induced Drag")]
     [SerializeField] private AnimationCurve cL;
     [SerializeField] private float wingArea;
+    private float startWingArea;
     [SerializeField] private float wingSpan;
     [SerializeField] private float wingEfficiency;
 
@@ -18,10 +19,9 @@ public class Aerodynamics : MonoBehaviour {
     [SerializeField] private float frontArea;
 
     [Header("Torque")]
+    [SerializeField] private AnimationCurve cT;
     [SerializeField] private AnimationCurve torqueStrength;
     [SerializeField] private float baseTorque;
-    [SerializeField] private float alignmentStrength;
-    [SerializeField] private float alignmentThresh;
     [SerializeField] private float speedOfControlEffectiveness;
 
     [Header("Atmosphere")]
@@ -31,6 +31,7 @@ public class Aerodynamics : MonoBehaviour {
     private PlaneController pc;
 
     void Start() {
+        startWingArea = wingArea;
         setPlaneController(); 
         es = transform.Find("EngineHitbox").GetComponent<EngineScript>();        
     }
@@ -66,7 +67,7 @@ public class Aerodynamics : MonoBehaviour {
     private void handleLift() {
         FlapScript fs = null;
         if (transform.Find("Flaps") != null) fs = transform.Find("Flaps").GetComponent<FlapScript>();
-        float liftForce = (cL.Evaluate(AoA()) + (fs == null ? 0 : (fs.getFlapEffectiveness() * fs.deflection() / fs.getMaxDeflection()))) * getAirDensity() * Mathf.Pow(GetComponent<Rigidbody2D>().linearVelocity.magnitude, 2) * wingArea / 2f;
+        float liftForce = .5f * (cL.Evaluate(AoA()) + (fs == null ? 0 : (fs.getFlapEffectiveness() * fs.deflection() / fs.getMaxDeflection()))) * getAirDensity() * Mathf.Pow(GetComponent<Rigidbody2D>().linearVelocity.magnitude, 2) * wingArea;
         Vector2 liftDir = transform.localScale.y * Vector3.Cross(GetComponent<Rigidbody2D>().linearVelocity, -transform.forward).normalized;
         GetComponent<Rigidbody2D>().AddForceAtPosition(liftDir * liftForce, transform.Find("CoL").position);
     }
@@ -77,7 +78,7 @@ public class Aerodynamics : MonoBehaviour {
         float inducedDragCoef = Mathf.Pow(cL.Evaluate(AoA()), 2) / (Mathf.PI * wingAspectRatio() * wingEfficiency);
         float totalDragCoef = inducedDragCoef + cD.Evaluate(AoA()) + (fs == null ? 0 : (fs.getFlapDrag() * fs.deflection() / fs.getMaxDeflection())) + (transform.Find("Gear") == null ? 0 : transform.Find("Gear").GetComponent<GearScript>().getGearDrag());
 
-        float dragForce = totalDragCoef * getAirDensity() * Mathf.Pow(GetComponent<Rigidbody2D>().linearVelocity.magnitude, 2) * frontArea;
+        float dragForce = .5f * totalDragCoef * getAirDensity() * Mathf.Pow(GetComponent<Rigidbody2D>().linearVelocity.magnitude, 2) * frontArea;
 
         GetComponent<Rigidbody2D>().AddForce(-GetComponent<Rigidbody2D>().linearVelocity.normalized * dragForce);
     }
@@ -85,13 +86,15 @@ public class Aerodynamics : MonoBehaviour {
     private void handleTorque() {
         if (pc != null) {
             float dirToTurn = pc.getDir();
-            if (GetComponent<Rigidbody2D>().linearVelocity.magnitude < speedOfControlEffectiveness) {
-                return;
-            }
+
+            if (GetComponent<Rigidbody2D>().linearVelocity.magnitude < speedOfControlEffectiveness) return;
+                
             GetComponent<Rigidbody2D>().angularVelocity = dirToTurn * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().linearVelocity.magnitude) * baseTorque;
-            bool positiveAoA = AoA() >= 0;
-            int correctionDir = positiveAoA ? -1 : 1;
-            if (AoA() > alignmentThresh || AoA() < -alignmentThresh) GetComponent<Rigidbody2D>().angularVelocity += correctionDir * Mathf.Abs(AoA()) * alignmentStrength * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().linearVelocity.magnitude) * transform.localScale.y;
+
+            float torque = .5f * cT.Evaluate(AoA()) * transform.localScale.y * Mathf.Pow(GetComponent<Rigidbody2D>().linearVelocity.magnitude, 2) * Mathf.Max(wingArea, startWingArea / 2f) * wingSpan * getAirDensity();
+            if (Mathf.Abs(AoA()) > 3f) {
+                GetComponent<Rigidbody2D>().angularVelocity += torque / GetComponent<Rigidbody2D>().mass;
+            }
         }
     }
 
@@ -119,14 +122,6 @@ public class Aerodynamics : MonoBehaviour {
 
     public float getBaseTorque() {
         return baseTorque;
-    }
-
-    public void setAlignmentThresh(float val) {
-        alignmentThresh = val;
-    }
-
-    public float getAlignmentThresh() {
-        return alignmentThresh;
     }
 
     public void setSpeedOfControlEff(float val) {
@@ -159,13 +154,5 @@ public class Aerodynamics : MonoBehaviour {
 
     public void setFrontArea(float val) {
         frontArea = val;
-    }
-
-    public void setAlignmentStrength(float val) {
-        alignmentStrength = val;
-    }
-
-    public float getAlignmentStrength() {
-        return alignmentStrength;
     }
 }
