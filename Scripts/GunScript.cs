@@ -20,7 +20,7 @@ public class GunScript : MonoBehaviour {
 
     protected virtual void shoot() {
         ammunition--;
-        GameObject newBullet = Instantiate(bullet, transform.position, transform.rotation);
+        GameObject newBullet = Instantiate(bullet, (transform.childCount == 0 ? transform.position : transform.GetChild(0).position), transform.rotation);
         newBullet.GetComponent<Rigidbody2D>().linearVelocity = newBullet.GetComponent<BulletScript>().getInitSpeed() * transform.right + baseVel;
         newBullet.GetComponent<BulletScript>().setPlaneFired(transform.parent.GetComponent<Aerodynamics>() == null ? transform.parent.parent.gameObject : transform.parent.gameObject);
         newBullet.GetComponent<BulletScript>().setFuseTime(bulletFuse);

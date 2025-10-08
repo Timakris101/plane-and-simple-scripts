@@ -13,6 +13,8 @@ public class GunnerScript : MonoBehaviour {
 
     private Sprite origSpriteOfPlane;
 
+    private Vector3 positionToCheckShotFrom => (transform.GetChild(0).childCount == 0 ? transform.GetChild(0).position : transform.GetChild(0).GetChild(0).position);
+
     protected virtual void Start() {
         origSpriteOfPlane = transform.parent.GetComponent<SpriteRenderer>().sprite;
     }
@@ -53,7 +55,7 @@ public class GunnerScript : MonoBehaviour {
     protected void attemptToShoot(Vector3 posToShoot, bool b) {
         bool tooFarFromSight = Mathf.Abs(Vector2.SignedAngle(posToShoot - transform.GetChild(0).position, transform.GetChild(0).right)) > angularThreshForGuns;
         bool hitsOwnPlane = false;
-        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.GetChild(0).position, transform.GetChild(0).right);
+        RaycastHit2D[] hits = Physics2D.RaycastAll(positionToCheckShotFrom, transform.GetChild(0).right);
         foreach (RaycastHit2D hit in hits) {
             if (hit.collider.transform == transform.parent) { //checks if the specific collider is of the parent and not of the children. Hit.transform would return parent transform
                 hitsOwnPlane = true;
