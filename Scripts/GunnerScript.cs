@@ -13,7 +13,7 @@ public class GunnerScript : MonoBehaviour {
 
     private Sprite origSpriteOfPlane;
 
-    private Vector3 positionToCheckShotFrom => (transform.GetChild(0).childCount == 0 ? transform.GetChild(0).position : transform.GetChild(0).GetChild(0).position);
+    private Vector3 positionToCheckShotFrom => (transform.GetChild(0).Find("BulletSpawnArea") == null ? transform.GetChild(0).position : transform.GetChild(0).Find("BulletSpawnArea").position);
 
     protected virtual void Start() {
         origSpriteOfPlane = transform.parent.GetComponent<SpriteRenderer>().sprite;
@@ -69,7 +69,7 @@ public class GunnerScript : MonoBehaviour {
         transform.GetChild(0).GetComponent<GunScript>().setShooting(b);
     }
 
-    protected void pointGunAt(Vector3 pos) {
+    protected virtual void pointGunAt(Vector3 pos) {
         transform.GetChild(0).eulerAngles = new Vector3(0, 0, Mathf.Atan2((pos - transform.GetChild(0).position).y, (pos - transform.GetChild(0).position).x) * Mathf.Rad2Deg);
         transform.GetChild(0).localEulerAngles = new Vector3(0, 0, boundedGunAngle(transform.GetChild(0).localEulerAngles.z, minDeflection, maxDeflection));
     }

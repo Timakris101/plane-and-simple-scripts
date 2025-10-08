@@ -4,13 +4,11 @@ using UnityEngine;
 
 public class AAGunnerScript : GunnerScript {
 
-    [SerializeField] private string alliance;
-
     protected override void Start() {}
 
     protected override void Update() {
         if (GetComponent<DamageModel>().isAlive()) {
-            findTarget();
+            setTargetedObj(transform.parent.GetComponent<AiGroundVehicleController>().getTargetedObj());
             if (!manualControl) {
                 bool inRange = false;
                 if (targetedObj != null) {
@@ -33,22 +31,6 @@ public class AAGunnerScript : GunnerScript {
             }
         } else {
             attemptToShoot(false);
-        }
-    }
-
-    private void findTarget() {
-        GameObject[] allPlanes = GameObject.FindGameObjectsWithTag("Plane");
-        targetedObj = null;
-        foreach (GameObject plane in allPlanes) {
-            if (plane == gameObject) continue;
-            
-            if (plane.GetComponent<AiPlaneController>().getAlliance() != alliance && !plane.GetComponent<PlaneController>().planeDead()) {
-                if (targetedObj == null) targetedObj = plane;
-
-                if (Vector3.Distance(plane.transform.position, transform.position) < Vector3.Distance(targetedObj.transform.position, transform.position)) {
-                    targetedObj = plane;
-                }
-            }
         }
     }
 }
