@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TankGunnerScript : GunnerScript {
+public class GroundVehicleGunnerScript : GunnerScript {
 
     [SerializeField] private bool rotatableTurret;
+    [SerializeField] private bool ammoHasFuse;
 
     protected override void Start() {}
 
@@ -19,6 +20,7 @@ public class TankGunnerScript : GunnerScript {
                 if (targetedObj != null && inRange) {
                     pointGunAt(positionToTarget());
                     attemptToShoot(positionToTarget(), targetInSights());
+                    if (ammoHasFuse) transform.GetChild(0).GetComponent<GunScript>().setFuseOfBullets(positionToTarget());
                 } else {
                     attemptToShoot(false);
                 }
@@ -27,6 +29,7 @@ public class TankGunnerScript : GunnerScript {
                     Vector3 screenToWorld = transform.parent.Find("Camera").GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -transform.parent.Find("Camera").position.z));
                     pointGunAt(new Vector3(screenToWorld.x, screenToWorld.y, 0));
                     attemptToShoot(new Vector3(screenToWorld.x, screenToWorld.y, 0), Input.GetMouseButton(0));
+                    if (ammoHasFuse) transform.GetChild(0).GetComponent<GunScript>().setFuseOfBullets(new Vector3(screenToWorld.x, screenToWorld.y, 0));
                 }
             }
         } else {
