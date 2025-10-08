@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlaneController : MonoBehaviour {
+public class PlaneController : VehicleController {
     protected float throttle;
     protected bool inWEP;
     private float throttleChangeSpeed = 1f;
@@ -37,7 +37,7 @@ public class PlaneController : MonoBehaviour {
         return origSprite;
     }
 
-    public bool planeDead() {
+    public override bool vehicleDead() {
         bool criticalSystemDamage = false;
         for (int i = 0; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;

@@ -12,16 +12,13 @@ public class AiPlaneController : PlaneController {
     [SerializeField] private float gunRange;
     private GameObject primaryBullet;
 
-    [Header("Alliance")]
-    [SerializeField] private string alliance;
-
     private void findTarget() {
         GameObject[] allPlanes = GameObject.FindGameObjectsWithTag("Plane");
         targetedObj = null;
         foreach (GameObject plane in allPlanes) {
             if (plane == gameObject) continue;
             
-            if (plane.GetComponent<AiPlaneController>().getAlliance() != alliance && !plane.GetComponent<PlaneController>().planeDead()) {
+            if (plane.GetComponent<AllianceHolder>().getAlliance() != GetComponent<AllianceHolder>().getAlliance() && !plane.GetComponent<PlaneController>().vehicleDead()) {
                 if (targetedObj == null) targetedObj = plane;
 
                 if (Vector3.Distance(plane.transform.position, transform.position) < Vector3.Distance(targetedObj.transform.position, transform.position)) {
@@ -31,13 +28,6 @@ public class AiPlaneController : PlaneController {
         }
     }
 
-    public string getAlliance() {
-        return alliance;
-    }
-
-    public void setAlliance(string alliance) {
-        this.alliance = alliance;
-    }
 
     protected override float wantedDir() {
         findTarget();

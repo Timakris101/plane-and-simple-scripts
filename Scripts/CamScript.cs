@@ -115,7 +115,7 @@ public class CamScript : MonoBehaviour {
         }
         if (planeToControl != null) {
             if (planeToControl.GetComponent<PlaneController>().pilotDeadOrGone()) {
-                GameObject newPlane = findNewPlane(planeToControl.GetComponent<AiPlaneController>().getAlliance());
+                GameObject newPlane = findNewPlane(planeToControl.GetComponent<AllianceHolder>().getAlliance());
                 if (newPlane != null) {
                     takeControlOfPlane(newPlane);
                 } else {
@@ -226,8 +226,8 @@ public class CamScript : MonoBehaviour {
         foreach (GameObject plane in GameObject.FindGameObjectsWithTag("Plane")) {
             if (plane == planeToControl) continue;
 
-            if (plane.GetComponent<AiPlaneController>().getAlliance() == alliance) {
-                if (!plane.GetComponent<PlaneController>().planeDead() && plane.GetComponent<AiPlaneController>().enabled) {
+            if (plane.GetComponent<AllianceHolder>().getAlliance() == planeToControl.GetComponent<AllianceHolder>().getAlliance()) {
+                if (!plane.GetComponent<VehicleController>().vehicleDead() && plane.GetComponent<AiPlaneController>().enabled) {
                     return plane;
                 }
             }
@@ -242,8 +242,8 @@ public class CamScript : MonoBehaviour {
         foreach (GameObject plane in GameObject.FindGameObjectsWithTag("Plane")) {
             if (plane == planeToControl) continue;
 
-            if (plane.GetComponent<AiPlaneController>().getAlliance() != planeToControl.GetComponent<AiPlaneController>().getAlliance()) {
-                if (!plane.GetComponent<PlaneController>().planeDead()) {
+            if (plane.GetComponent<AllianceHolder>().getAlliance() != planeToControl.GetComponent<AllianceHolder>().getAlliance()) {
+                if (!plane.GetComponent<VehicleController>().vehicleDead()) {
                     if (nearestEnemy == null) {
                         nearestEnemy = plane;
                         continue;

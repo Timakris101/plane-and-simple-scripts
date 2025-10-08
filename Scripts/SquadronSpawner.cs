@@ -48,7 +48,7 @@ public class SquadronSpawner : MonoBehaviour {
                     selectorDropdown.GetComponent<TMP_Dropdown>().value = i;
                 }
             }
-            allianceDropdown.transform.Find("Label").GetComponent<TMP_Text>().text = baseSpawner.GetComponent<SquadronSpawner>().plane.GetComponent<AiPlaneController>().getAlliance();
+            allianceDropdown.transform.Find("Label").GetComponent<TMP_Text>().text = baseSpawner.GetComponent<SquadronSpawner>().plane.GetComponent<AllianceHolder>().getAlliance();
             for (int i = 0; i < allianceDropdown.GetComponent<TMP_Dropdown>().options.Count; i++) {
                 if (allianceDropdown.GetComponent<TMP_Dropdown>().options[i].text == allianceDropdown.transform.Find("Label").GetComponent<TMP_Text>().text) {
                     allianceDropdown.GetComponent<TMP_Dropdown>().value = i;
@@ -81,7 +81,7 @@ public class SquadronSpawner : MonoBehaviour {
             editSpawner(curSelected);
         }
         if (arcade && arcadeOn) {
-            if (!anyPlanesLeft(plane.GetComponent<AiPlaneController>().getAlliance())) {
+            if (!anyPlanesLeft(plane.GetComponent<AllianceHolder>().getAlliance())) {
                 spawnPlanes();
                 GameObject.Find("Score").GetComponent<TMP_Text>().text = (int.Parse(GameObject.Find("Score").GetComponent<TMP_Text>().text) + (containsPlayer ? -1 : 1)).ToString();
             }
@@ -90,7 +90,7 @@ public class SquadronSpawner : MonoBehaviour {
 
     public bool anyPlanesLeft(string alliance) {
         foreach (GameObject plane in GameObject.FindGameObjectsWithTag("Plane")) {
-            if (plane.GetComponent<AiPlaneController>().getAlliance() == alliance) {
+            if (plane.GetComponent<AllianceHolder>().getAlliance() == alliance) {
                 if (!plane.GetComponent<PlaneController>().allCrewGoneFromPlane()) {
                     return true;
                 }
@@ -176,7 +176,7 @@ public class SquadronSpawner : MonoBehaviour {
     public void spawnPlanes() {
         for (int i = 0; i < amt; i++) {
             GameObject newPlane = Instantiate(plane, transform.position + (Vector3) offset * i, transform.rotation);
-            newPlane.GetComponent<AiPlaneController>().setAlliance(alliance);
+            newPlane.GetComponent<AllianceHolder>().setAlliance(alliance);
             if (containsPlayer && i == 0) {
                 camera.GetComponent<CamScript>().takeControlOfPlane(newPlane);
                 continue;
