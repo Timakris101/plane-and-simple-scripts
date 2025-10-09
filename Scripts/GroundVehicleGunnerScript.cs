@@ -45,19 +45,33 @@ public class GroundVehicleGunnerScript : GunnerScript {
         Transform gunPivot = transform.GetChild(0).Find("GunPivotPoint");
         Vector3 gunPivotPrevPos = gunPivot.position;
 
-        float yAnglePrev =  transform.GetChild(0).localEulerAngles.y;
+        if (rotatableTurret) {
+            float yAnglePrev = transform.GetChild(0).localEulerAngles.y;
+            transform.GetChild(0).localEulerAngles = new Vector3(0, (posToTheFrontSide ? 0 : 180f), transform.GetChild(0).localEulerAngles.z);
+            float newYAngle = transform.GetChild(0).localEulerAngles.y;
+            transform.Find("TurretCenter").localPosition = new Vector3(transform.Find("TurretCenter").localPosition.x, transform.GetChild(0).localPosition.y, 0f);
+            if (yAnglePrev != newYAngle) {
+                transform.GetChild(0).localPosition = new Vector3(2f * transform.Find("TurretCenter").localPosition.x - transform.GetChild(0).localPosition.x, transform.GetChild(0).localPosition.y, 0f);
+                return;
+            }
 
-        if (posToTheFrontSide || !rotatableTurret) {
-            transform.GetChild(0).eulerAngles = new Vector3(0, 0, Mathf.Atan2((pos - transform.GetChild(0).position).y, (pos - transform.GetChild(0).position).x) * Mathf.Rad2Deg);
-        } else if (!rotatableTurret) {
-            transform.GetChild(0).eulerAngles = new Vector3(0, 0, Mathf.Atan2((reflectedPos - transform.GetChild(0).position).y, (reflectedPos - transform.GetChild(0).position).x) * Mathf.Rad2Deg);
+            float eulersZ = 0f;
+            if (posToTheFrontSide || !rotatableTurret) {
+                eulersZ = Mathf.Atan2((pos - transform.GetChild(0).position).y, (pos - transform.GetChild(0).position).x) * Mathf.Rad2Deg - (transform.GetChild(0).localEulerAngles.y == 0 ? 1f : -1f) * rotOfBase();
+                if (eulersZ < 0) eulersZ += 360f;
+            }
+            if (!posToTheFrontSide && rotatableTurret) {
+                eulersZ = Mathf.Atan2((reflectedPos - transform.GetChild(0).position).y, (reflectedPos - transform.GetChild(0).position).x) * Mathf.Rad2Deg - (transform.GetChild(0).localEulerAngles.y == 0 ? 1f : -1f) * rotOfBase();
+                if (eulersZ < 0) eulersZ += 360f;
+            }
+            transform.GetChild(0).localEulerAngles = new Vector3(0, transform.GetChild(0).localEulerAngles.y, 0f);
+            transform.GetChild(0).eulerAngles = new Vector3(0, transform.GetChild(0).eulerAngles.y, boundedGunAngle(eulersZ, minDeflection, maxDeflection) + (transform.GetChild(0).localEulerAngles.y == 0 ? 1f : -1f) * rotOfBase());
+        } else {
+            base.pointGunAt(pos);
         }
-        transform.GetChild(0).localEulerAngles = new Vector3(0, (posToTheFrontSide || !rotatableTurret ? 0 : 180f), boundedGunAngle(transform.GetChild(0).localEulerAngles.z, minDeflection, maxDeflection));
 
         Vector3 newGunPivotPos = gunPivot.position;
 
-        float newYAngle = transform.GetChild(0).localEulerAngles.y;
-
-        if (yAnglePrev == newYAngle) transform.GetChild(0).position += gunPivotPrevPos - newGunPivotPos;
+        transform.GetChild(0).position += gunPivotPrevPos - newGunPivotPos;
     }
 }

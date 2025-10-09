@@ -76,14 +76,14 @@ public class GunnerScript : MonoBehaviour {
 
     protected float boundedGunAngle(float unboundedAngle, float minDeflection, float maxDeflection) {
         if (minDeflection < maxDeflection) {
-            return Mathf.Clamp(unboundedAngle + (unboundedAngle < 0f ? 360f : 0f) + rotOfBase(), minDeflection + rotOfBase(), maxDeflection + rotOfBase()) - rotOfBase();
+            return Mathf.Clamp(unboundedAngle + (unboundedAngle > 180f + (minDeflection + maxDeflection) / 2f ? -360f : 0f), minDeflection, maxDeflection);
         } else {
-            return (Mathf.Clamp(unboundedAngle + (unboundedAngle < maxDeflection ? 360f : 0f) + rotOfBase(), minDeflection + rotOfBase(), maxDeflection + 360f + rotOfBase()) - rotOfBase()) - 360f;
+            return (Mathf.Clamp(unboundedAngle + (unboundedAngle < (minDeflection + maxDeflection) / 2f ? 360f : 0f), minDeflection, maxDeflection + 360f)) - 360f;
         }
     }
 
-    private float rotOfBase() {
-        return transform.eulerAngles.z - transform.localEulerAngles.z;
+    protected float rotOfBase() {
+        return transform.parent.eulerAngles.z + (transform.parent.eulerAngles.z < 0f ? 360f : 0f);
     }
 
     protected bool targetInSights() {
