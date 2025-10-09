@@ -11,6 +11,7 @@ public class DamageModel : MonoBehaviour {
     [SerializeField] private bool crewRole;
     [SerializeField] private bool criticalSystem;
     [SerializeField] private GameObject destructiveEffect;
+    [SerializeField] private Sprite replacementSprite;
     private float startingValOfEffect;
     [SerializeField] private float effectivenessFalloffRate;
 
@@ -65,6 +66,7 @@ public class DamageModel : MonoBehaviour {
                 effectApplied = true;
                 Instantiate(destructiveEffect, transform.position, Quaternion.identity, transform);
             }
+            if (GetComponent<SpriteRenderer>() != null) GetComponent<SpriteRenderer>().sprite = replacementSprite;
             switch (effect) {
                 case "Wing":
                     transform.parent.GetComponent<Animator>().speed = transform.parent.GetComponent<Rigidbody2D>().linearVelocity.magnitude / animatorSpeedFactor;

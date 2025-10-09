@@ -9,7 +9,7 @@ public class AiGroundVehicleController : GroundVehicleController {
     }
 
     void Update() {
-        
+        setGunnersToManual(false);
     }
 
     private void findTarget() {

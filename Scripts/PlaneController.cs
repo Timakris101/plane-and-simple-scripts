@@ -10,7 +10,6 @@ public class PlaneController : VehicleController {
     private bool unconcious;
     private bool pilotDead;
     private bool pilotGone;
-    private Sprite origSprite;
     [SerializeField] private bool enginesStartOn;
 
     private bool onGround;
@@ -23,19 +22,16 @@ public class PlaneController : VehicleController {
         onGround = false;
     }
 
-    void Awake() {
-        origSprite = GetComponent<SpriteRenderer>().sprite;
-    }
-
     void Start() {
         enginesOn = enginesStartOn;
         throttle = enginesStartOn ? 1 : 0;
+    }
+
+    void OnEnable() {
         setGunnersToManual(false);
     }
 
-    public Sprite getOrigSprite() {
-        return origSprite;
-    }
+    public override bool whenToRemoveCamera() {return pilotDeadOrGone();}
 
     public override bool vehicleDead() {
         bool criticalSystemDamage = false;
@@ -49,7 +45,7 @@ public class PlaneController : VehicleController {
                 }
             }
         }
-        if (allCrewGoneFromPlane()) return true;
+        if (allCrewGoneFromVehicle()) return true;
         return criticalSystemDamage || pilotDeadOrGone();
     }
 
@@ -74,19 +70,6 @@ public class PlaneController : VehicleController {
 
     public void removeCam() {
         if (transform.Find("Camera") != null) transform.Find("Camera").GetComponent<CamScript>().uncoupleCam();
-    }
-
-    public bool allCrewGoneFromPlane() {
-        for (int i = 0; i < transform.childCount; i++) {
-            if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;
-            
-            if (transform.GetChild(i).GetComponent<DamageModel>().isCrewRole()) {
-                if (transform.GetChild(i).GetComponent<DamageModel>().isAlive()) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     public bool pilotDeadOrGone() {
@@ -131,7 +114,7 @@ public class PlaneController : VehicleController {
         }
         if (pilotGone || pilotDead) setGuns(false);
         
-        if (!allCrewGoneFromPlane()) {
+        if (!allCrewGoneFromVehicle()) {
             handleNonPilotControls();
             handleSwapping();
         }
@@ -171,27 +154,6 @@ public class PlaneController : VehicleController {
 
         setGuns(Input.GetMouseButton(0));
         setBombs(Input.GetKey(KeyCode.Space));
-    }
-
-    private void toggleGunners() {
-        for (int i = 0; i < transform.childCount; i++) {
-            if (transform.GetChild(i).GetComponent<GunnerScript>() != null) {
-                transform.GetChild(i).GetComponent<GunnerScript>().setManualControl(!transform.GetChild(i).GetComponent<GunnerScript>().getManualControl());
-            }
-        }
-    }
-
-    private void setGunnersToManual(bool manual) {
-        for (int i = 0; i < transform.childCount; i++) {
-            if (transform.GetChild(i).GetComponent<GunnerScript>() != null) transform.GetChild(i).GetComponent<GunnerScript>().setManualControl(manual);
-        }
-    }
-
-    public bool gunnersAreManual() {
-        for (int i = 0; i < transform.childCount; i++) {
-            if (transform.GetChild(i).GetComponent<GunnerScript>() != null) return transform.GetChild(i).GetComponent<GunnerScript>().getManualControl();
-        }
-        return false;
     }
 
     protected void setGuns(bool shooting) {

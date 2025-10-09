@@ -9,8 +9,9 @@ public class GroundVehicleController : VehicleController
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        
+    void Update() {
+        setGunnersToManual(true);
     }
+    
+    public override bool whenToRemoveCamera() {return allCrewGoneFromVehicle();}
 }

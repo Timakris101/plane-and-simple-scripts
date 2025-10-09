@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using static Utils;
 
 public class SquadronSpawner : MonoBehaviour {  
     [Header("Mode")]
@@ -12,13 +13,13 @@ public class SquadronSpawner : MonoBehaviour {
     [Header("SelectionSpawner")]
     [SerializeField] private bool selectionSpawner;
     [SerializeField] private GameObject curSelected;
-    [SerializeField] private GameObject[] planes;
+    [SerializeField] private GameObject[] vehicles;
     [SerializeField] private GameObject baseSpawner;
     [SerializeField] private Sprite unselected;
     [SerializeField] private Sprite selected;
 
     [Header("Stats")]
-    [SerializeField] private GameObject plane;
+    [SerializeField] private GameObject vehicle;
     [SerializeField] private bool containsPlayer;
     [SerializeField] private int amt;
     [SerializeField] private string alliance;
@@ -39,16 +40,16 @@ public class SquadronSpawner : MonoBehaviour {
     void Start() {
         inEditor = true;
         if (selectionSpawner) {
-            for (int i = 0; i < planes.Length; i++) {
-                selectorDropdown.GetComponent<TMP_Dropdown>().options.Add(new TMP_Dropdown.OptionData(planes[i].name));
+            for (int i = 0; i < vehicles.Length; i++) {
+                selectorDropdown.GetComponent<TMP_Dropdown>().options.Add(new TMP_Dropdown.OptionData(vehicles[i].name));
             }
-            selectorDropdown.transform.Find("Label").GetComponent<TMP_Text>().text = baseSpawner.GetComponent<SquadronSpawner>().plane.name;
+            selectorDropdown.transform.Find("Label").GetComponent<TMP_Text>().text = baseSpawner.GetComponent<SquadronSpawner>().vehicle.name;
             for (int i = 0; i < selectorDropdown.GetComponent<TMP_Dropdown>().options.Count; i++) {
                 if (selectorDropdown.GetComponent<TMP_Dropdown>().options[i].text == selectorDropdown.transform.Find("Label").GetComponent<TMP_Text>().text) {
                     selectorDropdown.GetComponent<TMP_Dropdown>().value = i;
                 }
             }
-            allianceDropdown.transform.Find("Label").GetComponent<TMP_Text>().text = baseSpawner.GetComponent<SquadronSpawner>().plane.GetComponent<AllianceHolder>().getAlliance();
+            allianceDropdown.transform.Find("Label").GetComponent<TMP_Text>().text = baseSpawner.GetComponent<SquadronSpawner>().vehicle.GetComponent<AllianceHolder>().getAlliance();
             for (int i = 0; i < allianceDropdown.GetComponent<TMP_Dropdown>().options.Count; i++) {
                 if (allianceDropdown.GetComponent<TMP_Dropdown>().options[i].text == allianceDropdown.transform.Find("Label").GetComponent<TMP_Text>().text) {
                     allianceDropdown.GetComponent<TMP_Dropdown>().value = i;
@@ -81,17 +82,17 @@ public class SquadronSpawner : MonoBehaviour {
             editSpawner(curSelected);
         }
         if (arcade && arcadeOn) {
-            if (!anyPlanesLeft(plane.GetComponent<AllianceHolder>().getAlliance())) {
-                spawnPlanes();
+            if (!anyVehiclesLeft(vehicle.GetComponent<AllianceHolder>().getAlliance())) {
+                spawnVehicles();
                 GameObject.Find("Score").GetComponent<TMP_Text>().text = (int.Parse(GameObject.Find("Score").GetComponent<TMP_Text>().text) + (containsPlayer ? -1 : 1)).ToString();
             }
         }
     }
 
-    public bool anyPlanesLeft(string alliance) {
-        foreach (GameObject plane in GameObject.FindGameObjectsWithTag("Plane")) {
-            if (plane.GetComponent<AllianceHolder>().getAlliance() == alliance) {
-                if (!plane.GetComponent<PlaneController>().allCrewGoneFromPlane()) {
+    public bool anyVehiclesLeft(string alliance) {
+        foreach (GameObject vehicle in GameObject.FindGameObjectsWithTag("Vehicle")) {
+            if (vehicle.GetComponent<AllianceHolder>().getAlliance() == alliance) {
+                if (!vehicle.GetComponent<VehicleController>().allCrewGoneFromVehicle()) {
                     return true;
                 }
             }
@@ -123,7 +124,7 @@ public class SquadronSpawner : MonoBehaviour {
         int ignore;
         if (int.TryParse(amountTextField.GetComponent<TMP_InputField>().text, out ignore)) spawnerToEdit.GetComponent<SquadronSpawner>().amt = int.Parse(amountTextField.GetComponent<TMP_InputField>().text);
         spawnerToEdit.GetComponent<SquadronSpawner>().containsPlayer = containsPlayerToggle.GetComponent<Toggle>().isOn;
-        spawnerToEdit.GetComponent<SquadronSpawner>().plane = planes[selectorDropdown.GetComponent<TMP_Dropdown>().value];
+        spawnerToEdit.GetComponent<SquadronSpawner>().vehicle = vehicles[selectorDropdown.GetComponent<TMP_Dropdown>().value];
         spawnerToEdit.GetComponent<SquadronSpawner>().alliance = allianceDropdown.GetComponent<TMP_Dropdown>().options[allianceDropdown.GetComponent<TMP_Dropdown>().value].text;
     }
 
@@ -136,7 +137,7 @@ public class SquadronSpawner : MonoBehaviour {
         origCamPos = camera.transform.position;
         origCamSize = camera.GetComponent<Camera>().fieldOfView;
         foreach (GameObject spawner in GameObject.FindGameObjectsWithTag("Spawner")) {
-            spawner.GetComponent<SquadronSpawner>().spawnPlanes();
+            spawner.GetComponent<SquadronSpawner>().spawnVehicles();
             spawner.GetComponent<SpriteRenderer>().enabled = false;
             if (spawner.GetComponent<SquadronSpawner>().arcade) spawner.GetComponent<SquadronSpawner>().arcadeOn = true;
         }
@@ -173,19 +174,19 @@ public class SquadronSpawner : MonoBehaviour {
         objectsWhichExistedInEditor.Clear();
     }
 
-    public void spawnPlanes() {
+    public void spawnVehicles() {
         for (int i = 0; i < amt; i++) {
-            GameObject newPlane = Instantiate(plane, transform.position + (Vector3) offset * i, transform.rotation);
-            newPlane.GetComponent<AllianceHolder>().setAlliance(alliance);
+            GameObject newVehicle = Instantiate(vehicle, transform.position + (Vector3) offset * i, transform.rotation);
+            newVehicle.GetComponent<AllianceHolder>().setAlliance(alliance);
             if (containsPlayer && i == 0) {
-                camera.GetComponent<CamScript>().takeControlOfPlane(newPlane);
+                camera.GetComponent<CamScript>().takeControlOfVehicle(vehicle);
                 continue;
             }
-            foreach (PlaneController pc in newPlane.GetComponents<PlaneController>()) {
-                if (pc == newPlane.GetComponent<AiPlaneController>()) {
-                    pc.enabled = true;
+            foreach (VehicleController vc in newVehicle.GetComponents<VehicleController>()) {
+                if (vc == aiControllerOfVehicle(newVehicle)) {
+                    vc.enabled = true;
                 } else {
-                    pc.enabled = false;
+                    vc.enabled = false;
                 }
             }
         }
@@ -200,7 +201,7 @@ public class SquadronSpawner : MonoBehaviour {
             amountTextField.GetComponent<TMP_InputField>().text = curSelected.GetComponent<SquadronSpawner>().amt.ToString();
             containsPlayerToggle.GetComponent<Toggle>().isOn = curSelected.GetComponent<SquadronSpawner>().containsPlayer;
             for (int i = 0; i < selectorDropdown.GetComponent<TMP_Dropdown>().options.Count; i++) {
-                if (selectorDropdown.GetComponent<TMP_Dropdown>().options[i].text == curSelected.GetComponent<SquadronSpawner>().plane.name) {
+                if (selectorDropdown.GetComponent<TMP_Dropdown>().options[i].text == curSelected.GetComponent<SquadronSpawner>().vehicle.name) {
                     selectorDropdown.GetComponent<TMP_Dropdown>().value = i;
                 }
             }
