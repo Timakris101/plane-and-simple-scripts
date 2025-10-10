@@ -46,30 +46,38 @@ public class DamageModelDisplay : MonoBehaviour {
 
     void Start() {
         coupledModules = new List<CoupledModule>();
-        transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().sprite = null;
-        transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = false;
+        spriteDisps = new List<GameObject>();
     }
 
     public void displayVehicle(GameObject vehicle) {
+        transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().sprite = null;
+        transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = false;
         this.vehicle = vehicle;
         foreach (CoupledModule c in coupledModules) {
             Destroy(c.getDisp());
         }
         coupledModules = new List<CoupledModule>();
+        foreach (GameObject g in spriteDisps) {
+            Destroy(g);
+        }
         spriteDisps = new List<GameObject>();
         if (vehicle == null) {
             return;
         }
-        float sizeMultiplier = transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x / vehicle.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
+        float sizeMultiplier = sizeMultiplier = transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x / vehicle.GetComponent<SpriteRenderer>().sprite.bounds.size.x;;
         foreach (GameObject objectWithSprite in allObjectsInTreeWith("SpriteRenderer", vehicle)) {
+            if (objectWithSprite.GetComponent<SpriteRenderer>().sprite == null) continue;
             GameObject newSpriteDisp = Instantiate(transform.GetChild(0).gameObject, transform);
             newSpriteDisp.GetComponent<UnityEngine.UI.Image>().enabled = true;
-            newSpriteDisp.GetComponent<UnityEngine.UI.Image>().sprite = objectWithSprite.GetComponent<SpriteRenderer>().sprite;
+            newSpriteDisp.GetComponent<UnityEngine.UI.Image>().sprite = (objectWithSprite != vehicle ? objectWithSprite.GetComponent<SpriteRenderer>().sprite : vehicle.GetComponent<VehicleController>().getOrigSprite());
             newSpriteDisp.transform.localPosition = sizeMultiplier * (localPositionFrom(vehicle, objectWithSprite));
-            newSpriteDisp.transform.localScale = objectWithSprite.transform.localScale;
+            newSpriteDisp.transform.localScale = (objectWithSprite == vehicle ? new Vector3(1f,1f,1f) : objectWithSprite.transform.localScale * vehicle.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit / objectWithSprite.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit);
             newSpriteDisp.transform.eulerAngles = objectWithSprite.transform.eulerAngles - vehicle.transform.eulerAngles;
-            spriteDisps.Add(newSpriteDisp);
-            Destroy(newSpriteDisp, Time.deltaTime * 2f);
+            if (!spriteDisps.Contains(newSpriteDisp)) {
+                spriteDisps.Add(newSpriteDisp);
+            } else {
+                Destroy(newSpriteDisp);
+            }
         }
         foreach (GameObject damageModel in progenyWithScript("DamageModel", vehicle)) {
             GameObject newModuleDisp = Instantiate(moduleImage, transform);
