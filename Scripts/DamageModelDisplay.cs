@@ -30,6 +30,10 @@ public class CoupledModule {
     public void setCoupledModule(GameObject module) {
         coupledModule = module;
     }
+
+    public bool equals(CoupledModule c) {
+        return coupledModule == c.getCoupledModule();
+    }
 }
 
 public class DamageModelDisplay : MonoBehaviour {
@@ -38,6 +42,7 @@ public class DamageModelDisplay : MonoBehaviour {
     [SerializeField] private Gradient healthDispGradient;
     [SerializeField] private GameObject camera;
     private List<CoupledModule> coupledModules;
+    private List<GameObject> spriteDisps;
 
     void Start() {
         coupledModules = new List<CoupledModule>();
@@ -47,26 +52,35 @@ public class DamageModelDisplay : MonoBehaviour {
 
     public void displayVehicle(GameObject vehicle) {
         this.vehicle = vehicle;
-        transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().sprite = null;
-        transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = false;
         foreach (CoupledModule c in coupledModules) {
             Destroy(c.getDisp());
         }
         coupledModules = new List<CoupledModule>();
+        spriteDisps = new List<GameObject>();
         if (vehicle == null) {
             return;
         }
-        transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = true;
-        transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().sprite = vehicle.GetComponent<VehicleController>().getOrigSprite();
-        float sizeMultiplier = GetComponent<RectTransform>().sizeDelta.x / vehicle.GetComponent<VehicleController>().getOrigSprite().bounds.size.x;
-        for (int i = 0; i < vehicle.transform.childCount; i++) {
-            if (vehicle.transform.GetChild(i).GetComponent<DamageModel>() != null) {
-                GameObject newModuleDisp = Instantiate(moduleImage, transform);
-                newModuleDisp.GetComponent<RectTransform>().sizeDelta = vehicle.transform.GetChild(i).GetComponent<BoxCollider2D>().size * sizeMultiplier; //size delta also changes position so it is done first
-                newModuleDisp.transform.localPosition = (vehicle.transform.GetChild(i).localPosition + (Vector3) vehicle.transform.GetChild(i).GetComponent<BoxCollider2D>().offset) * sizeMultiplier;
-                newModuleDisp.transform.localEulerAngles = vehicle.transform.GetChild(i).localEulerAngles;
+        float sizeMultiplier = transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x / vehicle.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
+        foreach (GameObject objectWithSprite in allObjectsInTreeWith("SpriteRenderer", vehicle)) {
+            GameObject newSpriteDisp = Instantiate(transform.GetChild(0).gameObject, transform);
+            newSpriteDisp.GetComponent<UnityEngine.UI.Image>().enabled = true;
+            newSpriteDisp.GetComponent<UnityEngine.UI.Image>().sprite = objectWithSprite.GetComponent<SpriteRenderer>().sprite;
+            newSpriteDisp.transform.localPosition = sizeMultiplier * (localPositionFrom(vehicle, objectWithSprite));
+            newSpriteDisp.transform.localScale = objectWithSprite.transform.localScale;
+            newSpriteDisp.transform.eulerAngles = objectWithSprite.transform.eulerAngles - vehicle.transform.eulerAngles;
+            spriteDisps.Add(newSpriteDisp);
+            Destroy(newSpriteDisp, Time.deltaTime * 2f);
+        }
+        foreach (GameObject damageModel in progenyWithScript("DamageModel", vehicle)) {
+            GameObject newModuleDisp = Instantiate(moduleImage, transform);
+            newModuleDisp.GetComponent<RectTransform>().sizeDelta = damageModel.GetComponent<BoxCollider2D>().size * sizeMultiplier; //size delta also changes position so it is done first
+            newModuleDisp.transform.localPosition = (damageModel.transform.localPosition + (Vector3) damageModel.GetComponent<BoxCollider2D>().offset) * sizeMultiplier;
+            newModuleDisp.transform.eulerAngles = damageModel.transform.eulerAngles - vehicle.transform.eulerAngles;
 
-                coupledModules.Add(new CoupledModule(newModuleDisp, vehicle.transform.GetChild(i).gameObject));
+            if (!coupledModules.Contains(new CoupledModule(newModuleDisp, damageModel))) {
+                coupledModules.Add(new CoupledModule(newModuleDisp, damageModel));
+            } else {
+                Destroy(newModuleDisp);
             }
         }
         foreach (CoupledModule c in coupledModules) {

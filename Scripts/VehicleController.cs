@@ -1,4 +1,5 @@
 using UnityEngine;
+using static Utils;
 
 public class VehicleController : MonoBehaviour {
     
@@ -25,11 +26,9 @@ public class VehicleController : MonoBehaviour {
 
     public virtual bool vehicleDead() {
         bool criticalSystemDamage = false;
-        for (int i = 0; i < transform.childCount; i++) {
-            if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;
-            
-            if (!transform.GetChild(i).GetComponent<DamageModel>().isCrewRole() && transform.GetChild(i).GetComponent<DamageModel>().isCritical()) {
-                if (!transform.GetChild(i).GetComponent<DamageModel>().isAlive()) {
+        foreach (GameObject damageModel in progenyWithScript("DamageModel", gameObject)) {
+            if (!damageModel.GetComponent<DamageModel>().isCrewRole() && damageModel.GetComponent<DamageModel>().isCritical()) {
+                if (!damageModel.GetComponent<DamageModel>().isAlive()) {
                     criticalSystemDamage = true;
                     break;
                 }
@@ -40,11 +39,9 @@ public class VehicleController : MonoBehaviour {
     }
 
     public bool allCrewGoneFromVehicle() {
-        for (int i = 0; i < transform.childCount; i++) {
-            if (transform.GetChild(i).GetComponent<DamageModel>() == null) continue;
-            
-            if (transform.GetChild(i).GetComponent<DamageModel>().isCrewRole()) {
-                if (transform.GetChild(i).GetComponent<DamageModel>().isAlive()) {
+        foreach (GameObject damageModel in progenyWithScript("DamageModel", gameObject)) {
+            if (damageModel.GetComponent<DamageModel>().isCrewRole()) {
+                if (damageModel.GetComponent<DamageModel>().isAlive()) {
                     return false;
                 }
             }
@@ -55,22 +52,20 @@ public class VehicleController : MonoBehaviour {
     public virtual bool whenToRemoveCamera() {return true;}
     
     protected void setGunnersToManual(bool manual) {
-        for (int i = 0; i < transform.childCount; i++) {
-            if (transform.GetChild(i).GetComponent<GunnerScript>() != null) transform.GetChild(i).GetComponent<GunnerScript>().setManualControl(manual);
+        foreach(GameObject gunner in progenyWithScript("GunnerScript", gameObject)) {
+            gunner.GetComponent<GunnerScript>().setManualControl(manual);
         }
     }
 
     protected void toggleGunners() {
-        for (int i = 0; i < transform.childCount; i++) {
-            if (transform.GetChild(i).GetComponent<GunnerScript>() != null) {
-                transform.GetChild(i).GetComponent<GunnerScript>().setManualControl(!transform.GetChild(i).GetComponent<GunnerScript>().getManualControl());
-            }
+        foreach(GameObject gunner in progenyWithScript("GunnerScript", gameObject)) {
+            gunner.GetComponent<GunnerScript>().setManualControl(!gunner.GetComponent<GunnerScript>().getManualControl());
         }
     }
 
     public bool gunnersAreManual() {
-        for (int i = 0; i < transform.childCount; i++) {
-            if (transform.GetChild(i).GetComponent<GunnerScript>() != null) return transform.GetChild(i).GetComponent<GunnerScript>().getManualControl();
+        foreach(GameObject gunner in progenyWithScript("GunnerScript", gameObject)) {
+            return gunner.GetComponent<GunnerScript>().getManualControl();
         }
         return false;
     }
