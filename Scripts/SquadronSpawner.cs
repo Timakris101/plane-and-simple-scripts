@@ -179,7 +179,7 @@ public class SquadronSpawner : MonoBehaviour {
             GameObject newVehicle = Instantiate(vehicle, transform.position + (Vector3) offset * i, transform.rotation);
             newVehicle.GetComponent<AllianceHolder>().setAlliance(alliance);
             if (containsPlayer && i == 0) {
-                camera.GetComponent<CamScript>().takeControlOfVehicle(vehicle);
+                camera.GetComponent<CamScript>().takeControlOfVehicle(newVehicle);
                 continue;
             }
             foreach (VehicleController vc in newVehicle.GetComponents<VehicleController>()) {
