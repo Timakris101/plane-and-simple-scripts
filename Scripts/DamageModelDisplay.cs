@@ -121,9 +121,14 @@ public class DamageModelDisplay : MonoBehaviour {
 
             newImg.transform.localEulerAngles = cObj.transform.localEulerAngles;
 
-            if (cObj.GetComponent<SpriteRenderer>() != null && cObj.GetComponent<SpriteRenderer>().sprite != null) newImg.transform.localScale = (cObj.transform.localScale * vehicle.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit / cObj.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit);
-
             if (cObj.GetComponent<SpriteRenderer>() != null && cObj.GetComponent<SpriteRenderer>().sprite != null) {
+                newImg.transform.localScale = (cObj.transform.localScale * vehicle.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit / cObj.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit);
+                newImg.GetComponent<UnityEngine.UI.Image>().color = cObj.GetComponent<SpriteRenderer>().color;
+            } else {
+                newImg.transform.localScale = cObj.transform.localScale;
+            }
+
+            if (cObj.GetComponent<SpriteRenderer>() != null && cObj.GetComponent<SpriteRenderer>().sprite != null && cObj.layer != LayerMask.NameToLayer("Debris")) {
                 newImg.GetComponent<UnityEngine.UI.Image>().sprite = cObj.GetComponent<SpriteRenderer>().sprite;
                 newImg.GetComponent<UnityEngine.UI.Image>().enabled = true;
                 spriteDisps.Add(newImg);
