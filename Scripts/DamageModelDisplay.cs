@@ -47,52 +47,96 @@ public class DamageModelDisplay : MonoBehaviour {
     void Start() {
         coupledModules = new List<CoupledModule>();
         spriteDisps = new List<GameObject>();
+        moduleImage.GetComponent<RectTransform>().sizeDelta = transform.GetChild(0).GetComponent<RectTransform>().sizeDelta;
     }
 
     public void displayVehicle(GameObject vehicle) {
         transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().sprite = null;
         transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = false;
         this.vehicle = vehicle;
+        
         foreach (CoupledModule c in coupledModules) {
             Destroy(c.getDisp());
         }
         coupledModules = new List<CoupledModule>();
         foreach (GameObject g in spriteDisps) {
-            Destroy(g);
+            if (g != transform.GetChild(0).gameObject) Destroy(g.getDisp());
         }
-        spriteDisps = new List<GameObject>();
+        spriteDisps = new List<CoupledModule>();
         if (vehicle == null) {
             return;
         }
-        float sizeMultiplier = sizeMultiplier = transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x / vehicle.GetComponent<SpriteRenderer>().sprite.bounds.size.x;;
-        foreach (GameObject objectWithSprite in allObjectsInTreeWith("SpriteRenderer", vehicle)) {
-            if (objectWithSprite.GetComponent<SpriteRenderer>().sprite == null) continue;
-            GameObject newSpriteDisp = Instantiate(transform.GetChild(0).gameObject, transform);
-            newSpriteDisp.GetComponent<UnityEngine.UI.Image>().enabled = true;
-            newSpriteDisp.GetComponent<UnityEngine.UI.Image>().sprite = (objectWithSprite != vehicle ? objectWithSprite.GetComponent<SpriteRenderer>().sprite : vehicle.GetComponent<VehicleController>().getOrigSprite());
-            newSpriteDisp.transform.localPosition = sizeMultiplier * (localPositionFrom(vehicle, objectWithSprite));
-            newSpriteDisp.transform.localScale = (objectWithSprite == vehicle ? new Vector3(1f,1f,1f) : objectWithSprite.transform.localScale * vehicle.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit / objectWithSprite.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit);
-            newSpriteDisp.transform.eulerAngles = objectWithSprite.transform.eulerAngles - vehicle.transform.eulerAngles;
-            if (!spriteDisps.Contains(newSpriteDisp)) {
-                spriteDisps.Add(newSpriteDisp);
-            } else {
-                Destroy(newSpriteDisp);
-            }
-        }
-        foreach (GameObject damageModel in progenyWithScript("DamageModel", vehicle)) {
-            GameObject newModuleDisp = Instantiate(moduleImage, transform);
-            newModuleDisp.GetComponent<RectTransform>().sizeDelta = damageModel.GetComponent<BoxCollider2D>().size * sizeMultiplier; //size delta also changes position so it is done first
-            newModuleDisp.transform.localPosition = (damageModel.transform.localPosition + (Vector3) damageModel.GetComponent<BoxCollider2D>().offset) * sizeMultiplier;
-            newModuleDisp.transform.eulerAngles = damageModel.transform.eulerAngles - vehicle.transform.eulerAngles;
+        
+        transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().sprite = null;
+        transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = true;
 
-            if (!coupledModules.Contains(new CoupledModule(newModuleDisp, damageModel))) {
-                coupledModules.Add(new CoupledModule(newModuleDisp, damageModel));
-            } else {
-                Destroy(newModuleDisp);
-            }
-        }
+        makeImages();
+        
         foreach (CoupledModule c in coupledModules) {
             c.getDisp().GetComponent<UnityEngine.UI.Image>().color = healthDispGradient.Evaluate(Mathf.Max(c.getCoupledModule().GetComponent<DamageModel>().getHealth(), 0f) / c.getCoupledModule().GetComponent<DamageModel>().getMaxHealth());
+        }
+    }
+
+    void makeImages() {
+        if (vehicle != null) makeImagesFor(vehicle);
+    }
+
+    void makeImagesFor(GameObject obj) {
+        float sizeMultiplier = transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x / obj.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
+        GameObject img = transform.GetChild(0).gameObject;
+        makeImagesFor(obj, img, sizeMultiplier, 0, new Vector3(0,0,0));
+    }
+
+    void makeImagesFor(GameObject obj, GameObject img, float sizeMultiplier, int depth, Vector3 prevAdditionalOffset) {
+        if (depth == 0) {
+            img.GetComponent<UnityEngine.UI.Image>().enabled = true;
+
+            if (obj.GetComponent<SpriteRenderer>() != null) {
+                img.GetComponent<UnityEngine.UI.Image>().sprite = obj.GetComponent<VehicleController>() != null ? obj.GetComponent<VehicleController>().getOrigSprite() : obj.GetComponent<SpriteRenderer>().sprite;
+                if (img.GetComponent<UnityEngine.UI.Image>().sprite != null) {
+                    img.GetComponent<UnityEngine.UI.Image>().enabled = true;
+                    spriteDisps.Add(new CoupledModule(img, obj));
+                }
+            } else {
+                img.GetComponent<UnityEngine.UI.Image>().enabled = false;
+            }
+            if (obj.GetComponent<DamageModel>() != null) img.GetComponent<UnityEngine.UI.Image>().enabled = true;
+
+            img.transform.localEulerAngles = new Vector3(0,0,0);
+        }
+        for (int i = 0; i < obj.transform.childCount; i++) {
+            if (obj.transform.GetChild(i).GetComponent<Camera>() != null) return;
+
+            GameObject newImg = Instantiate(moduleImage, img.transform);
+            GameObject cObj = obj.transform.GetChild(i).gameObject;
+    
+            if (cObj.GetComponent<DamageModel>() != null) {
+                newImg.GetComponent<RectTransform>().sizeDelta = cObj.GetComponent<BoxCollider2D>().size * sizeMultiplier; //size delta also changes position so it is done first
+            }
+
+            Vector3 additionalOffset = cObj.GetComponent<DamageModel>() != null ? (Vector3) cObj.GetComponent<BoxCollider2D>().offset : new Vector3(0,0,0) - prevAdditionalOffset;
+            newImg.transform.localPosition = (cObj.transform.localPosition + additionalOffset) * sizeMultiplier;
+
+            newImg.transform.localEulerAngles = cObj.transform.localEulerAngles;
+
+            if (cObj.GetComponent<SpriteRenderer>() != null) newImg.transform.localScale = (cObj == vehicle ? new Vector3(1f,1f,1f) : cObj.transform.localScale * vehicle.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit / cObj.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit);
+
+            if (cObj.GetComponent<SpriteRenderer>() != null) {
+                newImg.GetComponent<UnityEngine.UI.Image>().enabled = true;
+                newImg.GetComponent<UnityEngine.UI.Image>().sprite = cObj.GetComponent<SpriteRenderer>().sprite;
+                if (newImg.GetComponent<UnityEngine.UI.Image>().sprite != null) {
+                    newImg.GetComponent<UnityEngine.UI.Image>().enabled = true;
+                    spriteDisps.Add(new CoupledModule(newImg, cObj));
+                }
+            } else {
+                newImg.GetComponent<UnityEngine.UI.Image>().enabled = false;
+            }
+            if (cObj.GetComponent<DamageModel>() != null) {
+                newImg.GetComponent<UnityEngine.UI.Image>().enabled = true;
+                coupledModules.Add(new CoupledModule(newImg, cObj));
+            }
+
+            makeImagesFor(cObj, newImg, sizeMultiplier, depth + 1, additionalOffset);
         }
     }
 
