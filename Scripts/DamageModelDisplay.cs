@@ -54,15 +54,10 @@ public class DamageModelDisplay : MonoBehaviour {
         transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().sprite = null;
         transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = false;
         this.vehicle = vehicle;
-        
-        foreach (CoupledModule c in coupledModules) {
-            Destroy(c.getDisp());
-        }
+        destroyImages(transform.gameObject, 0, 1);
         coupledModules = new List<CoupledModule>();
-        foreach (GameObject g in spriteDisps) {
-            if (g != transform.GetChild(0).gameObject) Destroy(g.getDisp());
-        }
-        spriteDisps = new List<CoupledModule>();
+        spriteDisps = new List<GameObject>();
+        
         if (vehicle == null) {
             return;
         }
@@ -71,9 +66,16 @@ public class DamageModelDisplay : MonoBehaviour {
         transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().enabled = true;
 
         makeImages();
-        
+
         foreach (CoupledModule c in coupledModules) {
             c.getDisp().GetComponent<UnityEngine.UI.Image>().color = healthDispGradient.Evaluate(Mathf.Max(c.getCoupledModule().GetComponent<DamageModel>().getHealth(), 0f) / c.getCoupledModule().GetComponent<DamageModel>().getMaxHealth());
+        }
+    }
+
+    void destroyImages(GameObject obj, int depth, params int[] depths) {
+        for (int i = 0; i < obj.transform.childCount; i++) {
+            if (i >= (depth < depths.Length ? depths[depth] : 0)) Destroy(obj.transform.GetChild(i).gameObject);
+            destroyImages(obj.transform.GetChild(i).gameObject, depth + 1, depths);
         }
     }
 
@@ -95,7 +97,7 @@ public class DamageModelDisplay : MonoBehaviour {
                 img.GetComponent<UnityEngine.UI.Image>().sprite = obj.GetComponent<VehicleController>() != null ? obj.GetComponent<VehicleController>().getOrigSprite() : obj.GetComponent<SpriteRenderer>().sprite;
                 if (img.GetComponent<UnityEngine.UI.Image>().sprite != null) {
                     img.GetComponent<UnityEngine.UI.Image>().enabled = true;
-                    spriteDisps.Add(new CoupledModule(img, obj));
+                    spriteDisps.Add(img);
                 }
             } else {
                 img.GetComponent<UnityEngine.UI.Image>().enabled = false;
@@ -109,7 +111,7 @@ public class DamageModelDisplay : MonoBehaviour {
 
             GameObject newImg = Instantiate(moduleImage, img.transform);
             GameObject cObj = obj.transform.GetChild(i).gameObject;
-    
+            
             if (cObj.GetComponent<DamageModel>() != null) {
                 newImg.GetComponent<RectTransform>().sizeDelta = cObj.GetComponent<BoxCollider2D>().size * sizeMultiplier; //size delta also changes position so it is done first
             }
@@ -119,15 +121,12 @@ public class DamageModelDisplay : MonoBehaviour {
 
             newImg.transform.localEulerAngles = cObj.transform.localEulerAngles;
 
-            if (cObj.GetComponent<SpriteRenderer>() != null) newImg.transform.localScale = (cObj == vehicle ? new Vector3(1f,1f,1f) : cObj.transform.localScale * vehicle.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit / cObj.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit);
+            if (cObj.GetComponent<SpriteRenderer>() != null && cObj.GetComponent<SpriteRenderer>().sprite != null) newImg.transform.localScale = (cObj.transform.localScale * vehicle.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit / cObj.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit);
 
-            if (cObj.GetComponent<SpriteRenderer>() != null) {
-                newImg.GetComponent<UnityEngine.UI.Image>().enabled = true;
+            if (cObj.GetComponent<SpriteRenderer>() != null && cObj.GetComponent<SpriteRenderer>().sprite != null) {
                 newImg.GetComponent<UnityEngine.UI.Image>().sprite = cObj.GetComponent<SpriteRenderer>().sprite;
-                if (newImg.GetComponent<UnityEngine.UI.Image>().sprite != null) {
-                    newImg.GetComponent<UnityEngine.UI.Image>().enabled = true;
-                    spriteDisps.Add(new CoupledModule(newImg, cObj));
-                }
+                newImg.GetComponent<UnityEngine.UI.Image>().enabled = true;
+                spriteDisps.Add(newImg);
             } else {
                 newImg.GetComponent<UnityEngine.UI.Image>().enabled = false;
             }
@@ -135,7 +134,7 @@ public class DamageModelDisplay : MonoBehaviour {
                 newImg.GetComponent<UnityEngine.UI.Image>().enabled = true;
                 coupledModules.Add(new CoupledModule(newImg, cObj));
             }
-
+                
             makeImagesFor(cObj, newImg, sizeMultiplier, depth + 1, additionalOffset);
         }
     }
