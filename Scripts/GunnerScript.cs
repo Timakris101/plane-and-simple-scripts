@@ -75,6 +75,11 @@ public class GunnerScript : MonoBehaviour {
         transform.GetChild(0).localEulerAngles = new Vector3(0, 0, boundedGunAngle(transform.GetChild(0).localEulerAngles.z, minDeflection, maxDeflection));
     }
 
+    protected virtual void pointGunAt(Vector3 pos, Vector3 pointFromPos) {
+        transform.GetChild(0).eulerAngles = new Vector3(0, 0, Mathf.Atan2((pos - pointFromPos).y, (pos - pointFromPos).x) * Mathf.Rad2Deg);
+        transform.GetChild(0).localEulerAngles = new Vector3(0, 0, boundedGunAngle(transform.GetChild(0).localEulerAngles.z, minDeflection, maxDeflection));
+    }
+
     protected float boundedGunAngle(float unboundedAngle, float minDeflection, float maxDeflection) {
         if (minDeflection < maxDeflection) {
             return Mathf.Clamp(unboundedAngle + (unboundedAngle > 180f + (minDeflection + maxDeflection) / 2f ? -360f : 0f), minDeflection, maxDeflection);

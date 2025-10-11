@@ -57,16 +57,16 @@ public class GroundVehicleGunnerScript : GunnerScript {
 
             float eulersZ = 0f;
             if (posToTheFrontSide) {
-                eulersZ = Mathf.Atan2((pos - transform.GetChild(0).position).y, (pos - transform.GetChild(0).position).x) * Mathf.Rad2Deg - rotOfBase();
+                eulersZ = Mathf.Atan2((pos - gunPivotPrevPos).y, (pos - gunPivotPrevPos).x) * Mathf.Rad2Deg - rotOfBase();
                 if (eulersZ < 0) eulersZ += 360f;
             }
             if (!posToTheFrontSide) {
-                eulersZ = Mathf.Atan2((reflectedPos - transform.GetChild(0).position).y, (reflectedPos - transform.GetChild(0).position).x) * Mathf.Rad2Deg - rotOfBase();
+                eulersZ = Mathf.Atan2((reflectedPos - gunPivotPrevPos).y, (reflectedPos - gunPivotPrevPos).x) * Mathf.Rad2Deg - rotOfBase();
                 if (eulersZ < 0) eulersZ += 360f;
             }
             transform.GetChild(0).eulerAngles = new Vector3(0, transform.parent.eulerAngles.y, boundedGunAngle(eulersZ, minDeflection, maxDeflection) + rotOfBase());
         } else {
-            base.pointGunAt(pos);
+            base.pointGunAt(pos, gunPivotPrevPos);
         }
 
         Vector3 newGunPivotPos = gunPivot.position;
