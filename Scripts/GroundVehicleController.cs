@@ -11,6 +11,7 @@ public class GroundVehicleController : VehicleController
     // Update is called once per frame
     void Update() {
         setGunnersToManual(true);
+        base.Update();
     }
     
     public override bool whenToRemoveCamera() {return allCrewGoneFromVehicle();}

@@ -50,22 +50,13 @@ public class PlaneController : VehicleController {
     }
 
     void Update() {
-        handleFeasibleControls();
+        base.Update();
         if (transform.Find("PilotHitbox") == null) {
             pilotGone = true;
             return;
         }
         pilotDead = !transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive();
         unconcious = GetComponent<GForcesScript>().isPersonSleepy();
-        if (transform.Find("Camera") == null) {
-            foreach (PlaneController controller in GetComponents<PlaneController>()) {
-                if (controller == GetComponent<AiPlaneController>()) {
-                    controller.enabled = true;
-                } else {
-                    controller.enabled = false;
-                }
-            }
-        }
     }
 
     public void removeCam() {
@@ -104,7 +95,7 @@ public class PlaneController : VehicleController {
         return val;
     }
 
-    public virtual void handleFeasibleControls() {
+    public override void handleFeasibleControls() {
         if (!unconcious && !pilotGone) {
             if (gunnersAreManual()) {
                 GetComponent<AiPlaneController>().handleControls();

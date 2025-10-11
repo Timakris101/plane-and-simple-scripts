@@ -18,11 +18,16 @@ public class VehicleController : MonoBehaviour {
         
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    protected virtual void Update() {
+        handleFeasibleControls();
+        if (transform.Find("Camera") == null) {
+            foreach (VehicleController controller in GetComponents<VehicleController>()) {
+                controller.enabled = controller == aiControllerOfVehicle(gameObject);
+            }
+        }
     }
+
+    public virtual void handleFeasibleControls() {}
 
     public virtual bool vehicleDead() {
         bool criticalSystemDamage = false;
