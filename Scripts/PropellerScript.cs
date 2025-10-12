@@ -75,7 +75,7 @@ public class PropellerScript : MonoBehaviour {
             }
         }
 
-        if (engineAmt != 1 && !transform.parent.GetComponent<Animator>().GetBool("Tailless")) {
+        if (engineAmt != 1 && (!transform.parent.GetComponent<Animator>().GetBool("Tailless") || transform.parent.GetComponent<Animator>().GetBool("Wingless"))) {
             Quaternion[] arrToUse = (transform.parent.GetComponent<Animator>().GetBool("Wingless") ? valsOfPropAtAnimIndexWingless : valsOfPropAtAnimIndexNonWingless);
             int indexToUse = int.Parse(transform.parent.GetComponent<SpriteRenderer>().sprite.name.Substring(transform.parent.GetComponent<SpriteRenderer>().sprite.name.Length - 1));
             transform.localPosition = new Vector3(arrToUse[indexToUse].x, arrToUse[indexToUse].y, 0f);
