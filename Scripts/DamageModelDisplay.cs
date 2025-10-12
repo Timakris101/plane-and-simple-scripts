@@ -43,6 +43,7 @@ public class DamageModelDisplay : MonoBehaviour {
     [SerializeField] private GameObject camera;
     private List<CoupledModule> coupledModules;
     private List<GameObject> spriteDisps;
+    private string[] bannedScripts = {"PropellerScript", "GearScript", "FlapScript"};
 
     void Start() {
         coupledModules = new List<CoupledModule>();
@@ -128,7 +129,15 @@ public class DamageModelDisplay : MonoBehaviour {
                 newImg.transform.localScale = cObj.transform.localScale;
             }
 
-            if (cObj.GetComponent<SpriteRenderer>() != null && cObj.GetComponent<SpriteRenderer>().sprite != null && cObj.layer != LayerMask.NameToLayer("Debris")) {
+            bool containsBannedScript = false;
+            foreach (string script in bannedScripts) {
+                if (cObj.GetComponent(script) != null) {
+                    containsBannedScript = true;
+                    break;
+                }
+            }
+
+            if (cObj.GetComponent<SpriteRenderer>() != null && cObj.GetComponent<SpriteRenderer>().sprite != null && !containsBannedScript) {
                 newImg.GetComponent<UnityEngine.UI.Image>().sprite = cObj.GetComponent<SpriteRenderer>().sprite;
                 newImg.GetComponent<UnityEngine.UI.Image>().enabled = true;
                 spriteDisps.Add(newImg);
