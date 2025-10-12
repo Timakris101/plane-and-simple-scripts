@@ -69,7 +69,7 @@ public class DamageModel : MonoBehaviour {
             if (GetComponent<SpriteRenderer>() != null) GetComponent<SpriteRenderer>().sprite = replacementSprite;
             switch (effect) {
                 case "Wing":
-                    transform.parent.GetComponent<Animator>().speed = transform.parent.GetComponent<Rigidbody2D>().linearVelocity.magnitude / animatorSpeedFactor;
+                    transform.parent.GetComponent<Animator>().speed = Mathf.Min(transform.parent.GetComponent<Rigidbody2D>().linearVelocity.magnitude / animatorSpeedFactor, 2f);
                     aero.setBaseTorque(0);
                     break;
 
@@ -77,11 +77,12 @@ public class DamageModel : MonoBehaviour {
                     aero.setSpeedOfControlEff(Mathf.Infinity);
                     if (transform.parent.GetComponent<Rigidbody2D>().linearVelocity.magnitude > 5f) {
                         if (transform.parent.GetComponent<Rigidbody2D>().angularVelocity > 0) {
-                            transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(.25f, .5f) * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().linearVelocity.magnitude, 2f);
+                            transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Mathf.Min(5f * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().linearVelocity.magnitude, 1f), 360f);
                         } else {
-                            transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(-.25f, -.5f) * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().linearVelocity.magnitude, 2f);
+                            transform.parent.GetComponent<Rigidbody2D>().angularVelocity = Mathf.Max(-5f * Mathf.Pow(transform.parent.GetComponent<Rigidbody2D>().linearVelocity.magnitude, 1f), -360f);
                         }
                     }
+                    aero.setWingArea(0f);
                     break;
 
                 case "Engine":
