@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Utils;
 
 public class BulletScript : MonoBehaviour {
     private static float explosiveRangeOfCertainHit = 5f;
@@ -10,6 +11,7 @@ public class BulletScript : MonoBehaviour {
     [SerializeField] private float damage;
     [SerializeField] private float explosionRad;
     [SerializeField] private float penetrationVal;
+    [SerializeField] private float armorPenMeters;
     [SerializeField] private float maxFlyPastDist;
     [SerializeField] private float armingDist;
     [SerializeField] private float fuseTimeSec;
@@ -26,10 +28,32 @@ public class BulletScript : MonoBehaviour {
     }
 
     void dealDamage(Collision2D col) {
-        Vector3 beginningHitPos = transform.position - (Vector3) col.relativeVelocity.normalized * Random.Range(0f, maxFlyPastDist);
-        RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position - (Vector3) col.relativeVelocity.normalized * Random.Range(0f, maxFlyPastDist), explosionRad == 0 ? transform.localScale.x : explosionRad, -col.relativeVelocity, penetrationVal);
+        Vector3 beginningHitPos = transform.position - (Vector3) GetComponent<Rigidbody2D>().linearVelocity * Time.deltaTime;
+        RaycastHit2D[] hits = Physics2D.RaycastAll(beginningHitPos, -col.relativeVelocity, penetrationVal);
+        float newPenVal = penetrationVal;
+        int armorHitCount = 0;
+        bool armorHitFirst = false;
+        int index = 0;
+        float effectiveArmorPen = armorPenMeters * col.relativeVelocity.magnitude / initSpeed;
         foreach (RaycastHit2D hit in hits) {
-            if (initSpeed != 0 && hit.transform.gameObject != col.gameObject) continue;
+            if (hit.collider.transform.GetComponent<ArmorScript>() != null) {
+                float effArmorThickness = hit.collider.transform.GetComponent<BoxCollider2D>().size.x / Mathf.Cos(Mathf.Deg2Rad * Vector3.Angle(col.relativeVelocity, hit.normal));
+                armorHitCount++;
+                if (effArmorThickness < effectiveArmorPen) {
+                    effectiveArmorPen -= effArmorThickness;
+                } else {
+                    if (index == 0) armorHitFirst = true;
+                    effectiveArmorPen = 0f;
+                    newPenVal = ((Vector3) hit.point - beginningHitPos).magnitude;
+                    break;
+                }
+            }
+            if (hit.collider.transform != transform) index++;
+        }
+        if (armorHitCount == 1 && effectiveArmorPen <= 0f && armorHitFirst) return;
+        hits = Physics2D.CircleCastAll(beginningHitPos - (Vector3) col.relativeVelocity.normalized * Random.Range(0f, maxFlyPastDist), explosionRad == 0 ? transform.localScale.x : explosionRad, -col.relativeVelocity, newPenVal);
+        foreach (RaycastHit2D hit in hits) {
+            if (hit.transform.gameObject != maxAncestor(col.gameObject)) continue;
             if (hit.collider.transform.GetComponent<DamageModel>() != null) {
                 hit.collider.transform.GetComponent<DamageModel>().hit(Random.Range((1f - damageVariation) * damage, (1f + damageVariation) * damage), explosionRad < explosiveRangeOfCertainHit);
             }

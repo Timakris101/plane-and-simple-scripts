@@ -16,7 +16,7 @@ public class GroundVehicleController : VehicleController {
         base.Update();
     }
 
-    void FixedUpdate() {
+    public override void handleFeasibleControls() {
         if (progenyWithScript("TrackScript", gameObject).Count == 0) return;
         if (progenyWithScript("TrackScript", gameObject)[0].GetComponent<TrackScript>().usable()) {
             move();
