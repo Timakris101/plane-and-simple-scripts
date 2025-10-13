@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Utils;
 
 public class DamageModel : MonoBehaviour {
 
@@ -28,6 +29,7 @@ public class DamageModel : MonoBehaviour {
 
     private Aerodynamics aero;
     private bool effectApplied;
+    private float drowningDps = 1f;
 
     public bool isCrewRole() {
         return crewRole;
@@ -86,10 +88,8 @@ public class DamageModel : MonoBehaviour {
                     break;
 
                 case "Engine":
-                    for (int i = 0; i < transform.parent.childCount; i++) {
-                        if (transform.parent.GetChild(i).GetComponent<DamageModel>() != null) {
-                            transform.parent.GetChild(i).GetComponent<DamageModel>().damage(fireDamagePerSec * Time.deltaTime);
-                        }
+                    foreach (GameObject damageModel in allObjectsInTreeWith("DamageModel", gameObject)) {
+                        damageModel.GetComponent<DamageModel>().damage(fireDamagePerSec * Time.deltaTime);
                     }
                     break;
             }   
@@ -100,6 +100,10 @@ public class DamageModel : MonoBehaviour {
                 kill();
             }
         }
+    }
+
+    public void drown() {
+        damage(drowningDps * Time.deltaTime);
     }
 
     public void setHitChance(float val) {
