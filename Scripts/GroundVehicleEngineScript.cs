@@ -6,7 +6,7 @@ public class GroundVehicleEngineScript : EngineScript {
     [SerializeField] private float reverseGearAmt;
 
     public override float getThrustNewtons(float speed, bool reverse) {
-        return (powerHp) / Mathf.Max(1f, speed) * 745.7f * (reverse ? reverseGearAmt / frontGearAmt : 1f);
+        return enginesOn ? (powerHp) / Mathf.Max(1f, speed) * 745.7f * (reverse ? reverseGearAmt / frontGearAmt : 1f) : 0f;
     }
 
     public override void setVal(float val) {
