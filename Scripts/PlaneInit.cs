@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlaneInit : MonoBehaviour {
 
     [SerializeField] private float speed;
+    [SerializeField] private bool enginesStartOn;
 
     void Start() {
         GetComponent<Rigidbody2D>().linearVelocity = transform.right * speed;
@@ -18,6 +19,11 @@ public class PlaneInit : MonoBehaviour {
                 }
                 handleKiddosOf(transform.GetChild(i));
             }
+        }
+        
+        foreach (PlaneController controller in GetComponents<PlaneController>()) {
+            controller.setThrottle(enginesStartOn ? 1 : 0);
+            controller.setEngines(enginesStartOn);
         }
     }
 
@@ -50,5 +56,9 @@ public class PlaneInit : MonoBehaviour {
         for (int j = 0; j < parent.childCount; j++) {
             parent.GetChild(j).localPosition -= parent.localPosition;
         }
+    }
+
+    public bool getEnginesStartOn() {
+        return enginesStartOn;
     }
 }

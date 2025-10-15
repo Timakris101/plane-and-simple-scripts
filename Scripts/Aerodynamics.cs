@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Utils;
 
 public class Aerodynamics : MonoBehaviour {
 
@@ -33,7 +34,7 @@ public class Aerodynamics : MonoBehaviour {
     void Start() {
         startWingArea = wingArea;
         setPlaneController(); 
-        es = transform.Find("EngineHitbox").GetComponent<EngineScript>();        
+        es = progenyWithScript("EngineScript", gameObject)[0].GetComponent<EngineScript>();        
     }
 
     void Update() {
@@ -99,11 +100,7 @@ public class Aerodynamics : MonoBehaviour {
     }
 
     private void handleThrust() {
-        if (pc != null) {
-            if (pc.getEnginesOn()) {
-                GetComponent<Rigidbody2D>().AddForce(transform.right * pc.getThrottle() * es.getThrustNewtons(GetComponent<Rigidbody2D>().linearVelocity.magnitude));
-            }
-        }
+        GetComponent<Rigidbody2D>().AddForce(transform.right * es.getThrustNewtons(GetComponent<Rigidbody2D>().linearVelocity.magnitude));
     }
 
     private float AoA() {

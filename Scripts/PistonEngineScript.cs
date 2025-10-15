@@ -19,7 +19,7 @@ public class PistonEngineScript : EngineScript {
             }
         }
         if (!anyPropellers) return 0;
-        return (((PlaneController) vc).getInWEP() ? wepHp : powerHp) / Mathf.Max(30f, speed) * 745.7f * enginePowerByAlt.Evaluate(transform.position.y) * propEff;
+        return enginesOn ? (((PlaneController) vc).getInWEP() ? wepHp : powerHp) / Mathf.Max(30f, speed) * 745.7f * enginePowerByAlt.Evaluate(transform.position.y) * propEff * throttle : 0f;
     }
 
     public override string getType() {return "power";}

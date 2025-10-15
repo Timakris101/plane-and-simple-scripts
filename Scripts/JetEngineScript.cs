@@ -10,7 +10,7 @@ public class JetEngineScript : EngineScript {
     }
 
     public override float getThrustNewtons() {
-        return (((PlaneController) vc).getInWEP() ? afterBurner : thrustKn) * 1000f * enginePowerByAlt.Evaluate(transform.position.y);
+        return enginesOn ? (((PlaneController) vc).getInWEP() ? afterBurner : thrustKn) * 1000f * enginePowerByAlt.Evaluate(transform.position.y) * throttle : 0f;
     }
 
     public override string getType() {return "thrust";}

@@ -98,8 +98,8 @@ public class AiPlaneController : PlaneController {
 
     protected override void handleControls() {
         findTarget();
-        throttle = 1f;
-        if (mode == "overshoot") throttle = 0f;
+        setThrottle(1f);
+        if (mode == "overshoot") setThrottle(0f);
         if (targetedObj != null && primaryBullet != null) {
             if (targetInSights(primaryBullet) && (transform.position - positionToTarget(primaryBullet, transform.right)).magnitude < gunRange && mode != "headon") {
                 setGuns(true);

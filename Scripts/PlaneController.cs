@@ -1,17 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Utils;
 
 public class PlaneController : VehicleController {
-    protected float throttle;
     protected bool inWEP;
     private float throttleChangeSpeed = 1f;
-    private bool enginesOn;
-    private bool unconcious;
-    private bool pilotDead;
-    private bool pilotGone;
-    [SerializeField] private bool enginesStartOn;
-
+    private bool pilotDead => !transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive();
+    private bool pilotGone => transform.Find("PilotHitbox") == null;
+    private bool unconcious => GetComponent<GForcesScript>().isPersonSleepy();
     private bool onGround;
 
     void OnCollisionStay2D() {
@@ -20,11 +17,6 @@ public class PlaneController : VehicleController {
 
     void OnCollisionExit2D() {
         onGround = false;
-    }
-
-    void Start() {
-        enginesOn = enginesStartOn;
-        throttle = enginesStartOn ? 1 : 0;
     }
 
     void OnEnable() {
@@ -51,12 +43,9 @@ public class PlaneController : VehicleController {
 
     void Update() {
         base.Update();
-        if (transform.Find("PilotHitbox") == null) {
-            pilotGone = true;
+        if (pilotGone) {
             return;
         }
-        pilotDead = !transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive();
-        unconcious = GetComponent<GForcesScript>().isPersonSleepy();
     }
 
     public void removeCam() {
@@ -64,14 +53,14 @@ public class PlaneController : VehicleController {
     }
 
     public bool pilotDeadOrGone() {
-        if (transform.Find("PilotHitbox") == null) {
+        if (pilotGone) {
             return true;
         }
-        return !transform.Find("PilotHitbox").GetComponent<DamageModel>().isAlive();
+        return pilotDead;
     }
 
     public float getDir() {
-        if (!pilotDead && !pilotGone) {
+        if (!pilotDeadOrGone()) {
             if (gunnersAreManual()) {
                 return GetComponent<AiPlaneController>().wantedDir() * (unconcious ? Constants.GForceEffectConstants.unconciousPilotEffectiveness : 1f);
             } else {
@@ -96,14 +85,14 @@ public class PlaneController : VehicleController {
     }
 
     public override void handleFeasibleControls() {
-        if (!unconcious && !pilotGone) {
+        if (!pilotDeadOrGone() && !unconcious) {
             if (gunnersAreManual()) {
                 GetComponent<AiPlaneController>().handleControls();
             } else {
                 handleControls();
             }
         }
-        if (pilotGone || pilotDead) setGuns(false);
+        if (pilotDeadOrGone()) setGuns(false);
         
         if (!allCrewGoneFromVehicle()) {
             handleNonPilotControls();
@@ -124,11 +113,11 @@ public class PlaneController : VehicleController {
     }
 
     protected virtual void handleControls() {
-        if (Input.GetKey("w") && throttle < 1) throttle += throttleChangeSpeed * Time.deltaTime;
-        if (Input.GetKey("s") && throttle > 0) throttle -= throttleChangeSpeed * Time.deltaTime;
+        if (Input.GetKey("w") && getThrottle() < 1) setThrottle(getThrottle() + throttleChangeSpeed * Time.deltaTime);
+        if (Input.GetKey("s") && getThrottle() > 0) setThrottle(getThrottle() - throttleChangeSpeed * Time.deltaTime);
 
         inWEP = false;
-        if (Input.GetKey("w") && throttle + throttleChangeSpeed * Time.deltaTime > 1) inWEP = true;
+        if (Input.GetKey("w") && getThrottle() + throttleChangeSpeed * Time.deltaTime > 1) inWEP = true;
 
         if (Input.GetKeyDown("i")) toggleEngines();
 
@@ -141,7 +130,7 @@ public class PlaneController : VehicleController {
                 }
             }
         }
-        if (Input.GetKey("s") && throttle - throttleChangeSpeed * Time.deltaTime < 0 && transform.Find("Gear")) transform.Find("Gear").GetComponent<GearScript>().brake();
+        if (Input.GetKey("s") && getThrottle() - throttleChangeSpeed * Time.deltaTime < 0 && transform.Find("Gear")) transform.Find("Gear").GetComponent<GearScript>().brake();
 
         setGuns(Input.GetMouseButton(0));
         setBombs(Input.GetKey(KeyCode.Space));
@@ -181,19 +170,23 @@ public class PlaneController : VehicleController {
     }
 
     public void toggleEngines() {
-        enginesOn = !enginesOn;
+        progenyWithScript("EngineScript", gameObject)[0].GetComponent<EngineScript>().setEngines(!progenyWithScript("EngineScript", gameObject)[0].GetComponent<EngineScript>().getEnginesOn());
+    }
+
+    public void setEngines(bool b) {
+        progenyWithScript("EngineScript", gameObject)[0].GetComponent<EngineScript>().setEngines(b);
+    }
+
+    public void setThrottle(float val) {
+        progenyWithScript("EngineScript", gameObject)[0].GetComponent<EngineScript>().setThrottle(val);
     }
 
     public float getThrottle() {
-        return throttle;
+        return progenyWithScript("EngineScript", gameObject)[0].GetComponent<EngineScript>().getThrottle();
     }
 
     public bool getEnginesOn() {
-        return enginesOn;
-    }
-
-    public bool getEnginesStartOn() {
-        return enginesStartOn;
+        return progenyWithScript("EngineScript", gameObject)[0].GetComponent<EngineScript>().getEnginesOn();
     }
 
     public bool getInWEP() {

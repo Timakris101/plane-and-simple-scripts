@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class EngineScript : MonoBehaviour {
     protected VehicleController vc;
+    [SerializeField] protected float throttle;
+    [SerializeField] protected bool enginesOn;
 
     void Start() {
         setVehicleController(); 
@@ -33,4 +35,17 @@ public class EngineScript : MonoBehaviour {
     public virtual float getThrustNewtons() {return 0f;}
 
     public virtual string getType() {return "";}
+
+    public void setThrottle(float f) {
+        throttle = f;
+    }
+    public float getThrottle() {
+        return throttle;
+    }
+    public void setEngines(bool b) {
+        enginesOn = b;
+    }
+    public bool getEnginesOn() {
+        return enginesOn;
+    }
 }

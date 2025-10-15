@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Utils;
 
 public class PropellerScript : MonoBehaviour {
 
@@ -33,7 +34,7 @@ public class PropellerScript : MonoBehaviour {
 
     void Start() {
         idleCoef = 0.05f;
-        GetComponent<Animator>().speed = transform.parent.GetComponent<PlaneController>().getEnginesStartOn() ? 0 : 1;
+        GetComponent<Animator>().speed = transform.parent.GetComponent<PlaneInit>().getEnginesStartOn() ? 1 : 0;
 
         for (int i = 0; i < transform.parent.childCount; i++) {
             if (transform.parent.GetChild(i).GetComponent<PropellerScript>() != null) engineAmt++;
@@ -57,10 +58,10 @@ public class PropellerScript : MonoBehaviour {
 
     void Update() {
         setPlaneController();
-        engineOn = pc.getEnginesOn();
-        engineBroken = !transform.parent.Find("EngineHitbox").GetComponent<DamageModel>().isAlive();
+        engineOn = allObjectsInTreeWith("EngineScript", gameObject)[0].GetComponent<EngineScript>().getEnginesOn();
+        engineBroken = !allObjectsInTreeWith("EngineScript", gameObject)[0].GetComponent<DamageModel>().isAlive();
         if (!engineBroken) {
-            if (engineOn && GetComponent<Animator>().speed <= Mathf.Min(pc.getThrottle() + idleCoef, 1)) {
+            if (engineOn && GetComponent<Animator>().speed <= Mathf.Min(allObjectsInTreeWith("EngineScript", gameObject)[0].GetComponent<EngineScript>().getThrottle() + idleCoef, 1)) {
                 GetComponent<Animator>().speed *= engineAccelRate;
                 GetComponent<Animator>().speed += engineAccelRate - 1;
             } else {
