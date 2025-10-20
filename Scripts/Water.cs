@@ -12,7 +12,7 @@ public class Water : MonoBehaviour {
     private float seaLevel => transform.localScale.y / 2f;
 
     void OnTriggerEnter2D(Collider2D other) {
-        if (other.transform.gameObject.layer == LayerMask.NameToLayer("Vehicle") && other.transform.gameObject.layer == LayerMask.NameToLayer("Crew") && other.transform.parent == null) {
+        if (other.transform.gameObject.layer != LayerMask.NameToLayer("Vehicle") && other.transform.gameObject.layer != LayerMask.NameToLayer("Crew") && other.transform.parent == null) {
             Destroy(other.transform.gameObject);
         }
         if (other.transform.parent == null) {
