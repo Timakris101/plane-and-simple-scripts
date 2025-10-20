@@ -73,7 +73,7 @@ public class SquadronSpawner : MonoBehaviour {
                 if (curSelected != null) containsPlayerToggle.GetComponent<Toggle>().isOn = false;
                 setCurrentSelectedObj(null);
             }
-            if (Input.GetKey(KeyCode.Backspace)) Destroy(curSelected);
+            if (Input.GetKey(KeyCode.Backspace) && !amountTextField.GetComponent<TMP_InputField>().isFocused) Destroy(curSelected);
             if (Input.GetMouseButtonDown(1) && curSelected == null) {
                 GameObject newSpawner = Instantiate(baseSpawner, camera.GetComponent<Camera>().ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -camera.transform.position.z)), Quaternion.identity);
                 setSpawnerToPanelStats(newSpawner);
