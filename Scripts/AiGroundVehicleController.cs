@@ -8,7 +8,7 @@ public class AiGroundVehicleController : GroundVehicleController {
         
     }
 
-    void Update() {
+    new void Update() { 
         setGunnersToManual(false);
     }
 

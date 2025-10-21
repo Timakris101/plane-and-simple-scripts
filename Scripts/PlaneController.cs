@@ -41,7 +41,7 @@ public class PlaneController : VehicleController {
         return criticalSystemDamage || pilotDeadOrGone();
     }
 
-    void Update() {
+    new void Update() {
         base.Update();
         if (pilotGone) {
             return;

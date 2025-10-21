@@ -24,7 +24,7 @@ public class SquadronSpawner : MonoBehaviour {
     [SerializeField] private int amt;
     [SerializeField] private string alliance;
     [SerializeField] private Vector2 offset;
-    [SerializeField] private GameObject camera;
+    [SerializeField] new private GameObject camera;
     private Vector3 origCamPos;
     private float origCamSize;
     private HashSet<GameObject> objectsWhichExistedInEditor;
@@ -147,7 +147,7 @@ public class SquadronSpawner : MonoBehaviour {
 
     private void saveObjectsToNotClear() {
         objectsWhichExistedInEditor = new HashSet<GameObject>();
-        foreach (GameObject obj in Object.FindObjectsOfType(typeof(GameObject))) {
+        foreach (GameObject obj in Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None)) {
             objectsWhichExistedInEditor.Add(obj);
         }
     }
@@ -168,7 +168,7 @@ public class SquadronSpawner : MonoBehaviour {
     }
 
     private void clearUnsavedObjects() {
-        foreach (GameObject obj in Object.FindObjectsOfType(typeof(GameObject))) {
+        foreach (GameObject obj in Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None)) {
             if (!objectsWhichExistedInEditor.Contains(obj)) Destroy(obj);
         }
         objectsWhichExistedInEditor.Clear();

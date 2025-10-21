@@ -11,7 +11,7 @@ public class GroundVehicleController : VehicleController {
     }
 
     // Update is called once per frame
-    void Update() {
+    new void Update() {
         setGunnersToManual(true);
         base.Update();
     }

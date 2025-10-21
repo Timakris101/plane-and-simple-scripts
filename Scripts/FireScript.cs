@@ -16,8 +16,8 @@ public class FireScript : MonoBehaviour {
                 Destroy(gameObject);
             } else {
                 var emissionModule = GetComponent<ParticleSystem>().emission;
-                emissionModule.rate = 0f;
-                if (GetComponent<ParticleSystem>().particleCount == 0 && emissionModule.rate.constant == 0f) {
+                emissionModule.rateOverTime = 0f;
+                if (GetComponent<ParticleSystem>().particleCount == 0 && emissionModule.rateOverTime.constant == 0f) {
                     Destroy(gameObject);
                 }
             }

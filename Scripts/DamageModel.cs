@@ -185,14 +185,16 @@ public class DamageModel : MonoBehaviour {
 
     private void handlePropellerOn(GameObject obj) {
         if (obj.transform.childCount != 0) {
+            int fallenPropIndex = 0;
             for (int i = 0; i < transform.parent.childCount; i++) {
                 GameObject possibleProp = transform.parent.GetChild(i).gameObject;
                 if (possibleProp.GetComponent<PropellerScript>() != null) {
                     if (possibleProp.GetComponent<PropellerScript>().isPropOfFallenWing()) {
                         possibleProp.GetComponent<PropellerScript>().enabled = false;
                         possibleProp.GetComponent<Animator>().enabled = false;
-                        possibleProp.transform.position = obj.transform.GetChild(0).position;
-                        possibleProp.transform.parent = obj.transform.GetChild(0);
+                        possibleProp.transform.position = obj.transform.GetChild(fallenPropIndex).position;
+                        possibleProp.transform.parent = obj.transform.GetChild(fallenPropIndex);
+                        fallenPropIndex++;
                     }
                 }
             }

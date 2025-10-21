@@ -20,9 +20,9 @@ public class CloudScript : MonoBehaviour {
         timer += Time.deltaTime;
         var emissionModule = GetComponent<ParticleSystem>().emission;
         if (timer >= lifeTime) {
-            emissionModule.rate = 0f;
+            emissionModule.rateOverTime = 0f;
         }
-        if (GetComponent<ParticleSystem>().particleCount == 0 && emissionModule.rate.constant == 0f) {
+        if (GetComponent<ParticleSystem>().particleCount == 0 && emissionModule.rateOverTime.constant == 0f) {
             Destroy(gameObject);
         }
     }

@@ -22,7 +22,6 @@ public class GForcesScript : MonoBehaviour {
     [Header("DestructiveEffects")]
     [SerializeField] private GameObject fire;
     [SerializeField] private GameObject explosion;
-    private bool extinguished = false;
     private bool destroyed = false;
     private Sprite origSprite;
 

@@ -40,7 +40,7 @@ public class DamageModelDisplay : MonoBehaviour {
     [SerializeField] private GameObject vehicle;
     [SerializeField] private GameObject moduleImage;
     [SerializeField] private Gradient healthDispGradient;
-    [SerializeField] private GameObject camera;
+    [SerializeField] new private GameObject camera;
     private List<CoupledModule> coupledModules;
     private List<GameObject> spriteDisps;
     private string[] bannedScripts = {"PropellerScript", "GearScript", "FlapScript"};
