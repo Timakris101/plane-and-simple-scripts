@@ -31,7 +31,7 @@ public class Water : MonoBehaviour {
         if (other.transform.GetComponent<Rigidbody2D>() != null) {
             float dragForce = dragForceCoef * Mathf.Pow(other.transform.GetComponent<Rigidbody2D>().linearVelocity.magnitude, 2);
 
-            other.transform.GetComponent<Rigidbody2D>().AddForce(-other.transform.GetComponent<Rigidbody2D>().linearVelocity.normalized * dragForce);
+            other.transform.GetComponent<Rigidbody2D>().AddForce(-other.transform.GetComponent<Rigidbody2D>().linearVelocity.normalized * dragForce * Time.deltaTime);
         }
         foreach (GameObject damageModel in allObjectsInTreeWith("DamageModel", other.transform.gameObject)) {
             if (damageModel.transform.position.y > seaLevel) damageModel.GetComponent<DamageModel>().drown();
