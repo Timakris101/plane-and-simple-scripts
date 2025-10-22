@@ -43,7 +43,7 @@ public class CrewScript : MonoBehaviour {
         handleHealth();
         if (transform.position.y < seaLevel) {
             toDoWhenOnGround();
-            GetComponent<Rigidbody2D>().linearVelocity += new Vector2(0f , Mathf.Max(-transform.position.y + seaLevel, Physics.gravity.magnitude * 1.5f) * Time.deltaTime);
+            GetComponent<Rigidbody2D>().linearVelocity += new Vector2(0f , Mathf.Min((-transform.position.y + seaLevel + .5f) * Physics.gravity.magnitude, Physics.gravity.magnitude * 1.5f) * Time.deltaTime);
             transform.rotation = Quaternion.identity;
             if (GetComponent<Animator>().GetBool("Dead") && onGround) {
                 transform.localEulerAngles = new Vector3(0, 0, 90f);
