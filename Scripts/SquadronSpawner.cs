@@ -90,7 +90,7 @@ public class SquadronSpawner : MonoBehaviour {
     }
 
     public bool anyVehiclesLeft(string alliance) {
-        foreach (GameObject vehicle in GameObject.FindGameObjectsWithTag("Vehicle")) {
+        foreach (GameObject vehicle in allVehiclesOfTags("Plane", "GroundVehicle")) {
             if (vehicle.GetComponent<AllianceHolder>().getAlliance() == alliance) {
                 if (!vehicle.GetComponent<VehicleController>().allCrewGoneFromVehicle()) {
                     return true;
