@@ -2,8 +2,6 @@ using UnityEngine;
 using static Utils;
 
 public class GroundVehicleController : VehicleController {
-    [SerializeField] private PhysicsMaterial2D brakeMat;
-    [SerializeField] private PhysicsMaterial2D rollMat;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -18,14 +16,15 @@ public class GroundVehicleController : VehicleController {
 
     public override void handleFeasibleControls() {
         if (progenyWithScript("TrackScript", gameObject).Count == 0) return;
-        if (progenyWithScript("TrackScript", gameObject)[0].GetComponent<TrackScript>().usable()) {
-            move();
+        if (progenyWithScript("TrackScript", gameObject)[0].GetComponent<TrackScript>().usable() && !allCrewGoneFromVehicle()) {
+            handleFacing();
+            applyForces(moveDir());
         } else {
-            progenyWithScript("TrackScript", gameObject)[0].GetComponent<BoxCollider2D>().sharedMaterial = brakeMat;
+            progenyWithScript("TrackScript", gameObject)[0].GetComponent<TrackScript>().braking(true);
         }
     }
 
-    void move() {
+    protected virtual Vector3 moveDir() {
         Vector3 movementDir = new Vector3(0,0,0);
         if (Input.GetKey("a")) {
             movementDir += -transform.right * transform.localScale.y;
@@ -33,6 +32,10 @@ public class GroundVehicleController : VehicleController {
         if (Input.GetKey("d")) {
             movementDir += transform.right * transform.localScale.y;
         }
+        return movementDir;
+    }
+
+    protected virtual void handleFacing() {
         if (Input.GetKeyDown("q")) {
             if (transform.localScale.y == 1f) {
                 transform.localScale = new Vector3(1f, -1f, 1f);
@@ -45,14 +48,13 @@ public class GroundVehicleController : VehicleController {
                 transform.localEulerAngles += new Vector3(0f, 0f, 180f);
             }
         }
+    }
+
+    private void applyForces(Vector3 movementDir) {
         bool goingReverse = movementDir.x / transform.right.x < 0f;
-        if (movementDir.magnitude == 0f) {
-            progenyWithScript("TrackScript", gameObject)[0].GetComponent<BoxCollider2D>().sharedMaterial = brakeMat;
-        } else {
-            progenyWithScript("TrackScript", gameObject)[0].GetComponent<BoxCollider2D>().sharedMaterial = rollMat;
-        }
+        progenyWithScript("TrackScript", gameObject)[0].GetComponent<TrackScript>().braking(movementDir.magnitude == 0f);
         GetComponent<Rigidbody2D>().AddForce(movementDir * transform.Find("EngineHitbox").GetComponent<EngineScript>().getThrustNewtons(GetComponent<Rigidbody2D>().linearVelocity.magnitude, goingReverse));
     }
-    
+        
     public override bool whenToRemoveCamera() {return allCrewGoneFromVehicle();}
 }
