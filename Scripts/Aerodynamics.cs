@@ -22,17 +22,24 @@ public class Aerodynamics : MonoBehaviour {
     [Header("Torque")]
     [SerializeField] private AnimationCurve cT;
     [SerializeField] private AnimationCurve torqueStrength;
-    [SerializeField] private float baseTorque;
+    [SerializeField] private float irlTurnTime;
+    private float baseTorque;
+    private float instantaneousTurnRateFactor = 1.5f;
     [SerializeField] private float speedOfControlEffectiveness;
 
     [Header("Atmosphere")]
     private static float seaLevelAirDensity = 20f;
+    private static float normalSeaLevelAirDensity = 1.225f;
     private static float scaleHeight = 8500f;
 
     private PlaneController pc;
 
-    void Start() {
+    void Awake() {
+        baseTorque = 360f / irlTurnTime * Mathf.Pow(seaLevelAirDensity / normalSeaLevelAirDensity, 1f/3f) * instantaneousTurnRateFactor;
         startWingArea = wingArea;
+    }
+
+    void Start() {
         setPlaneController(); 
         es = progenyWithScript("EngineScript", gameObject)[0].GetComponent<EngineScript>();        
     }
@@ -93,7 +100,7 @@ public class Aerodynamics : MonoBehaviour {
             GetComponent<Rigidbody2D>().angularVelocity = dirToTurn * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().linearVelocity.magnitude) * baseTorque;
 
             float torque = .5f * cT.Evaluate(AoA()) * transform.localScale.y * Mathf.Pow(GetComponent<Rigidbody2D>().linearVelocity.magnitude, 2) * Mathf.Max(wingArea, startWingArea / 2f) * wingSpan * getAirDensity();
-            if (Mathf.Abs(AoA()) > 3f) {
+            if (Mathf.Abs(AoA()) > 3f || dirToTurn != 0) {
                 GetComponent<Rigidbody2D>().angularVelocity += torque / GetComponent<Rigidbody2D>().mass;
             }
         }

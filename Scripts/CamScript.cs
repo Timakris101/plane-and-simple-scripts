@@ -87,11 +87,10 @@ public class CamScript : MonoBehaviour {
     }
 
     private void handleGForceDisp() {
-        if (vehicleToControl == null) return;
-        if (vehicleToControl.GetComponent<GForcesScript>() == null) return;
         transform.Find("Canvas").Find("GForceDisp").GetComponent<UnityEngine.UI.Image>().color = new Color(0f, 0f, 0f, Mathf.Max(0f, transform.Find("Canvas").Find("GForceDisp").GetComponent<UnityEngine.UI.Image>().color.a - Time.deltaTime));
         transform.Find("Canvas").Find("GForceDisp").GetComponent<RectTransform>().sizeDelta = transform.Find("Canvas").GetComponent<RectTransform>().sizeDelta;
         if (vehicleToControl == null) return;
+        if (vehicleToControl.GetComponent<GForcesScript>() == null) return;
         transform.Find("Canvas").Find("GForceDisp").GetComponent<UnityEngine.UI.Image>().color = new Color(0f, 0f, 0f, vehicleToControl.GetComponent<GForcesScript>().howSleepyIsPerson() * Constants.GForceEffectConstants.GlocDarkness);
     }
 
