@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Utils;
 
 public class GunScript : MonoBehaviour {
 
@@ -11,7 +12,6 @@ public class GunScript : MonoBehaviour {
     [SerializeField] protected int ammunition;
     [SerializeField] private float bulletFuse;
     private bool shooting;
-    private Vector3 prevPos;
     private Vector3 baseVel;
 
     protected void Start() {
@@ -35,8 +35,7 @@ public class GunScript : MonoBehaviour {
     }
 
     private void FixedUpdate() {
-        baseVel = (transform.position - prevPos) / Time.fixedDeltaTime;
-        prevPos = transform.position;
+        baseVel = (Vector3) maxAncestor(gameObject).GetComponent<Rigidbody2D>().linearVelocity;
     }
 
     public void setFuseOfBullets(float sec) {
