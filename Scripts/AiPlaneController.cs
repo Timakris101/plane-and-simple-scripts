@@ -73,7 +73,7 @@ public class AiPlaneController : PlaneController {
     }
 
     private float pointTowards(Vector3 pos) {
-        return Mathf.Clamp(-angleTo(pos), -1, 1);
+        return Mathf.Clamp(-Mathf.Pow(angleTo(pos), 3), -1, 1);
     }
 
     private float angleTo(Vector3 pos) {
