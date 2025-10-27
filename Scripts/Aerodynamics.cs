@@ -102,7 +102,7 @@ public class Aerodynamics : MonoBehaviour {
             GetComponent<Rigidbody2D>().angularVelocity = dirToTurn * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().linearVelocity.magnitude) * baseTorque;
 
             float torque = .5f * cT.Evaluate(AoA()) * transform.localScale.y * Mathf.Pow(GetComponent<Rigidbody2D>().linearVelocity.magnitude, 2) * Mathf.Max(wingArea, startWingArea / 2f) * wingSpan * getAirDensity();
-            if (Mathf.Abs(AoA()) > 3f || dirToTurn != 0) {
+            if (Mathf.Abs(AoA()) > 3f) {
                 GetComponent<Rigidbody2D>().angularVelocity += torque / GetComponent<Rigidbody2D>().mass;
             }
         }
