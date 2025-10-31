@@ -25,6 +25,6 @@ public class FireScript : MonoBehaviour {
     }
 
     private bool waterLogged() {
-        return terrain.GetComponent<TerrainGen>().getWaterLvl() > transform.position.y - 1f;
+        return Constants.Water.seaLevel > transform.position.y - 1f;
     }
 }

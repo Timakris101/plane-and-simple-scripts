@@ -41,7 +41,7 @@ public class AiPlaneController : PlaneController {
 
         if (primaryBullet == null) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
         
-        if (transform.position.y < minAltitude) return pointTowards(transform.position + Vector3.up);
+        if (transform.position.y < minAltitude + Constants.Water.seaLevel) return pointTowards(transform.position + Vector3.up);
 
         if (targetedObj == null || targetedObj.GetComponent<Rigidbody2D>().linearVelocity.magnitude < 1f) return pointTowards(transform.position + Vector3.Project(transform.right, Vector3.right));
 

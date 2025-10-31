@@ -6,7 +6,6 @@ public class CrewScript : MonoBehaviour {
 
     [SerializeField] private float chuteSpeed;
     [SerializeField] private float chuteEff;
-    private float seaLevel = 60f;
     private bool onGround;
 
     void OnCollisionEnter2D(Collision2D col) {
@@ -41,9 +40,9 @@ public class CrewScript : MonoBehaviour {
 
     void Update() {
         handleHealth();
-        if (transform.position.y < seaLevel) {
+        if (transform.position.y < Constants.Water.seaLevel) {
             toDoWhenOnGround();
-            GetComponent<Rigidbody2D>().linearVelocity += new Vector2(0f , Mathf.Min((-transform.position.y + seaLevel + .5f) * Physics.gravity.magnitude, Physics.gravity.magnitude * 1.5f) * Time.deltaTime);
+            GetComponent<Rigidbody2D>().linearVelocity += new Vector2(0f , Mathf.Min((-transform.position.y + Constants.Water.seaLevel + .5f) * Physics.gravity.magnitude, Physics.gravity.magnitude * 1.5f) * Time.deltaTime);
             transform.rotation = Quaternion.identity;
             if (GetComponent<Animator>().GetBool("Dead") && onGround) {
                 transform.localEulerAngles = new Vector3(0, 0, 90f);

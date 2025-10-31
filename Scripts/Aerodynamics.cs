@@ -17,7 +17,9 @@ public class Aerodynamics : MonoBehaviour {
 
     [Header("Drag")]
     [SerializeField] private AnimationCurve cD;
-    [SerializeField] private float frontArea;
+    [SerializeField] private float baseFrontArea;
+    [SerializeField] private float elevatorArea;
+    [SerializeField] private float trueFrontArea;
 
     [Header("Torque")]
     [SerializeField] private AnimationCurve cT;
@@ -26,7 +28,6 @@ public class Aerodynamics : MonoBehaviour {
     private float baseTorque;
     private float instantaneousTurnRateFactor = 1.5f;
     [SerializeField] private float speedOfControlEffectiveness;
-    private float elevatorArea = .15f;
 
     [Header("Atmosphere")]
     private static float seaLevelAirDensity = 20f;
@@ -60,6 +61,7 @@ public class Aerodynamics : MonoBehaviour {
     }
 
     void FixedUpdate() {
+        updateTrueFrontArea();
         setPlaneController();
         handleThrust();
         handleDrag();
@@ -67,6 +69,10 @@ public class Aerodynamics : MonoBehaviour {
         handleTorque();
 
         GetComponent<Rigidbody2D>().centerOfMass = transform.Find("CoM").localPosition;
+    }
+
+    private void updateTrueFrontArea() {
+        trueFrontArea = baseFrontArea + elevatorArea * Mathf.Abs(pc.getDir()) * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().linearVelocity.magnitude);
     }
 
     private float getAirDensity() {
@@ -83,12 +89,11 @@ public class Aerodynamics : MonoBehaviour {
 
     private void handleDrag() {
         FlapScript fs = null;
-        float frontAreaPlusElev = frontArea + elevatorArea * Mathf.Abs(pc.getDir());
         if (transform.Find("Flaps") != null) fs = transform.Find("Flaps").GetComponent<FlapScript>();
         float inducedDragCoef = Mathf.Pow(cL.Evaluate(AoA()), 2) / (Mathf.PI * wingAspectRatio() * wingEfficiency);
         float totalDragCoef = inducedDragCoef + cD.Evaluate(AoA()) + (fs == null ? 0 : (fs.getFlapDrag() * fs.deflection() / fs.getMaxDeflection())) + (transform.Find("Gear") == null ? 0 : transform.Find("Gear").GetComponent<GearScript>().getGearDrag());
 
-        float dragForce = .5f * totalDragCoef * getAirDensity() * Mathf.Pow(GetComponent<Rigidbody2D>().linearVelocity.magnitude, 2) * frontAreaPlusElev;
+        float dragForce = .5f * totalDragCoef * getAirDensity() * Mathf.Pow(GetComponent<Rigidbody2D>().linearVelocity.magnitude, 2) * trueFrontArea;
 
         GetComponent<Rigidbody2D>().AddForce(-GetComponent<Rigidbody2D>().linearVelocity.normalized * dragForce);
     }
@@ -155,10 +160,10 @@ public class Aerodynamics : MonoBehaviour {
     }
 
     public float getFrontArea() {
-        return frontArea;
+        return baseFrontArea;
     }
 
     public void setFrontArea(float val) {
-        frontArea = val;
+        baseFrontArea = val;
     }
 }
