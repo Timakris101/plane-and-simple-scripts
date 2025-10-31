@@ -30,14 +30,14 @@ public class Aerodynamics : MonoBehaviour {
     [SerializeField] private float speedOfControlEffectiveness;
 
     [Header("Atmosphere")]
-    private static float seaLevelAirDensity = 10f;
+    private static float seaLevelAirDensity = 9f;
     private static float normalSeaLevelAirDensity = 1.225f;
     private static float scaleHeight = 8500f;
 
     private PlaneController pc;
 
     void Awake() {
-        baseTorque = 360f / irlTurnTime * Mathf.Pow(seaLevelAirDensity / normalSeaLevelAirDensity, 1f/3f) * instantaneousTurnRateFactor;
+        baseTorque = 360f / irlTurnTime * Mathf.Pow(seaLevelAirDensity / normalSeaLevelAirDensity, 1f/2f) * instantaneousTurnRateFactor;
         startWingArea = wingArea;
     }
 
