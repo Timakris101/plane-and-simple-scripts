@@ -30,7 +30,7 @@ public class Aerodynamics : MonoBehaviour {
     [SerializeField] private float speedOfControlEffectiveness;
 
     [Header("Atmosphere")]
-    private static float seaLevelAirDensity = 20f;
+    private static float seaLevelAirDensity = 10f;
     private static float normalSeaLevelAirDensity = 1.225f;
     private static float scaleHeight = 8500f;
 
