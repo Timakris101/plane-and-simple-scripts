@@ -64,6 +64,7 @@ public class DamageModel : MonoBehaviour {
     void Update() {
         if (health > maxHealth) health = maxHealth;
         if (health <= 0) {
+            if (transform.parent.GetComponent<ObjectOnVehicleScript>() != null) transform.parent.GetComponent<ObjectOnVehicleScript>().kill();
             if (destructiveEffect != null && !effectApplied) {
                 effectApplied = true;
                 Instantiate(destructiveEffect, transform.position, Quaternion.identity, transform);

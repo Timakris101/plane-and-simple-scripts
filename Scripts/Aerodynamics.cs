@@ -72,7 +72,12 @@ public class Aerodynamics : MonoBehaviour {
     }
 
     private void updateTrueFrontArea() {
-        trueFrontArea = baseFrontArea + elevatorArea * Mathf.Abs(pc.getDir()) * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().linearVelocity.magnitude);
+        FlapScript fs = null;
+        if (transform.Find("Flaps") != null) fs = transform.Find("Flaps").GetComponent<FlapScript>();
+        trueFrontArea = baseFrontArea + 
+                        elevatorArea * Mathf.Abs(pc.getDir()) * torqueStrength.Evaluate(GetComponent<Rigidbody2D>().linearVelocity.magnitude) + 
+                        (fs == null ? 0 : (fs.getFlapDrag() * fs.deflection() / fs.getMaxDeflection())) + 
+                        (transform.Find("Gear") == null ? 0 : transform.Find("Gear").GetComponent<GearScript>().getGearDrag());
     }
 
     private float getAirDensity() {
@@ -88,10 +93,8 @@ public class Aerodynamics : MonoBehaviour {
     }
 
     private void handleDrag() {
-        FlapScript fs = null;
-        if (transform.Find("Flaps") != null) fs = transform.Find("Flaps").GetComponent<FlapScript>();
         float inducedDragCoef = Mathf.Pow(cL.Evaluate(AoA()), 2) / (Mathf.PI * wingAspectRatio() * wingEfficiency);
-        float totalDragCoef = inducedDragCoef + cD.Evaluate(AoA()) + (fs == null ? 0 : (fs.getFlapDrag() * fs.deflection() / fs.getMaxDeflection())) + (transform.Find("Gear") == null ? 0 : transform.Find("Gear").GetComponent<GearScript>().getGearDrag());
+        float totalDragCoef = inducedDragCoef + cD.Evaluate(AoA());
 
         float dragForce = .5f * totalDragCoef * getAirDensity() * Mathf.Pow(GetComponent<Rigidbody2D>().linearVelocity.magnitude, 2) * trueFrontArea;
 

@@ -121,20 +121,20 @@ public class DamageModelDisplay : MonoBehaviour {
             newImg.transform.localPosition = (cObj.transform.localPosition + additionalOffset) * sizeMultiplier;
 
             newImg.transform.localEulerAngles = cObj.transform.localEulerAngles;
-
-            if (cObj.GetComponent<SpriteRenderer>() != null && cObj.GetComponent<SpriteRenderer>().sprite != null) {
-                newImg.transform.localScale = (cObj.transform.localScale * vehicle.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit / cObj.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit);
-                newImg.GetComponent<UnityEngine.UI.Image>().color = cObj.GetComponent<SpriteRenderer>().color;
-            } else {
-                newImg.transform.localScale = cObj.transform.localScale;
-            }
-
+            
             bool containsBannedScript = false;
             foreach (string script in bannedScripts) {
                 if (cObj.GetComponent(script) != null) {
                     containsBannedScript = true;
                     break;
                 }
+            }
+
+            if (cObj.GetComponent<SpriteRenderer>() != null && cObj.GetComponent<SpriteRenderer>().sprite != null && !containsBannedScript) {
+                newImg.transform.localScale = (cObj.transform.localScale * vehicle.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit / cObj.GetComponent<SpriteRenderer>().sprite.pixelsPerUnit);
+                newImg.GetComponent<UnityEngine.UI.Image>().color = cObj.GetComponent<SpriteRenderer>().color;
+            } else {
+                newImg.transform.localScale = cObj.transform.localScale;
             }
 
             if (cObj.GetComponent<SpriteRenderer>() != null && cObj.GetComponent<SpriteRenderer>().sprite != null && !containsBannedScript) {
